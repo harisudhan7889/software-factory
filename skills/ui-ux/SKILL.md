@@ -1,6 +1,6 @@
 ---
 name: ui-ux
-description: Analyze user experience for web UI features and produce a structured UX specification before visual design or implementation.
+description: Guides agents through analyzing web UI user experience and producing a structured UX specification (goals, journeys, screens, interactions, states) before visual design or implementation. Use when a product requirement, RFC, or feature needs UX analysis, new/modified user journeys/screens, or UX edge-case definition. Do not use for visual styling, component tokens, or application code (use ui-design).
 ---
 
 # UI/UX Skill
@@ -23,6 +23,17 @@ Given a product requirement, RFC, or feature description:
 5. Identify important edge cases.
 6. Consider accessibility and responsive behavior.
 7. Produce a structured UX specification that can be consumed by UI design and implementation workflows.
+
+## When to Use
+
+Use when:
+- A product requirement, accepted RFC, or feature description requires understanding user goals/journeys before UI work.
+- New screens, journey modifications, or interaction/state design is needed.
+- Existing UX must be validated or extended for an incremental change/Jira ticket.
+
+Do not use when:
+- Defining visual hierarchy, tokens, or design-system usage (use `ui-ux`→`ui-design` handoff; `ui-design` owns visual).
+- Implementing application code, APIs, or back-end architecture.
 
 ## Scope
 
@@ -98,6 +109,25 @@ Prefer extending existing patterns over introducing new interaction models.
 
 Do not redesign unrelated parts of the application.
 
+## Workflow
+
+1. Gather strongest inputs (RFC, ADRs, existing UX/UI artifacts, product requirements, current app behavior) — see ## Inputs.
+2. Inspect existing approved UX/design for reuse — see ## Existing approved UX/design.
+3. Clarify user goals — see ## User goal.
+4. Define journeys, flows, information architecture, and screens/navigation.
+5. Define interactions, validation, and all applicable UI states (including edge cases, empty/loading/error/success/permission).
+6. Consider responsive and accessibility implications for the journey.
+7. Classify scope (new journey / modification / new screen / modification / small UI change) — see ## Determine UX scope.
+8. Produce `docs/ux/<feature-or-rfc>/overview.md` artifact and request human approval.
+
+```
+         ┌─ Existing approved UX satisfies requirement? ─ yes ─► Reuse / Extend
+         │                                                        │
+         └─ no ─► Create new UX                                  │
+         ┌─ Requirement conflicts with existing UX? ─ yes ─► Identify conflict, request decision
+         └─ no ─► Continue
+```
+
 ## Determine UX scope
 
 Not every UI change requires a complete UX exercise.
@@ -156,4 +186,37 @@ Advertisement review screen
 Expected outcome:
 The user can understand the findings and decide what to correct.
 ```
+
+## Verification
+
+After completing UX analysis, confirm with evidence:
+- [ ] UX artifact at `docs/ux/<feature>/overview.md` exists and lists user goals, journeys/flows, screens/navigation, interactions, and applicable states (validation, error, empty, loading, success, permission)
+- [ ] Existing approved UX/design was inspected; reuse/extension or conflict was recorded
+- [ ] Responsive and accessibility considerations documented
+- [ ] Edge cases identified
+- [ ] Human approval obtained (Proposed vs Approved) — never hand unapproved UX to ui-design
+
+## Handoff to ui-design
+
+Approved UX spec becomes input to `ui-design` skill. Preserve user goals, journeys, and behavioral states; do not redefine visual styling in UX.
+
+## Common Rationalizations
+| Rationalization | Reality |
+|---|---|
+| No RFC exists, so invent requirements in UX | Use strongest available product context; stop and request clarification if requirement is missing |
+| Existing UX is old, so discard it silently | Reuse/extend where it satisfies current requirement; identify conflict explicitly before redesigning |
+| Small UI change needs no UX check | Perform minimum UX analysis to confirm existing experience remains valid — see Determine UX scope #5 |
+
+## Red Flags
+- New UX discards existing approved journey without requirement-driven reason
+- UX spec defines colors/typography instead of behavior
+- States beyond happy-path (error, empty, permission) not documented
+- Responsive text/content behavior not considered
+- Unapproved UX handed to ui-design as final
+
+## Self-Improvement
+
+Follow the common self-improvement standard in:
+
+`../self-improvement/references/standard.md`
 

@@ -1,10 +1,11 @@
 #!/bin/bash
 
 set -euo pipefail
+trap 'rm -f "${TMP:-}"' EXIT 2>/dev/null || true
 
 # Check arguments
 if [ "$#" -ne 2 ]; then
-    echo "Usage: jira-transition.sh <JIRA-KEY> <STATUS>"
+    echo "Usage: jira-transition.sh <JIRA-KEY> <STATUS>" >&2
     echo "Example: jira-transition.sh ADVERIFY-70 \"In Progress\""
     exit 1
 fi
@@ -32,8 +33,8 @@ TRANSITION_ID=$(echo "$RESPONSE" | jq -r \
     | head -n 1)
 
 if [ -z "$TRANSITION_ID" ] || [ "$TRANSITION_ID" = "null" ]; then
-    echo "Error: No available transition to '$TARGET_STATUS' for $ISSUE_KEY"
-    echo "Available transitions:"
+    echo "Error: No available transition to '$TARGET_STATUS' for $ISSUE_KEY" >&2
+    echo "Available transitions:" >&2
     echo "$RESPONSE" | jq -r '.transitions[] | "\(.id): \(.name) → \(.to.name)"'
     exit 1
 fi
@@ -60,7 +61,7 @@ ISSUE=$(curl -sS \
 CURRENT_STATUS=$(echo "$ISSUE" | jq -r '.fields.status.name // empty')
 
 if [ "$CURRENT_STATUS" != "$TARGET_STATUS" ]; then
-    echo "Error: Transition request completed, but status is '$CURRENT_STATUS'"
+    echo "Error: Transition request completed, but status is '$CURRENT_STATUS'" >&2
     exit 1
 fi
 

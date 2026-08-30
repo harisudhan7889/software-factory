@@ -1,6 +1,6 @@
 ---
 name: factory
-description: Manage and evolve the software factory itself. Use for factory-level architecture, provisioning, workflow design, capability planning, and self-improvement.
+description: Guides agents through managing and evolving the software factory itself. Use for factory-level architecture, provisioning, workflow design, capability planning, and self-improvement when working on factory capabilities, repository provisioning, or GitHub PR workflows.
 ---
 
 # Software Factory
@@ -34,6 +34,17 @@ Factory-level concerns include:
 Project-specific requirements belong to the project's own RFCs, ADRs,
 Jira tickets, and source code.
 
+## When to Use
+
+Use when:
+- Inspecting, provisioning, or changing the factory itself (architecture, capabilities, global skills/workflows)
+- Running `/factory provision`, `/factory pr open`, `pr resolve-conflicts`, or `pr fix-build`
+- Planning capability improvements or self-improvement evaluations
+
+Do not use when:
+- Implementing product requirements, RFCs, ADRs, or Jira tickets (use project skills)
+- Writing product code or product-specific infrastructure
+
 ## Principles
 
 1. Prefer deterministic workflows over unnecessary agent autonomy.
@@ -59,6 +70,15 @@ Discovery
 → Delivery
 → Operation
 → Self-improvement
+
+> Lifecycle stage names map to references/architecture.md: Design covers RFC/ADR, Planning covers Jira; see that file for canonical 8-stage definition.
+
+## Workflow
+
+1. Identify factory operation from ## Available operations.
+2. Read the corresponding reference: `references/github-provisioning.md`, `references/github-pr.md`, `references/conflict-resolution.md`, or `references/pipeline-debug.md` — see ## References.
+3. Follow the reference's numbered phases and approval boundaries.
+4. Verify completion per reference verification steps and propose self-improvement only with evidence.
 
 ## Factory capability development
 
@@ -97,6 +117,26 @@ Follow the common self-improvement standard in:
 Factory self-improvements require explicit human approval before modifying
 factory instructions or workflows.
 
+## Verification
+
+After a factory operation, confirm with evidence:
+- [ ] Correct reference workflow was followed (provisioning or PR phases)
+- [ ] Human approvals obtained where defined in references
+- [ ] Factory artifacts remain separate from project artifacts
+- [ ] No product-specific requirement was encoded into global instructions
+
+## Common Rationalizations
+| Rationalization | Reality |
+|---|---|
+| It’s just a small factory tweak, skip RFC | Significant capabilities require RFC/ADR per Factory capability development :63 |
+| Provisioning can silently fix repo settings | Follow references/github-provisioning.md approval boundaries and verification steps |
+
+## Red Flags
+- Project-specific requirement encoded into global instruction
+- New agent/skill/script added merely for convenience without reusable value
+- Factory lifecycle changed without referencing references/architecture.md
+- Self-improvement proposed without evidence
+
 ## References
 
 Read `references/architecture.md` when:
@@ -118,9 +158,9 @@ Read `references/github-provisioning.md` when the user invokes
 The GitHub provisioning reference defines the detailed workflow,
 approval boundaries, safety rules, and verification steps.
 
-Read `references/github-pr.md` → when the user invokes `/factory pr open`.
-Read `/factory pr resolve-conflicts` → read `references/conflict-resolution.md`
-Read `/factory pr fix-build` → read `references/pipeline-debug.md`
+Read `references/github-pr.md` when the user invokes `/factory pr open`.
+Read `references/conflict-resolution.md` when the user invokes `/factory pr resolve-conflicts`.
+Read `references/pipeline-debug.md` when the user invokes `/factory pr fix-build`.
 
 The GitHub PR reference defines the branch, push, Pull Request, CI,
 Jira synchronization, approval, idempotency, and self-improvement rules.

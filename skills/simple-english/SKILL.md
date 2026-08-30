@@ -1,7 +1,6 @@
 ---
 name: simple-english
-version: 1.0.0
-description: Write clear factory text using ASD-STE100 Simplified Technical English principles, with Pragmatic mode as the default and Strict mode when the user asks for ASD-STE100 or STE compliance.
+description: Guides agents through writing clear factory text using ASD-STE100 Simplified Technical English principles. Use when writing or rewriting factory text for users; Pragmatic mode by default and Strict mode when the user asks for ASD-STE100 or STE compliance. Do not use for changing technical content or identifiers.
 ---
 
 # Simple English
@@ -31,6 +30,16 @@ This skill improves:
 - Other user-facing technical text
 
 Do not change technical content only to make it sound simple.
+
+## When to Use
+
+Use when:
+- Writing or rewriting factory text (responses, reports, plans, docs, Jira/PR descriptions, guides)
+- Checking text for Simple English / STE compliance (Review mode)
+
+Do not use when:
+- Changing code, identifiers, or technical accuracy (see ## Untouchables)
+- Claiming full ASD-STE100 compliance without official dictionary
 
 ## Modes
 
@@ -118,6 +127,25 @@ Use:
 
 Do not mix procedural and descriptive styles without a clear section
 boundary.
+
+## Workflow
+
+1. Identify mode (Pragmatic default; Strict if user asked for STE per :72).
+2. Classify text as Procedural or Descriptive per :87 — see ## Classify the text.
+3. Apply Core writing rules per :122 (sentences, voice, verbs, terminology, conditions).
+4. Rewrite per :422 (preserve meaning/identifiers, remove filler, split sentences).
+5. Self-check per :459 and deliver.
+
+```
+        ┌─ Text tells reader what to do? ─ yes ─► Procedural (20 words, imperative)
+        └─ no ─► Descriptive (25 words, 6 sentences per paragraph)
+```
+
+## Red Flags
+- Vague/promotional language from ## Words to avoid:236 present
+- Long noun chain >3 nouns per :197
+- Inconsistent term (settings/config) per :180
+- Passive voice where actor is known per :149
 
 ## Core writing rules
 
@@ -233,78 +261,11 @@ CAUTION: Do not force-push the branch. It can remove remote commits.
 
 ## Words to avoid
 
-Do not use vague, promotional, or decorative language when it adds no useful
-information.
-
-Avoid terms such as:
-
-- leverage
-- utilize
-- seamless
-- robust
-- powerful
-- comprehensive
-- cutting-edge
-- state-of-the-art
-- streamline
-- facilitate
-- delve
-- dive into
-- in order to
-- prior to
-- due to the fact that
-- it is worth noting that
-- crucially
-- simply
-- just
-- easily
-- effortlessly
-- and/or
-
-Prefer clear alternatives.
-
-Examples:
-
-```text
-leverage → use
-utilize → use
-in order to → to
-prior to → before
-due to the fact that → because
-facilitate → help
-```
-
-When a phrase adds no information, delete it.
+Avoid vague/promotional terms (leverage/utilize/seamless...) and filler phrases (in order to, due to the fact that). Prefer `use` for `leverage`. See `references/word-lists.md` for full list.
 
 ## Technical vocabulary
 
-Keep required technical vocabulary.
-
-Do not rewrite:
-
-- Code terms
-- API names
-- CLI commands
-- File paths
-- URLs
-- Jira keys
-- Git branches
-- Commit hashes
-- Environment variable names
-- Error codes
-- Database table names
-- Function names
-- Type names
-- Product names
-- Tool names
-
-Example:
-
-```text
-Run `npm run typecheck`.
-```
-
-Do not change the command to a plain-English substitute.
+Keep required technical terms (Jira, Supabase, RLS, API, RFC...). See `references/word-lists.md` for allowlist.
 
 ## Untouchables
 
@@ -456,7 +417,9 @@ Do not invent ASD-STE100 rule numbers.
 
 When strict rule numbering is required, use a verified rule source.
 
-## Self-check
+## Verification
+
+Before delivering user-facing text, confirm (Self-check):
 
 Before delivering user-facing text, check:
 
@@ -471,6 +434,13 @@ Before delivering user-facing text, check:
 - Did I preserve quoted or verbatim text?
 - Did I avoid unsupported claims?
 - Did I preserve the original meaning?
+
+## Common Rationalizations
+| Rationalization | Reality |
+|---|---|
+| Skip consistent terminology, synonym is shorter | Use one term per concept per :180; inconsistency confuses readers |
+| Use promotional language to sound impressive | Avoid vague terms per ## Words to avoid; use direct language |
+| Passive voice is more formal, so use it always | Prefer active voice per :135; use passive only when actor unknown |
 
 ## Integration with factory skills
 

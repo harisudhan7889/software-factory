@@ -1,6 +1,6 @@
 ---
 name: implementation
-description: Plan and implement accepted Jira stories using the RFC, ADRs, and existing codebase.
+description: Guides agents through planning and implementing accepted Jira stories using the RFC, ADRs, and existing codebase. Use when an accepted Jira Story is ready for implementation planning or implementation. Do not use for RFC/ADR creation or product discovery.
 ---
 
 # Implementation Skill
@@ -12,6 +12,16 @@ project RFCs, ADRs, and existing codebase.
 
 - `/implementation plan <JIRA-KEY>` — create an implementation plan
 - `/implementation work <JIRA-KEY>` — plan, implement, test, review, and commit a Jira Story
+
+## When to Use
+
+Use when:
+- An accepted Jira Story (with RFC/ADRs) is ready for implementation planning (`/implementation plan`)
+- An accepted Jira Story is ready for implementation (`/implementation work`)
+
+Do not use when:
+- Creating RFCs/ADRs (use `rfc` / `adr` skills)
+- Product discovery or UX/UI design without a Jira Story
 
 ## General rules
 
@@ -67,6 +77,24 @@ The `/implementation work` operation must:
 10. Review the implementation against the Story, RFC, and ADRs.
 11. Commit the completed implementation locally.
 12. Do not push to a remote unless explicitly requested.
+
+## Verification
+
+Before commit, confirm per references/workflow.md Phase 11:
+- [ ] Acceptance criteria satisfied, relevant tests/typecheck/lint pass, no unrelated changes, no secrets committed, ADR/RFC alignment verified (and for UI Stories, UX/UI design compliance per Phase 9)
+
+## Common Rationalizations
+| Rationalization | Reality |
+|---|---|
+| Skip inspecting existing codebase, just implement | Inspect repository first per General rules:21 and references/workflow.md Phase 3 |
+| Modify code before plan approval to save time | Do not modify codebase during planning / Wait for explicit approval per :27,67 |
+| Create ADR for every Story change | Do not create ADR for routine details; only when genuinely new architecture decision per :28 |
+
+## Red Flags
+- Implementation modifies code before `references/planning.md` approval
+- New ADR created for routine implementation detail
+- Unrelated Jira Story implemented or Jira scope silently expanded
+- Force-push, history rewrite, or push without explicit request
 
 ## Self-Improvement
 

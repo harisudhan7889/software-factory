@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
+trap 'rm -f "${TMP:-}"' EXIT 2>/dev/null || true
 
 # Load project configuration
 PROJECT_DIR="$(pwd)"
@@ -10,7 +11,7 @@ if [ -f "$PROJECT_DIR/.env" ]; then
     source "$PROJECT_DIR/.env"
     set +a
 else
-    echo "Error: .env not found in $PROJECT_DIR"
+    echo "Error: .env not found in $PROJECT_DIR" >&2
     exit 1
 fi
 
@@ -24,7 +25,7 @@ fi
 INPUT=$(cat)
 
 if [ -z "$INPUT" ]; then
-    echo "Error: No ticket JSON provided"
+    echo "Error: No ticket JSON provided" >&2
     exit 1
 fi
 
@@ -38,12 +39,12 @@ PARENT=$(echo "$INPUT" | jq -r '.parent // empty')
 
 # Validate required fields
 if [ -z "$SUMMARY" ]; then
-    echo "Error: summary is required"
+    echo "Error: summary is required" >&2
     exit 1
 fi
 
 if [ -z "$DESCRIPTION" ]; then
-    echo "Error: description is required"
+    echo "Error: description is required" >&2
     exit 1
 fi
 

@@ -1,6 +1,6 @@
 ---
 name: product-director
-description: Transform evidence-backed market and product analysis into a clear Product Requirements Document (PRD) without inventing facts or technical architecture.
+description: Guides agents through transforming evidence-backed market and product analysis into a clear Product Requirements Document (PRD) without inventing facts or technical architecture. Use when Market Director output or validated product evidence needs to become a PRD with goals, requirements, scope, and success criteria. Do not use for technical architecture or implementation design (use rfc).
 ---
 
 # Product Director
@@ -32,6 +32,17 @@ Given Market Director output and approved product context:
 9. Identify assumptions, risks, dependencies, and open questions.
 10. Produce a structured PRD.
 11. Preserve uncertainty instead of turning assumptions into facts.
+
+## When to Use
+
+Use when:
+- Market Director output or validated market research needs to become a decision-ready PRD
+- Product goals/requirements need definition from evidence before RFC/UX work
+- Scope, success criteria, or open questions need structuring for a product version
+
+Do not use when:
+- Designing system/technical architecture (use `rfc` skill)
+- Defining visual design or user journeys (use `ui-ux` skill)
 
 ## Inputs
 
@@ -94,6 +105,27 @@ Do not invent:
 - Competitive claims
 - Legal conclusions
 - Technical capabilities
+
+## Workflow
+
+1. Gather inputs (Market Director output, market evidence, product goals, existing context) — see ## Inputs.
+2. Carry forward evidence classifications per :48 (FACT/INFERENCE/HYPOTHESIS/UNKNOWN).
+3. Define problem, users, goals per :98-153; preserve uncertainty.
+4. Define requirements, constraints, scope, success criteria per :155-239.
+5. Identify risks/assumptions/dependencies/open questions per :241-281.
+6. Produce PRD per ## Output (or references/prd-template.md) and verify per ## Review.
+7. Request human approval; keep Status: Proposed until explicit approve per :417.
+8. Handoff approved PRD to RFC/UX per :430.
+
+```
+        ┌─ Evidence supports claim? ─ yes ─► FACT
+        └─ no ─► INFERENCE / HYPOTHESIS / UNKNOWN — do not convert to FACT per :55
+```
+
+## Red Flags
+- PRD contains frontend/backend/database/LLM selection per :288 (belongs in RFC)
+- HYPOTHESIS/INFERENCE presented as FACT or market size invented per :86
+- Requirements describe React/Supabase instead of observable behavior per :173
 
 ## Product problem
 
@@ -302,96 +334,11 @@ Architecture decisions belong in the RFC and ADR workflow.
 
 ## Output
 
-Produce:
+Produce PRD per `references/prd-template.md` (load on demand). Adapt structure when product is small. Key sections: Product, Status (Proposed), Source, Product Problem, Target Users, Product Goal/Outcomes, Requirements PR-001..., In/Out Scope, Success Criteria, Risks/Assumptions/Dependencies, Open Questions, Evidence Classification (FACT/INFERENCE/HYPOTHESIS/UNKNOWN).
 
-```text
-# Product Requirements Document
+## Verification
 
-## Product
-
-<name>
-
-## Status
-
-Proposed
-
-## Source
-
-<Market Director / research references>
-
-## Product Problem
-
-<problem>
-
-## Target Users
-
-### <user>
-Context:
-Need:
-Desired outcome:
-
-## Product Goal
-
-<goal>
-
-## Product Outcomes
-
-- ...
-
-## Product Requirements
-
-### PR-001
-<requirement>
-
-### PR-002
-<requirement>
-
-## In Scope
-
-- ...
-
-## Out of Scope
-
-- ...
-
-## Success Criteria
-
-- ...
-
-## Risks
-
-- ...
-
-## Assumptions
-
-- ...
-
-## Dependencies
-
-- ...
-
-## Open Questions
-
-- ...
-
-## Evidence Classification
-
-### FACT
-- ...
-
-### INFERENCE
-- ...
-
-### HYPOTHESIS
-- ...
-
-### UNKNOWN
-- ...
-```
-
-Adapt the structure when the product is small.
-
-## Review
+Before presenting PRD, verify (Review):
 
 Before presenting the PRD, verify:
 
@@ -406,6 +353,13 @@ Before presenting the PRD, verify:
 - Success criteria are meaningful.
 - Open decisions are visible.
 - No unsupported requirements were invented.
+
+## Common Rationalizations
+| Rationalization | Reality |
+|---|---|
+| Market size unknown, invent number for business case | Preserve as UNKNOWN/inference per :149; do not invent per :86 |
+| Technical solution is the product goal | Define observable behavior per :157; architecture belongs in RFC per :288 |
+| PRD is ready, skip human approval | Keep Status: Proposed until explicit approve per :417 |
 
 ## Human approval
 
@@ -458,7 +412,9 @@ UX determines how the user accomplishes the approved product goals.
 
 ## Self-Improvement
 
-Follow the common self-improvement standard used by the software factory.
+Follow the common self-improvement standard in:
+
+`../self-improvement/references/standard.md`
 
 Only propose a factory change when real evidence shows that future PRD
 generation should behave differently.

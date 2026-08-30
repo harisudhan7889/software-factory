@@ -1,6 +1,6 @@
 ---
 name: adr
-description: Create and manage Architecture Decision Records for the project.
+description: Guides agents through creating and managing Architecture Decision Records (ADRs) for the project. Use when recording a significant architectural decision, creating a new ADR, or reviewing an existing ADR against the ADR standard. Do not use for implementation plans or Jira tickets.
 ---
 
 # ADR Skill
@@ -14,6 +14,18 @@ them, alternatives considered, and the consequences of the decision.
 
 - `/adr create` — create a new ADR
 - `/adr review` — review an existing ADR
+
+## When to Use
+
+Use when:
+- Recording a significant architectural decision as an ADR
+- Creating a new ADR (`/adr create`)
+- Reviewing an existing ADR for completeness and consistency (`/adr review`)
+
+Do not use when:
+- Drafting implementation plans (use Jira/implementation skills)
+- Writing product RFCs (use `rfc` skill)
+- Capturing trivial implementation details
 
 ## General rules
 
@@ -76,6 +88,28 @@ An ADR records a decision. It is not an implementation plan and is not
 a Jira ticket.
 
 A single ADR may apply to many Jira Stories.
+
+## Verification
+
+After ADR create/review, confirm with evidence:
+- [ ] `references/standard.md` was read and ADR at `docs/adr/NNNN-short-title.md` follows naming `NNN` sequential, zero-padded, never reused
+- [ ] ADR contains Status/Date/Authors and Context/Decision/Alternatives/Consequences/Risks
+- [ ] New ADR starts as `Proposed` and was not marked `Accepted` without explicit user approval
+- [ ] Existing ADRs were inspected for duplicates/contradictions before creating
+
+## Common Rationalizations
+| Rationalization | Reality |
+|---|---|
+| Skip reading standard.md, the format is obvious | Check references/standard.md first; naming, statuses, and metadata are strict per ADR |
+| Reuse an ADR number, the old one was rejected | Never reuse numbers, including for rejected ADRs per references/standard.md:42 |
+| Mark ADR as Accepted immediately, decision is clear | New ADRs must start as Proposed; Accepted requires explicit user approval per adr:27 |
+
+## Red Flags
+- ADR created for trivial implementation detail instead of significant decision
+- ADR number reused or out of sequence
+- ADR marked Accepted without explicit approval
+- Existing ADR silently modified to change its decision
+- Missing alternatives or consequences
 
 ## Self-Improvement
 

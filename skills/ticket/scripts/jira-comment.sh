@@ -1,10 +1,11 @@
 #!/bin/bash
 
 set -euo pipefail
+trap 'rm -f "${TMP:-}"' EXIT 2>/dev/null || true
 
 # Check arguments
 if [ "$#" -ne 2 ]; then
-    echo "Usage: jira-comment.sh <JIRA-KEY> <COMMENT>"
+    echo "Usage: jira-comment.sh <JIRA-KEY> <COMMENT>" >&2
     echo 'Example: jira-comment.sh ADVERIFY-70 "Implementation completed."'
     exit 1
 fi

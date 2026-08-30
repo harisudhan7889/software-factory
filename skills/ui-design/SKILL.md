@@ -1,6 +1,6 @@
 ---
 name: ui-design
-description: Transform an approved UX specification into a structured visual design specification for web applications.
+description: Guides agents through translating an approved UX specification into a structured visual UI design specification (layouts, components, states, responsive behavior, accessibility). Use when an approved UX/RFC exists and visual design, screen layouts, component variants/design-system tokens, or design-tool handoff is required. Do not use for UX journey definition (use ui-ux) or for application code/back-end implementation.
 ---
 
 # UI Design Skill
@@ -27,6 +27,19 @@ Given an approved UX specification:
 9. Produce a structured UI design specification.
 10. Prepare the design specification for implementation and external design
    tools when available.
+
+## When to Use
+
+Use when:
+- An approved UX specification, accepted RFC, or approved design-system change requires visual design.
+- New screens, major screen changes, or new reusable components/variants are needed.
+- Responsive or accessibility visual behavior must be defined before implementation.
+- A design-tool artifact or handoff spec is requested.
+
+Do not use when:
+- Defining user goals, journeys, or interaction behavior (use `ui-ux` skill).
+- Implementing application code, APIs, or back-end architecture.
+- No approved UX/RFC exists and UX decisions remain open — resolve UX first.
 
 ## Scope
 
@@ -183,6 +196,25 @@ If visual design appears to require a UX change:
 2. Explain why the visual design cannot satisfy the current UX.
 3. Stop and request the required UX decision.
 
+## Workflow
+
+1. Gather strongest inputs (approved UX, RFC, ADRs, existing designs, design-system docs) — see ## Inputs.
+2. Inspect existing designs and reusable components — see ## Existing design.
+3. Establish design-system tokens to reuse — see ## Design system; if none, define minimum tokens.
+4. Verify UX preservation; if visual design requires UX change → stop and request UX decision (see diagram below).
+5. Classify scope (new screen / major change / new component / variation / small adjustment) — see ## Determine design scope.
+6. Design screens and components (layout, hierarchy, states, responsive, accessibility) — see ## Screen design, ## Components, ## Visual foundations (references/design-foundations.md).
+7. Create or update external design-tool representation if available — see ## External design tools.
+8. Produce `docs/ui/design/<feature>/overview.md` artifact and request human approval — see ## Design artifact, ## Design status.
+
+```
+              ┌─ UX decision unresolved? ─ yes ─► Stop, request clarification
+              │                                          │
+              └─ no ─► Continue                         │
+              ┌─ Visual change needs UX change? ─ yes ──► Stop, request UX decision
+              └─ no ─► Continue to Scope classification
+```
+
 ## Determine design scope
 
 Not every UI change requires a complete visual design exercise.
@@ -262,126 +294,25 @@ Before defining a new component:
 Do not create duplicate components with different names for the same
 behavior.
 
-## Visual states
+## Visual foundations
 
-Design all applicable states identified by the UX specification.
+For states, responsive behavior, accessibility, design tokens, and interaction presentation, follow `references/design-foundations.md` (load on demand). Key rules:
 
-Consider:
-
-- Default
-- Loading
-- Empty
-- Error
-- Success
-- Disabled
-- Validation error
-- Permission denied
-- Partial/degraded
-- Pending
-- Selected
-- Expanded
-- Collapsed
-- Hover
-- Focus
-- Active
-
-Only include states that are meaningful for the component or screen.
-
-Do not design only the happy path.
-
-## Responsive design
-
-Define visual behavior for:
-
-- Desktop
-- Tablet
-- Mobile
-
-Describe meaningful layout changes.
-
-Examples:
-
-- Two columns become stacked.
-- Side navigation becomes a drawer.
-- Tables become cards.
-- Actions move to a bottom action area.
-- Secondary information becomes collapsible.
-
-Responsive behavior must preserve the UX intent.
-
-Do not prescribe framework-specific CSS unless needed for clarity.
-
-## Accessibility
-
-Accessibility must be considered during design.
-
-Consider:
-
-- Visible focus states
-- Keyboard navigation
-- Semantic grouping
-- Form labels
-- Error presentation
-- Accessible names
-- Contrast
-- Non-color-only meaning
-- Screen-reader interpretation
-- Touch target clarity
-- Responsive text/content behavior
-
-Do not claim accessibility compliance from design alone.
-
-Accessibility is verified later.
-
-## Design tokens
-
-When the project has a design system, use existing tokens.
-
-When a new visual token is genuinely required:
-
-- Explain why the existing system cannot satisfy the requirement.
-- Define the smallest appropriate token.
-- Prefer reusable values over one-off styling.
-
-Avoid arbitrary per-screen values when a reusable design token is suitable.
-
-## Interaction presentation
-
-Describe how interactions should appear visually.
-
-Examples:
-
-- Buttons
-- Forms
-- Validation
-- Confirmation dialogs
-- Drawers
-- Tooltips
-- Tabs
-- Accordions
-- Toasts
-- Inline feedback
-- Progress indicators
-
-Do not redefine interaction behavior that belongs to the UX specification.
+- **Visual states** — design all meaningful states (default, loading, empty, error, success, disabled, validation, permission-denied, pending, selected, expanded/collapsed, hover/focus/active); never happy-path-only.
+- **Responsive** — define desktop/tablet/mobile behavior with meaningful layout changes (stacked columns, drawer, cards, etc.); preserve UX intent; avoid framework-specific CSS unless needed.
+- **Accessibility** — consider focus states, keyboard navigation, semantics, labels, contrast, non-color meaning, screen-reader and touch targets; do not claim compliance from design alone.
+- **Design tokens** — reuse existing tokens; when a new token is genuinely required explain why, define the smallest reusable value.
+- **Interaction presentation** — describe visual appearance of buttons, forms, dialogs, drawers, tooltips, tabs, etc.; do not redefine UX behavior.
 
 ## External design tools
 
-The skill is tool-agnostic.
+The workflow is tool-agnostic. Supported integrations include Figma, Stitch, or other MCP/adapters — do not make the skill dependent on a specific platform. The tool-neutral Markdown specification remains the source of truth.
 
-When an external design tool is available, the design may be created or
-represented through an appropriate tool or adapter.
-
-Supported examples may include:
-
-- Figma
-- Stitch
-- Other compatible design tools
-
-Do not make the skill dependent on a specific design platform.
-
-The tool-neutral UI design specification remains the source document for
-the implementation workflow.
+When materializing an approved design in an external tool, the agent must:
+- preserve the approved UX and UI specification without changing product behavior;
+- use the available integration for that project;
+- record the canonical design artifact/link in the Design artifact section;
+- report integration failures without silently substituting another tool.
 
 ## Design artifact
 
@@ -440,22 +371,6 @@ For new or materially changed UI:
 
 Do not hand an unapproved design to implementation as final.
 
-## External design tools
-
-The UI Design workflow is design-tool agnostic.
-
-When an approved design needs to be materialized in an external design tool,
-use an available design-tool integration or MCP capability.
-
-The agent must:
-- preserve the approved UX and UI specification;
-- use the available design tool without changing product behavior;
-- record the canonical design artifact/link;
-- report integration failures without silently substituting another tool.
-
-The specific design tool is determined by the available integration.
-
-
 ## Handoff to implementation
 
 After approval:
@@ -489,6 +404,31 @@ Verification should consider:
 - Component consistency
 
 The design skill does not perform final implementation verification.
+
+## Verification
+
+After completing visual design, confirm with evidence:
+- [ ] Artifact at `docs/ui/design/<feature>/overview.md` exists and lists Feature, Design status, UX reference, Screens, Components, States, Responsive behavior, Accessibility, Open questions, and external tool link if applicable
+- [ ] Approved UX journey, navigation, and permission behavior preserved unchanged (or conflict was escalated)
+- [ ] Existing design-system tokens/components reused where possible; new tokens justified and recorded
+- [ ] All screens define layout, visual hierarchy, primary/secondary actions, and states per UX spec (no happy-path-only)
+- [ ] Responsive behavior defined for desktop/tablet/mobile with meaningful layout changes
+- [ ] Accessibility considerations documented (focus, semantics, labels, contrast, touch targets)
+- [ ] Human approval obtained and status recorded as Proposed or Approved; never handed off as Approved without explicit approval
+
+## Common Rationalizations
+| Rationalization | Reality |
+|---|---|
+| No design system exists, so invent per-screen colors/fonts | Define minimum reusable tokens only; record for future reuse — don't create one-off styling |
+| UX spec is draft but design can proceed | Unapproved UX must not be treated as final — stop and request clarification if it affects visual design |
+| Design reference looks better, so override UX | Approved UX/RFC/ADR always wins over references — preserve requirement and explain conflict |
+
+## Red Flags
+- Visual design changes user flow or permission behavior without UX decision
+- New component duplicates an existing reusable component under a different name
+- Screen designed only for desktop or only happy-path state
+- Design-tool artifact link missing from handoff artifact
+- Unapproved (Proposed) design passed to implementation as final
 
 ## Self-Improvement
 

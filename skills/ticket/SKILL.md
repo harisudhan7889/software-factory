@@ -1,6 +1,6 @@
 ---
 name: ticket
-description: Create and manage Jira tickets from natural-language requirements.
+description: Guides agents through creating and managing Jira tickets from natural-language requirements. Use when creating a single Jira ticket, converting an RFC into Stories/Epics, or refining an existing ticket via /ticket create|rfctostories|refine. Do not use for implementation or RFC/ADR creation.
 ---
 
 # Ticket Skill
@@ -12,6 +12,17 @@ This skill manages Jira tickets using the Jira scripts in this skill directory.
 - `/ticket create` — create a single Jira ticket
 - `/ticket rfctostories` — analyse an RFC and convert actionable work into Jira Stories or an Epic with Stories
 - `/ticket refine` — refine an existing Jira ticket
+
+## When to Use
+
+Use when:
+- Creating a single Jira ticket from natural language (`/ticket create`)
+- Analysing an RFC and converting work into Stories/Epics (`/ticket rfctostories`)
+- Refining an existing ticket (`/ticket refine`)
+
+Do not use when:
+- Implementing code (use `implementation` skill)
+- Creating RFCs/ADRs (use `rfc` / `adr` skills)
 
 ## Command routing
 
@@ -61,6 +72,25 @@ When creating any Jira issue that can belong to an Epic:
    ask the user rather than guessing.
 7. Do not require the user to provide an Epic key when the factory can
    determine the correct Epic from available context.
+
+## Verification
+
+After ticket operations, confirm with evidence:
+- [ ] Correct reference followed (`create` / `rfctostories` / `refine`) and Epic validated to belong to current project
+- [ ] Ticket preview shown including Epic and user confirmation obtained before calling `scripts/jira-create.sh`
+- [ ] No requirements invented; scope kept per reference templates
+- [ ] Jira key/URL returned after creation
+
+## Common Rationalizations
+| Rationalization | Reality |
+|---|---|
+| No Epic found, pick the first one | Ask user rather than guessing per :60 — never invent Epic |
+| Skip preview, just create | Do not create without user confirmation per :28 |
+
+## Red Flags
+- Jira issue created without Epic preview when Epic applicable
+- Ticket created before explicit "create"/"yes" confirmation
+- Requirements invented not in user request or RFC
 
 ## Self-Improvement
 
