@@ -42,6 +42,8 @@ Read these before auditing:
 
 Read only the additional files required to verify a finding.
 
+Note: Finding Classification, Evidence, and Proposed Changes follow `references/audit-methodology.md` (shared with `policy-audit`).
+
 ## Audit Process
 
 ### 1. Identify the target
@@ -111,48 +113,15 @@ Recommend a clear source of truth and a direct reference.
 
 ## Finding Classification
 
-Classify every meaningful finding as exactly one of:
-
-### Required fix
-
-The skill violates a required standard or has a defect that can cause
-incorrect, unsafe, or unreliable behavior.
-
-### Recommended improvement
-
-The skill meets the required standard but can be improved for clarity,
-context efficiency, reuse, reliability, or maintainability.
-
-### Not applicable
-
-The standard does not apply to this skill.
-
-Do not convert recommended patterns into mandatory requirements.
+Follow `references/audit-methodology.md` — Finding Classification. Classify every finding as exactly one of Required fix / Recommended improvement / Not applicable. Do not convert recommended patterns into mandatory requirements. See shared file for full definitions.
 
 ## Evidence
 
-Every finding must include:
-
-- Rule or standard being checked.
-- Evidence from the target skill.
-- Impact.
-- Recommended change.
-
-Do not report a defect without evidence.
-
-Do not invent missing content.
+Follow `references/audit-methodology.md` — Evidence. Every finding must include rule, evidence, impact, recommended change; no defect without evidence, no invented content.
 
 ## Proposed Changes
 
-After the audit, provide focused proposed changes.
-
-Prefer:
-
-- Exact replacement text.
-- Exact insertion point.
-- Minimal diff.
-
-Do not rewrite an entire skill when a small change is sufficient.
+Follow `references/audit-methodology.md` — Proposed Changes. Provide focused minimal diff (exact insertion/replacement text); after approval show diff, validate, re-run audit, report new result.
 
 ## Verification
 
