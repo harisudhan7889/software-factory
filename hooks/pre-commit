@@ -1,0 +1,12 @@
+#!/bin/bash
+set -euo pipefail
+
+if ! command -v gitleaks >/dev/null 2>&1; then
+  echo "ERROR: gitleaks is not installed or is not in PATH." >&2
+  exit 1
+fi
+
+echo "Running Gitleaks on staged changes..." >&2
+gitleaks protect --staged --redact
+
+echo "Secret scan passed. Commit may continue." >&2
