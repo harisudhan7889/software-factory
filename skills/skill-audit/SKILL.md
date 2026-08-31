@@ -214,3 +214,7 @@ Only propose a factory change when real evidence shows that future audits
 should behave differently.
 
 Do not propose cosmetic or hypothetical changes.
+
+Follow the common self-improvement standard in:
+
+../self-improvement/references/standard.md
