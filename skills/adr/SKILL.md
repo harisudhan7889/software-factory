@@ -111,6 +111,13 @@ After ADR create/review, confirm with evidence:
 - Existing ADR silently modified to change its decision
 - Missing alternatives or consequences
 
+## Policies
+
+Use:
+- `policies/guardrails.md` for scope, authority, approval, and evidence reporting. ADR must not expand scope without approval and must not be marked Accepted without explicit approval.
+- `policies/security.md` for secrets and credentials. Never store secrets in ADRs.
+- `policies/verification.md` for ADR verification and completion evidence.
+
 ## Self-Improvement
 
 Follow the common self-improvement standard in:

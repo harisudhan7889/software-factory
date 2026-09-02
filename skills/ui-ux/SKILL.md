@@ -214,6 +214,12 @@ Approved UX spec becomes input to `ui-design` skill. Preserve user goals, journe
 - Responsive text/content behavior not considered
 - Unapproved UX handed to ui-design as final
 
+## Policies
+
+Use:
+- `policies/web-best-practices.md` for accessibility, responsive behavior, and UI states.
+- `policies/verification.md` for UX verification and completion evidence.
+
 ## Self-Improvement
 
 Follow the common self-improvement standard in:

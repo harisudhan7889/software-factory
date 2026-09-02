@@ -92,6 +92,14 @@ After ticket operations, confirm with evidence:
 - Ticket created before explicit "create"/"yes" confirmation
 - Requirements invented not in user request or RFC
 
+## Policies
+
+Use:
+- `policies/guardrails.md` for scope and approval. Do not create or modify Jira issues without user confirmation.
+- `policies/verification.md` for Jira verification and completion evidence.
+- `policies/security.md` for Jira credentials and data protection.
+- `policies/observability.md` for Jira run traceability and audit records.
+
 ## Self-Improvement
 
 Follow the common self-improvement standard in:

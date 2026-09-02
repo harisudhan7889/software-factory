@@ -26,6 +26,14 @@ Scaffold a new RFC from free-form `<context>`: read the README + overview.md, as
 
 See `references/create.md` for the full procedure.
 
+## Policies
+
+Use:
+- `policies/guardrails.md` for scope, approval, and evidence reporting. RFC `accept` requires explicit approval.
+- `policies/security.md` for secrets and credentials. Never store secrets in RFCs.
+- `policies/verification.md` for completion evidence and delivery checks.
+- `policies/git-safety.md` for branch isolation and Pull Request safety when building RFC waves.
+
 ## Self-Improvement
 
 Follow the common self-improvement standard in:

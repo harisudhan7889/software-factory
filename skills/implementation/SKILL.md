@@ -96,6 +96,17 @@ Before commit, confirm per references/workflow.md Phase 11:
 - Unrelated Jira Story implemented or Jira scope silently expanded
 - Force-push, history rewrite, or push without explicit request
 
+## Policies
+
+Use:
+- `policies/guardrails.md` for scope, approval, and evidence reporting.
+- `policies/security.md` for secrets, auth, and data protection.
+- `policies/verification.md` for acceptance criteria, tests, and completion evidence.
+- `policies/git-safety.md` for branch isolation, push safety, and Pull Request safety.
+- `policies/dependency-safety.md` for dependency addition, lockfiles, and supply-chain checks.
+- `policies/observability.md` for run and verification records.
+- `policies/web-best-practices.md` for UI Stories only — semantic HTML, accessibility, and responsive behavior. For non-UI Stories, do not apply web checks.
+
 ## Self-Improvement
 
 Follow the common self-improvement standard in:

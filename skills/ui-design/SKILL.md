@@ -430,6 +430,12 @@ After completing visual design, confirm with evidence:
 - Design-tool artifact link missing from handoff artifact
 - Unapproved (Proposed) design passed to implementation as final
 
+## Policies
+
+Use:
+- `policies/web-best-practices.md` for semantic HTML, accessibility, responsive behavior, and design-system usage.
+- `policies/verification.md` for UI verification and completion evidence.
+
 ## Self-Improvement
 
 Follow the common self-improvement standard in:

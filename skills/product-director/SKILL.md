@@ -410,6 +410,11 @@ UX workflow.
 
 UX determines how the user accomplishes the approved product goals.
 
+## Policies
+
+Use:
+- `policies/guardrails.md` for scope, authority, and approval. PRD must stay `Proposed` until explicit approval and must not silently decide architecture.
+
 ## Self-Improvement
 
 Follow the common self-improvement standard in:

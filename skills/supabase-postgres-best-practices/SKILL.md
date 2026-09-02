@@ -55,6 +55,12 @@ Each rule file contains:
 - Additional context and references
 - Supabase-specific notes (when applicable)
 
+## Policies
+
+Use:
+- `policies/security.md` for Row Level Security, auth, and data protection.
+- `policies/verification.md` for tests, advisors, and completion evidence.
+
 ## References
 
 - https://www.postgresql.org/docs/current/

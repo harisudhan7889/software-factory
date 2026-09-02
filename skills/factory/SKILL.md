@@ -165,6 +165,15 @@ Read `references/pipeline-debug.md` when the user invokes `/factory pr fix-build
 The GitHub PR reference defines the branch, push, Pull Request, CI,
 Jira synchronization, approval, idempotency, and self-improvement rules.
 
+## Policies
+
+Use:
+- `policies/guardrails.md` for scope, approval, and evidence reporting. Do not silently make product, security, or architectural decisions.
+- `policies/security.md` for secrets, permissions, and branch protection.
+- `policies/git-safety.md` for branch safety, push safety, and Pull Request base safety.
+- `policies/verification.md` for verification evidence and completion gates.
+- `policies/observability.md` for factory run and audit records.
+
 ## Factory documents
 
 Factory RFCs and ADRs are stored under:
