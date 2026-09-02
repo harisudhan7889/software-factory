@@ -348,10 +348,12 @@ Never claim a security control is effective without verification.
 
 Use:
 
-- `policies/guardrails.md` for cross-cutting agent behavior.
-- `policies/guardrails.md#GR-SECRET-001` defers to this policy for detailed secret controls (this file is owner).
-- `policies/verification.md` for proof of correctness.
-- `policies/git-safety.md` for detailed Git controls.
+- `verification.md` for verification requirements and evidence.
+- `git-safety.md` for Git safety.
+- `guardrails.md` for agent behavior controls.
+- `dependency-safety.md` for dependency safety.
+- `web-best-practices.md` for web app best practices.
+- `observability.md` for factory execution records.
 
 Do not duplicate the same detailed rule across policies when one source of
 truth is sufficient.

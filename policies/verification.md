@@ -482,7 +482,14 @@ Do not duplicate entire verification workflows inside every skill.
 
 ## Relationship to Other Policies
 
-Use `policies/guardrails.md` for approval and evidence reporting, `policies/security.md` for security verification, `policies/git-safety.md` for Git state verification.
+Use 
+
+- `security.md` for security and data protection.
+- `git-safety.md` for Git safety.
+- `guardrails.md` for agent behavior controls.
+- `dependency-safety.md` for dependency safety.
+- `web-best-practices.md` for web app best practices.
+- `observability.md` for factory execution records.
 
 ## Self-Improvement
 

@@ -378,7 +378,12 @@ Verify via Jira read-back, git ancestry (`git log target..source`), diff review,
 
 ## Relationship to Other Policies
 
-Use `policies/security.md` for secret/storage controls (owner), `policies/git-safety.md` for Git isolation (owner), `policies/verification.md` for completion evidence, `policies/web-best-practices.md` for UI quality.
+- `security.md` for security and data protection.
+- `verification.md` for verification requirements and evidence.
+- `git-safety.md` for Git safety.
+- `dependency-safety.md` for dependency safety.
+- `web-best-practices.md` for web app best practices.
+- `observability.md` for factory execution records.
 
 ## Self-Improvement
 

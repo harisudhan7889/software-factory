@@ -528,11 +528,12 @@ Lint (`eslint-plugin-jsx-a11y`), static checks, `axe` accessibility scan, design
 
 Use:
 
-- `policies/guardrails.md` for cross-cutting agent controls.
-- `policies/security.md` for security requirements.
-- `policies/verification.md` for verification evidence and completion rules.
-- `policies/git-safety.md` for Git and branch controls.
-- Approved UX/UI artifacts for product experience and visual design.
+- `security.md` for security and data protection.
+- `verification.md` for verification requirements and evidence.
+- `git-safety.md` for Git safety.
+- `guardrails.md` for agent behavior controls.
+- `dependency-safety.md` for dependency safety.
+- `observability.md` for factory execution records.
 
 Do not duplicate complete procedures from those policies.
 

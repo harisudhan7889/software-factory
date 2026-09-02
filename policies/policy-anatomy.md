@@ -19,6 +19,8 @@ policies/
   verification.md
   git-safety.md
   web-best-practices.md
+  observability.md
+  dependency-safety.md
 ```
 
 A policy may also be scoped to a specific subsystem when the factory needs
@@ -222,6 +224,12 @@ git-safety.md
 
 web-best-practices.md
 → web quality
+
+observability.md
+→ factory execution record
+
+dependency-safety.md
+→ dependency safety
 ```
 
 Do not place a rule in a policy merely because it is related.
@@ -432,6 +440,9 @@ guardrails.md
 security.md
 git-safety.md
 web-best-practices.md
+verification.md
+observability.md
+dependency-safety.md
 ```
 
 Use clear names that describe the policy's responsibility.

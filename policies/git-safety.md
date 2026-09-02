@@ -344,11 +344,12 @@ Pre-commit/-push hooks, branch protection, `git merge-base` / `git log target..s
 
 Use:
 
-- `policies/guardrails.md` for cross-cutting agent behavior.
-- `policies/security.md` for security controls.
-- `policies/verification.md` for verification requirements.
-- `references/conflict-resolution.md` for the conflict-resolution procedure.
-- `references/github-pr.md` for Pull Request creation and delivery.
+- `security.md` for security and data protection.
+- `verification.md` for verification requirements and evidence.
+- `guardrails.md` for agent behavior controls.
+- `dependency-safety.md` for dependency safety.
+- `web-best-practices.md` for web app best practices.
+- `observability.md` for factory execution records.
 
 Do not duplicate complete workflows across policy files.
 
