@@ -24,6 +24,7 @@ Use when:
 - Planning execution order for a set of Jira tickets from PRD/RFC/ADR/Jira sources
 - Determining which tickets are READY vs BLOCKED
 - Identifying safe parallel work or dependency levels
+- Checking dependencies for a newly created or materially changed Jira ticket
 
 Do not use when:
 - Implementing code (use `implementation`)
@@ -311,6 +312,8 @@ Human review should be requested when:
 
 Do not hide uncertainty to make the graph look complete.
 
+Reporting an uncertain graph as DRAFT does not require blocking; do not write Jira dependency links until the required review is approved.
+
 ## Changes to the Graph
 
 Dependencies may change when:
@@ -370,7 +373,9 @@ Before reporting the dependency plan:
 - [ ] Parallel candidates do not have known conflicting dependencies.
 - [ ] Cycles are detected and reported.
 - [ ] The graph matches the approved source material.
-- [ ] No Jira changes were made unless explicitly authorized.
+- [ ] No Jira dependency links were created or changed unless explicitly authorized (drafting the graph ≠ writing to Jira).
+- [ ] New or materially changed tickets were checked against existing tickets in both directions.
+- [ ] The reported graph reflects all relationship changes since the prior report (deltas listed or “no changes”).
 
 Use the statuses and evidence rules in `policies/verification.md`.
 
@@ -410,6 +415,8 @@ Follow `policies/observability.md`.
 
 Keep the result simple.
 
+`UNKNOWN:` in the output is a category for uncertain relationships, not a confidence value. Always include `Reason / Evidence / Confidence:` with Confidence as one of `FACT / INFERENCE / HYPOTHESIS / UNKNOWN`.
+
 The preferred output is:
 
 ```text
@@ -439,6 +446,41 @@ Confidence: INFERENCE
 ```
 
 Do not produce unnecessary detail when the dependency structure is simple.
+
+## Incremental Dependency Check
+
+When a new Jira ticket is created or an existing ticket changes materially,
+re-evaluate its dependency relationships.
+
+Check both directions:
+
+1. Does the new or changed ticket depend on existing tickets?
+2. Do existing tickets depend on the new or changed ticket?
+
+When a dependency is identified:
+
+- Update the dependency graph.
+- Record the reason, source, evidence, and confidence.
+- Recalculate READY and BLOCKED states.
+- Identify any newly available parallel work.
+
+Updating Jira dependency links is a separate action.
+
+Only apply Jira dependency links when:
+
+- The dependency is supported by approved source material; or
+- The dependency has been explicitly approved.
+
+For an uncertain dependency:
+
+- Mark the relationship as `INFERENCE`, `HYPOTHESIS`, or `UNKNOWN`.
+- Do not automatically create the Jira dependency link.
+- Request review when required.
+
+The dependency graph is a persistent planning artifact and must be updated
+rather than recreated as an isolated result for each ticket.
+
+Persist the graph as the `Dependency Graph` + `READY/BLOCKED/PARALLEL` section in the report output and carry it forward to the next run; deltas (added/removed edges with reason/source/confidence) are the evidence for the verification checkbox.
 
 ## Self-Improvement
 
