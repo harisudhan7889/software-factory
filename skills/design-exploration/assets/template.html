@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Design Exploration</title>
+  <meta name="description" content="Design exploration comparison">
+  <style>
+    /*
+      Factory design-exploration template.
+      Replace only the marked content areas.
+      Keep the shared exploration chrome consistent across variants.
+    */
+
+    :root {
+      --de-bg: #f7f7f5;
+      --de-surface: #ffffff;
+      --de-text: #171717;
+      --de-muted: #666666;
+      --de-border: #ddddda;
+      --de-radius: 14px;
+      --de-gap: 24px;
+      --de-max: 1400px;
+      --de-font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--de-bg);
+      color: var(--de-text);
+      font-family: var(--de-font);
+      line-height: 1.5;
+    }
+
+    a {
+      color: inherit;
+    }
+
+    .exploration {
+      width: min(calc(100% - 32px), var(--de-max));
+      margin: 0 auto;
+      padding: 32px 0 64px;
+    }
+
+    .exploration-header {
+      margin-bottom: 32px;
+    }
+
+    .exploration-kicker {
+      margin: 0 0 8px;
+      color: var(--de-muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .exploration-title {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 48px);
+      line-height: 1.05;
+    }
+
+    .exploration-subtitle {
+      max-width: 760px;
+      margin: 12px 0 20px;
+      color: var(--de-muted);
+      font-size: 16px;
+    }
+
+    .meta-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .meta-item {
+      padding: 6px 10px;
+      border: 1px solid var(--de-border);
+      border-radius: 999px;
+      background: var(--de-surface);
+      color: var(--de-muted);
+      font-size: 12px;
+    }
+
+    .variants {
+      display: grid;
+      gap: var(--de-gap);
+    }
+
+    .variant {
+      overflow: hidden;
+      border: 1px solid var(--de-border);
+      border-radius: var(--de-radius);
+      background: var(--de-surface);
+    }
+
+    .variant-header {
+      display: grid;
+      gap: 6px;
+      padding: 18px 20px;
+      border-bottom: 1px solid var(--de-border);
+    }
+
+    .variant-label {
+      color: var(--de-muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .variant-title {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.15;
+    }
+
+    .variant-tradeoff {
+      margin: 0;
+      color: var(--de-muted);
+      font-size: 14px;
+    }
+
+    .variant-preview {
+      min-height: 320px;
+      padding: 24px;
+      background: var(--de-bg);
+    }
+
+    /*
+      Put the actual design direction inside .variant-preview.
+      Scope variant-specific CSS under .variant-a, .variant-b, etc.
+    */
+
+    .variant-analysis {
+      display: grid;
+      gap: 8px;
+      padding: 18px 20px 20px;
+      border-top: 1px solid var(--de-border);
+    }
+
+    .variant-analysis-title {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .variant-analysis-text {
+      margin: 0;
+      max-width: 880px;
+      color: var(--de-muted);
+      font-size: 14px;
+    }
+
+    .decision {
+      margin-top: 32px;
+      padding: 20px;
+      border: 1px solid var(--de-border);
+      border-radius: var(--de-radius);
+      background: var(--de-surface);
+    }
+
+    .decision-title {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+
+    .decision-text {
+      margin: 0;
+      color: var(--de-muted);
+      font-size: 14px;
+    }
+
+    @media (min-width: 1000px) {
+      .variants {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+      }
+
+      .variant {
+        min-width: 0;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .exploration {
+        width: min(calc(100% - 20px), var(--de-max));
+        padding-top: 20px;
+      }
+
+      .variant-preview {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="exploration">
+    <!-- Exploration header -->
+    <header class="exploration-header">
+      <p class="exploration-kicker">Design Exploration</p>
+      <h1 class="exploration-title">Replace with exploration title</h1>
+      <p class="exploration-subtitle">
+        Replace with a one-line description of the surface being explored.
+      </p>
+
+      <div class="meta-strip">
+        <span class="meta-item">Surface: Replace</span>
+        <span class="meta-item">Source: Replace</span>
+        <span class="meta-item">Date: Replace</span>
+      </div>
+    </header>
+
+    <section class="variants" aria-label="Design directions">
+
+      <!-- Variant A -->
+      <article class="variant variant-a">
+        <header class="variant-header">
+          <div class="variant-label">Direction A</div>
+          <h2 class="variant-title">Replace with direction name</h2>
+          <p class="variant-tradeoff">
+            Optimizes for X, but gives up Y.
+          </p>
+        </header>
+
+        <div class="variant-preview" aria-label="Direction A preview">
+          <!-- Replace with the actual design direction. -->
+        </div>
+
+        <div class="variant-analysis">
+          <h3 class="variant-analysis-title">Analysis</h3>
+          <p class="variant-analysis-text">
+            Replace with no more than three short sentences covering strengths,
+            risks, and when to choose this direction.
+          </p>
+        </div>
+      </article>
+
+      <!-- Variant B -->
+      <article class="variant variant-b">
+        <header class="variant-header">
+          <div class="variant-label">Direction B</div>
+          <h2 class="variant-title">Replace with direction name</h2>
+          <p class="variant-tradeoff">
+            Optimizes for X, but gives up Y.
+          </p>
+        </header>
+
+        <div class="variant-preview" aria-label="Direction B preview">
+          <!-- Replace with the actual design direction. -->
+        </div>
+
+        <div class="variant-analysis">
+          <h3 class="variant-analysis-title">Analysis</h3>
+          <p class="variant-analysis-text">
+            Replace with no more than three short sentences covering strengths,
+            risks, and when to choose this direction.
+          </p>
+        </div>
+      </article>
+
+      <!-- Variant C -->
+      <article class="variant variant-c">
+        <header class="variant-header">
+          <div class="variant-label">Direction C</div>
+          <h2 class="variant-title">Replace with direction name</h2>
+          <p class="variant-tradeoff">
+            Optimizes for X, but gives up Y.
+          </p>
+        </header>
+
+        <div class="variant-preview" aria-label="Direction C preview">
+          <!-- Replace with the actual design direction. -->
+        </div>
+
+        <div class="variant-analysis">
+          <h3 class="variant-analysis-title">Analysis</h3>
+          <p class="variant-analysis-text">
+            Replace with no more than three short sentences covering strengths,
+            risks, and when to choose this direction.
+          </p>
+        </div>
+      </article>
+
+      <!-- Optional Variant D -->
+      <article class="variant variant-d">
+        <header class="variant-header">
+          <div class="variant-label">Direction D</div>
+          <h2 class="variant-title">Optional fourth direction</h2>
+          <p class="variant-tradeoff">
+            Optimizes for X, but gives up Y.
+          </p>
+        </header>
+
+        <div class="variant-preview" aria-label="Direction D preview">
+          <!-- Remove this entire article when fewer than four directions are needed. -->
+        </div>
+
+        <div class="variant-analysis">
+          <h3 class="variant-analysis-title">Analysis</h3>
+          <p class="variant-analysis-text">
+            Replace with no more than three short sentences covering strengths,
+            risks, and when to choose this direction.
+          </p>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- Decision row -->
+    <section class="decision" aria-label="Direction selection guidance">
+      <h2 class="decision-title">Which direction fits?</h2>
+      <p class="decision-text">
+        Replace with simple decision guidance, for example:
+        If you want X → pick A. If you want Y → pick B. If you want Z → pick C.
+      </p>
+    </section>
+  </main>
+</body>
+</html>

@@ -14,6 +14,18 @@ Additional context
 [any additional information or dependency]
 ```
 
+When a UI Story builds an approved design-exploration direction, append this optional block to the description:
+
+```text
+Design input
+Selection: design-explorations/<short-name>.selection.md (Status: Approved, Direction X — <Name>)
+Comparison: design-explorations/<short-name>.html (Direction X section)
+UX artifact: <approved UX artifact path or NONE>
+UI design artifact: <approved UI design artifact path or NONE>
+```
+
+For such Stories, include acceptance criteria that the implementation follows the selected direction per its `Preserve:` decisions, leaves approved UX/RFC/ADR behavior unchanged, and handles aspirational elements as specified. Omit the block when no approved selection applies.
+
 ## Bug
 
 ```text

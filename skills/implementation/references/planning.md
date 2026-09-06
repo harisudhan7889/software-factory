@@ -8,6 +8,7 @@ The implementation plan must be based on:
 2. The accepted RFC
 3. Relevant ADRs
 4. The existing codebase
+5. The approved design-exploration selection and comparison (when the Story references them)
 
 ## Goal
 
@@ -62,6 +63,10 @@ Return:
 ## Understanding
 
 <Brief explanation of what the Story needs to accomplish.>
+
+## Design input
+
+<List the approved selection path and direction plus the comparison path and section when the Story references design-exploration input. Omit when not applicable.>
 
 ## Existing code
 
@@ -133,3 +138,4 @@ Before finalizing the plan, verify:
 - No requirements were invented.
 - Tests are included.
 - Out-of-scope work is identified.
+- When design-exploration input applies, the plan identifies how the approved selection translates into the UI.

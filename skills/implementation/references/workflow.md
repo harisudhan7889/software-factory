@@ -71,6 +71,17 @@ Before creating the implementation plan:
    to the current Story.
 5. Use these artifacts when creating the implementation plan.
 
+### Design-exploration inputs
+
+When the Jira Story references approved design-exploration artifacts:
+
+1. Read the referenced `.selection.md` and verify `Status: Approved` and all required fields are present.
+2. Inspect the selected direction section of the referenced comparison `.html`.
+3. Map the `Preserve:` decisions and aspirational/gap handling into the implementation plan.
+4. A conversational selection without a `.selection.md` is not valid input.
+
+Authority: Use .selection.md as the approved visual-direction record. Use the source that owns a requirement for behavioral or architectural decisions. The visual exploration must not override an approved product, UX, architecture, or security requirement.
+
 A design link must not be treated as informational metadata only.
 
 If a referenced UX/UI design artifact cannot be located or accessed:
@@ -79,6 +90,8 @@ If a referenced UX/UI design artifact cannot be located or accessed:
 - Report exactly which artifact is missing or inaccessible.
 - Ask the user whether to proceed without the design.
 - Do not silently create an inferred or basic replacement UI.
+
+This applies equally to a missing design-exploration `.selection.md` or comparison `.html`: report the exact missing path.
 
 ## Phase 3 — Inspect the codebase
 
@@ -289,7 +302,7 @@ After the user explicitly approves the implementation plan:
 1. Transition the Jira Story to `In Progress`.
 2. Run:
 
-`/skills/tickets/scripts/jira-transition.sh <JIRA-KEY> "In Progress"`
+`skills/ticket/scripts/jira-transition.sh <JIRA-KEY> "In Progress"`
 
 3. Verify that the transition succeeds.
 4. Only after the Jira transition succeeds, begin implementation.
@@ -307,6 +320,7 @@ For UI Stories, before modifying UI code, verify that:
 - The approved UX specification has been read.
 - The approved UI design specification has been read.
 - Any referenced external design artifact has been inspected when available.
+- When the Story declares design-exploration input, the `.selection.md` and comparison `.html` have been inspected and the implementation plan maps them.
 - The implementation plan identifies how the approved design will be
   translated into the UI.
 
@@ -384,6 +398,7 @@ For UI Stories, verify the implementation against:
 1. Approved UX specification
 2. Approved UI design specification
 3. Referenced external design artifact
+4. Approved design-exploration selection and comparison (when the Story references them)
 
 Verify, when applicable:
 
@@ -396,6 +411,10 @@ Verify, when applicable:
 - Responsive behavior
 - Accessibility
 - Design-system usage
+- Selected-direction `Preserve:` decisions and aspirational/gap handling (when design-exploration input applies)
+- No unrelated redesign
+
+Method for v1 design-exploration verification: manual browser side-by-side comparison of the running app against the selected direction section of the comparison artifact. Do not add screenshot-diff infrastructure for v1.
 
 A UI Story must not be considered fully implemented when it only satisfies
 the Jira acceptance criteria but materially deviates from the approved
@@ -512,6 +531,7 @@ Before completing the workflow, verify:
 - For UI Stories, the implementation matches the approved UX and UI design
   artifacts, and referenced external design artifacts were inspected when
   available.
+- For UI Stories with design-exploration input, the implementation matches the approved selection and comparison artifacts.
 
 ## Phase 12 — Commit
 
@@ -545,6 +565,10 @@ Report:
 
 <Whether the implementation satisfies the Story>
 
+### Design input
+
+<Selection path and direction, comparison path and section, when applicable>
+
 ### Commit
 
 <Commit hash and message>
@@ -564,7 +588,7 @@ After the implementation has been successfully committed:
 3. Prepare the verification results.
 4. Add a Jira comment using:
 
-`jira-comment.sh <JIRA-KEY> "<COMMENT>"`
+`skills/ticket/scripts/jira-comment.sh <JIRA-KEY> "<COMMENT>"`
 
 The comment should include:
 
@@ -619,7 +643,7 @@ transition the Jira Story to `In Review`.
 
 Run:
 
-`/skills/tickets/scripts/jira-transition.sh <JIRA-KEY> "In Review"`
+`skills/ticket/scripts/jira-transition.sh <JIRA-KEY> "In Review"`
 
 Verify that the transition succeeds.
 

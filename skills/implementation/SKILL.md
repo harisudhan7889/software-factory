@@ -34,6 +34,7 @@ Do not use when:
 - Use managed services where the architecture specifies them.
 - Do not invent requirements.
 - Do not implement unrelated Jira Stories.
+- When the Story references approved `design-explorations/*.selection.md` and comparison `.html`, consume them per `references/workflow.md` Phase 2/9; never proceed on conversational selection alone; never implement production UI without a Jira Story.
 - Do not modify the codebase during the planning phase.
 - Do not create an ADR for routine implementation details.
 - If a genuinely new architectural decision is required, stop and use
@@ -74,7 +75,7 @@ The `/implementation work` operation must:
 7. Wait for explicit approval.
 8. Implement only after approval.
 9. Run relevant tests, linting, and type checking.
-10. Review the implementation against the Story, RFC, and ADRs.
+10. Review the implementation against the Story, RFC, and ADRs (including the approved exploration selection when the Story references it).
 11. Commit the completed implementation locally.
 12. Do not push to a remote unless explicitly requested.
 
