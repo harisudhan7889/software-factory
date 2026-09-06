@@ -30,8 +30,7 @@ Follow accepted ADRs.
 Do not replace a selected managed service with custom infrastructure
 unless the Jira Story or an ADR requires it.
 
-For AdVerify, do not create custom infrastructure for capabilities
-already assigned to Supabase or another managed service.
+For generated web applications, use the factory-standard remote/managed Supabase architecture defined by factory ADR-0002 (`factory/docs/adr/0002-default-web-backend-architecture/overview.md`), unless an accepted project ADR explicitly defines an exception. Do not create custom infrastructure for capabilities assigned to Supabase or another managed service.
 
 ## Implementation areas
 

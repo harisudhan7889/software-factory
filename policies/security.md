@@ -258,6 +258,8 @@ If Jira access is insufficient:
 
 ## Supabase Security
 
+Factory default: remote/managed Supabase is the application backend, per factory ADR-0002 (`factory/docs/adr/0002-default-web-backend-architecture/overview.md`). Local Supabase services or CLI tooling are optional development/testing tooling and do not replace the approved remote environment.
+
 When Supabase is used:
 
 - Treat database data as protected.
@@ -267,7 +269,7 @@ When Supabase is used:
 - Keep privileged operations inside the approved trusted boundary.
 - Test tenant isolation and authorization for affected changes.
 
-The project's RFCs and ADRs define the specific Supabase architecture.
+The project's RFCs and ADRs define the specific Supabase architecture within that default; a custom backend requires an accepted project ADR exception per ADR-0002.
 
 ## Security-Sensitive Changes
 
