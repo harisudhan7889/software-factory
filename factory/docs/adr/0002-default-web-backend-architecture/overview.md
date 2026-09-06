@@ -10,7 +10,7 @@ Accepted
 
 ## Authors
 
-TBD (requires human author confirmation before acceptance)
+Hari
 
 ## Context
 
