@@ -1,0 +1,124 @@
+# Software Factory Dangerous Command Patterns
+#
+# Purpose:
+# Block high-risk shell commands before execution.
+#
+# Format:
+# - One regular expression per line.
+# - Blank lines and lines beginning with # are ignored.
+#
+# Scope:
+# These are generic high-risk command patterns.
+# Project-specific rules belong in the relevant factory policies.
+#
+# Important:
+# - Prefer blocking clearly destructive commands.
+# - Do not use this file as a substitute for Git, security, or approval
+#   policies.
+# - Test new patterns for false positives before adding them.
+
+# ---------- Filesystem destruction ----------
+
+# Delete the filesystem root.
+(^|[;&|[:space:]])rm[[:space:]]+-rf[[:space:]]+/(($|[[:space:];|]))
+
+# Delete the current or parent directories recursively.
+(^|[;&|[:space:]])rm[[:space:]]+-rf[[:space:]]+\.[./]*($|[[:space:];|])
+
+# Delete the user's home directory explicitly.
+(^|[;&|[:space:]])rm[[:space:]]+-rf[[:space:]]+(["']?)(\$HOME|~)(/.*)?["']?($|[[:space:];|])
+
+# Remove a wildcard from a filesystem root.
+(^|[;&|[:space:]])rm[[:space:]]+-rf[[:space:]]+/(\*|\?)[^[:space:]]*($|[[:space:];|])
+
+# ---------- Raw disk / device destruction ----------
+
+# Write directly to a block device with dd.
+(^|[;&|[:space:]])dd[[:space:]].*([[:space:]]|^)of=/dev/
+
+# Write arbitrary content to a raw device.
+(^|[;&|[:space:]])(cat|printf|echo)[[:space:]].*>[[:space:]]*/dev/(disk|sd|nvme|vd|xvd)
+
+# Linux filesystem / partition formatting.
+(^|[;&|[:space:]])mkfs([._[:alnum:]-]*)[[:space:]]+(/dev/|.*[[:space:]]/dev/)
+
+# Partition-table destruction tools.
+(^|[;&|[:space:]])(fdisk|sfdisk|parted|cfdisk)[[:space:]].*(/dev/|--script|--delete)
+
+# ---------- Fork bombs ----------
+
+# Common fork-bomb structure.
+:[:space:]*\(\)[[:space:]]*\{[[:space:]]*:[[:space:]]*\|[:space:]*:[[:space:]]*&[[:space:]]*\}[[:space:]]*;[[:space:]]*\:
+
+# ---------- Remote content piped to a shell ----------
+
+# curl piped directly to a shell/interpreter.
+(^|[;&|[:space:]])curl([[:space:]]+[^|;]*)?[|][[:space:]]*(sh|bash|zsh|ksh|fish|python|python3|perl|ruby)
+
+# wget piped directly to a shell/interpreter.
+(^|[;&|[:space:]])wget([[:space:]]+[^|;]*)?[|][[:space:]]*(sh|bash|zsh|ksh|fish|python|python3|perl|ruby)
+
+# Command substitution around remote shell fetches.
+(^|[;&|[:space:]])(sh|bash|zsh)[[:space:]]+-[^[:space:]]*<[[:space:]]*<(curl|wget)[[:space:]]
+
+# ---------- Dangerous Git history operations ----------
+
+# Force push.
+(^|[;&|[:space:]])git[[:space:]]+push([[:space:]]+[^;|]*)?[[:space:]]+--force([[:space:]]|$)
+
+# Short force push.
+(^|[;&|[:space:]])git[[:space:]]+push([[:space:]]+[^;|]*)?[[:space:]]+-f([[:space:]]|$)
+
+# Delete remote branches.
+(^|[;&|[:space:]])git[[:space:]]+push([[:space:]]+[^;|]*)?[[:space:]]+--delete([[:space:]]|$)
+
+# Hard reset.
+(^|[;&|[:space:]])git[[:space:]]+reset[[:space:]]+--hard([[:space:]]|$)
+
+# Force checkout/restore can discard local work.
+(^|[;&|[:space:]])git[[:space:]]+(checkout|restore)[[:space:]]+.*--(force|ours|theirs)([[:space:]]|$)
+
+# Remove untracked/ignored files recursively.
+(^|[;&|[:space:]])git[[:space:]]+clean[[:space:]].*(-|[[:space:]])f.*(-|[[:space:]])d([[:space:]]|$)
+
+# Rewrite repository history.
+(^|[;&|[:space:]])git[[:space:]]+filter-repo([[:space:]]|$)
+(^|[;&|[:space:]])git[[:space:]]+filter-branch([[:space:]]|$)
+
+# ---------- Dangerous GitHub CLI operations ----------
+
+# Delete a GitHub repository.
+(^|[;&|[:space:]])gh[[:space:]]+repo[[:space:]]+delete([[:space:]]|$)
+
+# Delete GitHub secrets.
+(^|[;&|[:space:]])gh[[:space:]]+secret[[:space:]]+delete([[:space:]]|$)
+
+# Delete a GitHub release.
+(^|[;&|[:space:]])gh[[:space:]]+release[[:space:]]+delete([[:space:]]|$)
+
+# ---------- Credential / password-manager access ----------
+
+# Export password-manager data.
+(^|[;&|[:space:]])(op|bw|pass)[[:space:]]+(export|list|get)[[:space:]]+
+
+# Read common SSH private-key locations.
+(^|[;&|[:space:]])(cat|less|more|head|tail|sed|awk|grep|strings)[[:space:]]+.*(/\.ssh/.*(id_rsa|id_ed25519|id_ecdsa)|\.pem([[:space:]]|$))
+
+# Read common cloud credential files.
+(^|[;&|[:space:]])(cat|less|more|head|tail|sed|awk|grep|strings)[[:space:]]+.*(\/\.aws\/credentials|\/\.config\/gcloud\/.*credentials|\/\.azure\/.*)
+
+# ---------- Broad permission changes ----------
+
+# Recursive world-writable permissions.
+(^|[;&|[:space:]])chmod[[:space:]]+-R[[:space:]]+777([[:space:]]|$)
+
+# Recursive ownership changes outside an explicitly approved path.
+(^|[;&|[:space:]])chown[[:space:]]+-R[[:space:]]+[^[:space:]]+[[:space:]]+(/|/[^[:space:]]*)
+
+# ---------- Dangerous shell execution patterns ----------
+
+# Execute an interpolated shell command.
+(^|[;&|[:space:]])(eval|exec)[[:space:]]+.*(\$|`)
+
+# Disable shell safety options while executing a command sequence.
+(^|[;&|[:space:]])set[[:space:]]+\+[[:space:]]*(e|u|o[[:space:]]+pipefail)([[:space:]]|$)
