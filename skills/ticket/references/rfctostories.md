@@ -23,7 +23,6 @@ The RFC may be provided as:
 
 If a file path is provided, read the RFC before analysing it.
 
-
 ## Story quality
 
 When generating application-development Stories, read and follow:
@@ -32,7 +31,6 @@ When generating application-development Stories, read and follow:
 
 Use those rules to translate RFC workstreams and milestones into
 concrete, independently implementable product or technical Stories.
-
 
 ## Analysis
 
@@ -51,7 +49,6 @@ First classify the RFC content into:
 Only actionable work should normally become Jira issues.
 
 Do not create issues for background information, decisions, or speculative future work.
-
 
 ## Capability detection
 
@@ -110,31 +107,33 @@ Do not invent requirements.
 When an actionable workstream contains both backend and frontend work:
 
 - Do not automatically combine backend and frontend work into one Jira
-  Story.
+Story.
 - Determine whether the backend and frontend can be independently
-  implemented, tested, reviewed, or delivered.
+implemented, tested, reviewed, or delivered.
 - If they can be independently implemented or reviewed, create separate
-  Stories or Tasks.
+Stories or Tasks.
 - If they are tightly coupled and represent one atomic outcome that cannot
-  reasonably be implemented or verified independently, they may remain in
-  one Story.
+reasonably be implemented or verified independently, they may remain in
+one Story.
 - When splitting the work, clearly define the relationship and dependency
-  between the resulting tickets.
+between the resulting tickets.
 - Do not duplicate the same acceptance criteria across both tickets.
 - UI tickets must follow the UI/UX classification and design-reference rules
-  below.
+below.
 - Backend-only tickets must not contain UI design references.
+
+
 
 ### Technical area labels
 
 For every generated Story or Task, classify its implementation area:
 
 - `backend` — backend, API, database, migration, server-side, engine, or
-  infrastructure work.
+infrastructure work.
 - `frontend` — web UI, frontend components, pages, client-side behavior, or
-  visual implementation.
+visual implementation.
 - Both `backend` and `frontend` — only when the ticket genuinely requires
-  both areas.
+both areas.
 
 Include the resulting labels in the proposed Jira structure.
 
@@ -162,6 +161,8 @@ Classify each workstream as exactly one of:
 2. UI change using an existing approved design
 3. New UI/UX design required
 
+
+
 ### No UI/UX required
 
 For backend, infrastructure, database, API, CI, testing, documentation, or
@@ -170,6 +171,8 @@ other work that does not require user-facing UI changes:
 - Do not invoke the UX or UI Design workflow.
 - Do not include a UI design reference in the Jira ticket.
 - Create the Jira issue using the normal Story/Task workflow.
+
+
 
 ### UI change using an existing approved design
 
@@ -181,6 +184,8 @@ design already exists:
 - Identify the canonical external design link when available.
 - Include the design reference in the Jira ticket description.
 
+
+
 ### New UI/UX design required
 
 When the work introduces a new user-facing experience that does not have an
@@ -189,9 +194,11 @@ approved design:
 - Route the work through the UX workflow.
 - Route the result through the UI Design workflow.
 - Require human approval of the design before creating the implementation
-  Jira ticket.
+Jira ticket.
 - Store the approved UX and UI design artifacts in the project.
 - Include the canonical approved design link in the Jira ticket description.
+
+
 
 ### Design reference rules
 
@@ -199,7 +206,7 @@ For UI-related Jira tickets:
 
 - Include only approved design references.
 - Prefer the canonical Sketch design link when a Sketch design has been
-  approved.
+approved.
 - Include the relevant design artifact path when available.
 - The design link must correspond to the specific work being tracked.
 - Do not add unrelated design links.
@@ -207,6 +214,8 @@ For UI-related Jira tickets:
 For non-UI Jira tickets:
 
 - Do not include a UI design link.
+
+
 
 ## UI classification in the proposed Jira structure
 
@@ -257,6 +266,8 @@ Priority: Medium
 UI/UX: None
 ```
 
+
+
 ## Proposed output
 
 Before creating Jira issues, present:
@@ -265,6 +276,8 @@ Before creating Jira issues, present:
 
 - Actionable work: Yes/No
 - Recommended structure: No tickets / Stories / Epic + Stories
+
+
 
 ## Proposed Jira structure
 
@@ -280,6 +293,8 @@ Summary: <epic summary>
 Description: <epic description>
 Priority: <priority>
 ```
+
+
 
 ### If Stories/Tasks only
 
@@ -298,3 +313,5 @@ Show the complete Proposed Jira structure including Epics. Wait for explicit con
 5. Show proposal + Confirm.
 6. After confirmation, create via `scripts/jira-create.sh` (one call per issue, Epic first).
 7. Return keys/URLs.
+8. If an Epic is created during this workflow, update the RFC's `overview.md` Jira Epic field with the created Epic key and link.
+

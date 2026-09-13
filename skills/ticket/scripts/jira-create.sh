@@ -3,23 +3,53 @@
 set -euo pipefail
 trap 'rm -f "${TMP:-}"' EXIT 2>/dev/null || true
 
-# Load project configuration
+# Resolve project-specific Jira configuration.
+# Only JIRA_PROJECT_KEY may come from the current project's .env.
+# Shared Jira credentials must already exist in the global environment.
 PROJECT_DIR="$(pwd)"
+PROJECT_ENV="$PROJECT_DIR/.env"
 
-if [ -f "$PROJECT_DIR/.env" ]; then
-    set -a
-    source "$PROJECT_DIR/.env"
-    set +a
-else
-    echo "Error: .env not found in $PROJECT_DIR" >&2
+if [ ! -f "$PROJECT_ENV" ]; then
+    echo "Error: Project-local .env not found in $PROJECT_DIR" >&2
+    echo "Ask the user to provide JIRA_PROJECT_KEY for this project, then add it to $PROJECT_ENV." >&2
     exit 1
 fi
 
-# Check required environment variables
-: "${JIRA_BASE_URL:?JIRA_BASE_URL is not set}"
-: "${JIRA_EMAIL:?JIRA_EMAIL is not set}"
-: "${JIRA_API_TOKEN:?JIRA_API_TOKEN is not set}"
-: "${JIRA_PROJECT_KEY:?JIRA_PROJECT_KEY is not set}"
+# Read only JIRA_PROJECT_KEY from the project-local .env.
+# Do not source the full file: project .env values must not override
+# globally provided Jira credentials.
+JIRA_PROJECT_KEY=$(
+    awk '
+        /^[[:space:]]*export[[:space:]]+JIRA_PROJECT_KEY[[:space:]]*=/ {
+            sub(/^[[:space:]]*export[[:space:]]+JIRA_PROJECT_KEY[[:space:]]*=[[:space:]]*/, "")
+            print
+            exit
+        }
+        /^[[:space:]]*JIRA_PROJECT_KEY[[:space:]]*=/ {
+            sub(/^[[:space:]]*JIRA_PROJECT_KEY[[:space:]]*=[[:space:]]*/, "")
+            print
+            exit
+        }
+    ' "$PROJECT_ENV"
+)
+
+# Strip one matching pair of surrounding quotes, if present.
+if [[ "$JIRA_PROJECT_KEY" =~ ^".*"$ ]]; then
+    JIRA_PROJECT_KEY="${JIRA_PROJECT_KEY:1:${#JIRA_PROJECT_KEY}-2}"
+elif [[ "$JIRA_PROJECT_KEY" =~ ^'.*'$ ]]; then
+    JIRA_PROJECT_KEY="${JIRA_PROJECT_KEY:1:${#JIRA_PROJECT_KEY}-2}"
+fi
+
+if [ -z "$JIRA_PROJECT_KEY" ]; then
+    echo "Error: JIRA_PROJECT_KEY is not configured for this project." >&2
+    echo "Ask the user explicitly for the Jira project key, then add it to $PROJECT_ENV." >&2
+    exit 1
+fi
+
+# Shared Jira credentials must come from the global environment.
+: "${JIRA_BASE_URL:?JIRA_BASE_URL is not set in the global environment}"
+: "${JIRA_EMAIL:?JIRA_EMAIL is not set in the global environment}"
+: "${JIRA_API_TOKEN:?JIRA_API_TOKEN is not set in the global environment}"
 
 # Read JSON from stdin
 INPUT=$(cat)

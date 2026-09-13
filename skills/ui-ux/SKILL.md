@@ -217,8 +217,8 @@ Approved UX spec becomes input to `ui-design` skill. Preserve user goals, journe
 ## Policies
 
 Use:
-- `policies/web-best-practices.md` for accessibility, responsive behavior, and UI states.
-- `policies/verification.md` for UX verification and completion evidence.
+- `../../policies/web-best-practices.md` for accessibility, responsive behavior, and UI states.
+- `../../policies/verification.md` for UX verification and completion evidence.
 
 ## Self-Improvement
 

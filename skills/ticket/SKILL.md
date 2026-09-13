@@ -80,6 +80,7 @@ After ticket operations, confirm with evidence:
 - [ ] Ticket preview shown including Epic and user confirmation obtained before calling `scripts/jira-create.sh`
 - [ ] No requirements invented; scope kept per reference templates
 - [ ] Jira key/URL returned after creation
+- [ ] If an Epic was created, `overview.md` was updated with its Jira key and link
 
 ## Common Rationalizations
 | Rationalization | Reality |

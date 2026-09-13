@@ -25,8 +25,11 @@ Given an approved UX specification:
 7. Define accessibility considerations.
 8. Reuse existing design-system patterns where possible.
 9. Produce a structured UI design specification.
-10. Prepare the design specification for implementation and external design
-   tools when available.
+10. Obtain human approval of the specification.
+11. Materialize the approved specification in the project's design tool
+    (e.g. Stitch) and record the canonical links — see ## External design tools.
+    This step is mandatory after approval unless the user explicitly waives
+    it (record the waiver + reason in the artifact).
 
 ## When to Use
 
@@ -84,6 +87,11 @@ Preferred inputs:
 4. Existing approved UI designs
 5. Existing design-system documentation
 6. Existing application UI and reusable components
+7. Design-tool target: tool name (e.g. Stitch, Figma) + project reference
+   (project ID/URL, or instruction to create a new project). If absent, the
+   agent must request it at approval time (create-new vs use-existing) — never
+   assume no design-tool output is wanted and never record NOT APPLICABLE
+   without evidence and user agreement.
 
 An unapproved UX specification must not be treated as final design authority.
 
@@ -204,8 +212,8 @@ If visual design appears to require a UX change:
 4. Verify UX preservation; if visual design requires UX change → stop and request UX decision (see diagram below).
 5. Classify scope (new screen / major change / new component / variation / small adjustment) — see ## Determine design scope.
 6. Design screens and components (layout, hierarchy, states, responsive, accessibility) — see ## Screen design, ## Components, ## Visual foundations (references/design-foundations.md).
-7. Create or update external design-tool representation if available — see ## External design tools.
-8. Produce `docs/ui/design/<feature>/overview.md` artifact and request human approval — see ## Design artifact, ## Design status.
+7. Produce `docs/ui/design/<feature>/overview.md` with status `Proposed` and request human approval of the specification — see ## Design artifact, ## Design status, ## Human approval.
+8. After approval: materialize the approved specification in the project's design tool and record the canonical links — see ## External design tools. Only a user waiver (recorded with reason) skips this step.
 
 ```
               ┌─ UX decision unresolved? ─ yes ─► Stop, request clarification
@@ -213,6 +221,10 @@ If visual design appears to require a UX change:
               └─ no ─► Continue                         │
               ┌─ Visual change needs UX change? ─ yes ──► Stop, request UX decision
               └─ no ─► Continue to Scope classification
+                                                         │
+              ┌─ Specification approved? ─ no ─► Stay Proposed, await approval
+              │                                          │
+              └─ yes ─► Materialize in design tool (or record user waiver + reason)
 ```
 
 ## Determine design scope
@@ -308,11 +320,28 @@ For states, responsive behavior, accessibility, design tokens, and interaction p
 
 The workflow is tool-agnostic. Supported integrations include Figma, Stitch, or other MCP/adapters — do not make the skill dependent on a specific platform. The tool-neutral Markdown specification remains the source of truth.
 
+After the specification is approved, materializing it in the project's design tool is mandatory — it is not an optional follow-up. The only way to skip it is an explicit user waiver, recorded in the Design artifact section with the reason.
+
 When materializing an approved design in an external tool, the agent must:
 - preserve the approved UX and UI specification without changing product behavior;
-- use the available integration for that project;
-- record the canonical design artifact/link in the Design artifact section;
-- report integration failures without silently substituting another tool.
+- use the project's configured design-tool target (tool + project reference from ## Inputs); if no target is configured, request it (create-new vs use-existing) instead of skipping;
+- create or update one screen per approved screen, then review each tool screen against the specification; fix deviations through tool edits, never by redefining the spec silently;
+- record the canonical project/screen links in the Design artifact section;
+- report integration failures with evidence, without silently substituting another tool.
+
+Completion test for this step: every approved screen exists in the tool, matches the specification (layout, hierarchy, states, responsive intent), and its link is recorded — or a user waiver with reason is recorded instead.
+
+### Generation timeouts and late arrivals
+
+Generation calls may time out client-side while the design tool keeps working server-side — a timeout is not evidence of failure. Evidence: timed-out requests have repeatedly landed minutes later, and every blind retry produced a duplicate screen.
+
+Rules:
+
+- On a generation timeout, do not retry immediately. Poll `list-screens` (or the tool equivalent) with ~90s backoff, up to ~10 minutes total, to confirm absence.
+- Re-check the screen list immediately before any retry. Only retry on confirmed absence.
+- A late-arriving screen from the original request counts as success — adopt it, do not regenerate.
+- Prefer editing the landed screen over regenerating it when corrections are needed.
+- If duplicates do occur (no delete capability, or a very late arrival), record primary vs duplicate in the artifact and reference only the primary going forward; never silently drop the record.
 
 ## Design artifact
 
@@ -334,7 +363,11 @@ The artifact must include:
 - Responsive behavior
 - Accessibility considerations
 - Open design questions
-- External design-tool link when applicable
+- External design-tool links (one per materialized screen plus project link),
+  OR a user waiver with reason when materialization was explicitly skipped.
+  A missing link without a recorded waiver fails verification — "not
+  applicable" requires evidence (e.g. no integration exists) AND user agreement,
+  never a silent default.
 
 Example:
 
@@ -361,13 +394,19 @@ Never treat a proposed design as approved.
 
 ## Human approval
 
-For new or materially changed UI:
+For new or materially changed UI, two confirmations are required:
 
+Approval 1 — specification:
 1. Present the visual design proposal.
 2. Identify significant design decisions.
 3. Show the relevant design artifact or external design-tool reference.
 4. Ask for explicit human approval.
-5. Record the approval status.
+5. Record the approval status (`Proposed` → `Approved`).
+
+Approval 2 — design-tool output (after materialization per ## External design tools):
+1. Present the tool project/screen links.
+2. Confirm each tool screen matches the approved specification (or report deviations).
+3. Ask for explicit human confirmation unless the user pre-authorized auto-proceed at Approval 1.
 
 Do not hand an unapproved design to implementation as final.
 
@@ -415,6 +454,7 @@ After completing visual design, confirm with evidence:
 - [ ] Responsive behavior defined for desktop/tablet/mobile with meaningful layout changes
 - [ ] Accessibility considerations documented (focus, semantics, labels, contrast, touch targets)
 - [ ] Human approval obtained and status recorded as Proposed or Approved; never handed off as Approved without explicit approval
+- [ ] Post-approval design-tool step resolved: canonical project/screen links recorded, OR a user waiver with reason recorded. A missing link without a waiver fails this checklist — "not applicable" needs evidence AND user agreement
 
 ## Common Rationalizations
 | Rationalization | Reality |
@@ -422,12 +462,14 @@ After completing visual design, confirm with evidence:
 | No design system exists, so invent per-screen colors/fonts | Define minimum reusable tokens only; record for future reuse — don't create one-off styling |
 | UX spec is draft but design can proceed | Unapproved UX must not be treated as final — stop and request clarification if it affects visual design |
 | Design reference looks better, so override UX | Approved UX/RFC/ADR always wins over references — preserve requirement and explain conflict |
+| No design-tool project exists, so skip tool output silently | Request the design-tool target (create-new vs use-existing) — skipping needs evidence AND an explicit user waiver, never silence |
+| Generation timed out, so retry immediately | A timeout is not a failure — poll with backoff (~90s, up to ~10 min) and re-check before any retry; late arrivals count as success |
 
 ## Red Flags
 - Visual design changes user flow or permission behavior without UX decision
 - New component duplicates an existing reusable component under a different name
 - Screen designed only for desktop or only happy-path state
-- Design-tool artifact link missing from handoff artifact
+- Design-tool artifact link missing from handoff artifact without a recorded user waiver
 - Unapproved (Proposed) design passed to implementation as final
 
 ## Policies
