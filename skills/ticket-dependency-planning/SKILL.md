@@ -57,6 +57,33 @@ Follow this order:
 5. Run `Verification`, then request `Human Review` when required.
 6. Report per `Output` without modifying Jira unless explicitly authorized.
 
+## Capability Detection
+
+Dependency planning may use capability-specific detection skills when a new or materially
+changed ticket suggests a specialized implementation capability.
+
+For Stripe recurring subscriptions, use `stripe-subscriptions` as a capability detector. For Stripe one-time payments, use `stripe-one-time-payments` as a capability detector. Route each capability separately and never merge them merely because both use Stripe.
+
+The capability detector:
+
+- identifies whether the requirement needs the relevant Stripe capability (recurring subscriptions or one-time payments)
+- identifies high-level candidate capability areas
+- provides reason, source, evidence, confidence, existing work, and unknowns
+
+The capability detector does not:
+
+- create or modify Jira tickets
+- create Jira dependency links
+- decide final ticket dependencies
+- own the persistent dependency graph
+- implement the capability
+
+After capability detection, continue this skill's normal dependency analysis.
+
+Treat capability output as candidate evidence, not as an automatic dependency.
+
+For Stripe work, implementation guidance belongs to `stripe-best-practices`; consult current Stripe documentation directly (use a docs-lookup skill only when `skills/stripe-docs/SKILL.md` exists). Do not duplicate those implementation responsibilities here.
+
 ## Dependency Model
 
 Represent a dependency as:
@@ -480,7 +507,7 @@ For an uncertain dependency:
 The dependency graph is a persistent planning artifact and must be updated
 rather than recreated as an isolated result for each ticket.
 
-Persist the graph as the `Dependency Graph` + `READY/BLOCKED/PARALLEL` section in the report output and carry it forward to the next run; deltas (added/removed edges with reason/source/confidence) are the evidence for the verification checkbox.
+Persist the graph as the `Dependency Graph` + `READY/BLOCKED/PARALLEL` section in the report output and carry it forward to the next run; deltas (added/removed edges with reason/source/confidence) are the evidence for the verification checkbox. Storage: include the full section in this run's report; when a project dependency record exists (e.g. docs/plan/dependency-graph.md or agreed Jira parent comment), update it and cite path/URL in Output; otherwise state 'No persistent store configured — graph lives only in this report.'
 
 ## Self-Improvement
 

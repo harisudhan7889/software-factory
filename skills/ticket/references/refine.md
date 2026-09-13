@@ -278,7 +278,7 @@ If the user changes the requested refinement after the preview:
 
 After explicit confirmation:
 
-1. Update only the approved fields.
+1. Update only the approved fields via the project's approved Jira update path (if no `scripts/jira-update.sh` exists, use the approved API call; do not use `scripts/jira-create.sh` for updates — it creates, not updates).
 2. Preserve unrelated ticket data.
 3. Verify the Jira update succeeded.
 4. Re-read the issue when practical.
@@ -290,7 +290,7 @@ Do not create a duplicate issue.
 
 ## Phase 10 — Jira comments and traceability
 
-When useful, add a concise Jira comment describing the refinement.
+When useful, add a concise Jira comment describing the refinement via `scripts/jira-comment.sh <KEY> <COMMENT>`.
 
 The comment should include:
 
@@ -358,9 +358,28 @@ If refinement reveals actionable work outside the ticket:
 2. Ask whether a separate Jira item should be created.
 3. Do not create it before explicit approval.
 
-## Phase 13 — Self-improvement
 
-Follow the common self-improvement standard used by the software factory.
+## Phase 13 — Capability detection
+
+When a refinement materially changes the ticket's payment, billing, or subscription behavior, re-evaluate applicable specialized capabilities before the final proposal.
+
+For Stripe recurring subscriptions, use `stripe-subscriptions` as the capability detector. For Stripe one-time payments, use `stripe-one-time-payments` as the capability detector. Route each capability separately.
+
+The detector may identify candidate capability areas, but it must not:
+
+- create Jira tickets
+- modify Jira dependency links
+- expand the ticket scope silently
+- own the persistent dependency graph
+- provide Stripe implementation instructions
+
+If the refinement changes dependency-relevant work, pass the capability findings to `ticket-dependency-planning`, which owns dependency analysis and graph updates.
+
+Do not duplicate Stripe implementation guidance here. `stripe-best-practices` owns implementation guidance.
+
+## Phase 14 — Self-improvement
+
+Follow the common self-improvement standard in `../self-improvement/references/standard.md`.
 
 Review the refinement run for:
 

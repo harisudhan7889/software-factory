@@ -52,6 +52,21 @@ Only actionable work should normally become Jira issues.
 
 Do not create issues for background information, decisions, or speculative future work.
 
+
+## Capability detection
+
+During RFC decomposition, use capability detection when actionable work indicates a specialized implementation capability.
+
+For Stripe recurring subscriptions, use `stripe-subscriptions` to determine whether the RFC contains subscription-related capability areas. For Stripe one-time payments, use `stripe-one-time-payments` to determine whether the RFC contains one-time-payment capability areas. Route each capability separately.
+
+The capability detector (`stripe-subscriptions`) defines the candidate areas (plan/price setup, checkout flow, lifecycle, app state) — do not copy the list here; use detector output.
+
+Treat these as candidate work areas supported by the RFC. Do not create additional Jira scope solely from keyword matches or from the detector alone.
+
+When candidate work creates dependency relationships, pass the findings to `ticket-dependency-planning`. That skill owns the actual dependency graph and READY/BLOCKED/parallel analysis.
+
+Do not put Stripe implementation instructions into the generated Stories. Use `stripe-best-practices` during implementation.
+
 ## Determine Jira structure
 
 ### No Jira work
@@ -264,3 +279,22 @@ EPIC
 Summary: <epic summary>
 Description: <epic description>
 Priority: <priority>
+```
+
+### If Stories/Tasks only
+
+Present each Story/Task with Summary/Description/Priority/Labels/UI-UX per above.
+
+## Confirm
+
+Show the complete Proposed Jira structure including Epics. Wait for explicit confirmation ("create"/"confirmed"/"yes"/"go ahead") before creating anything. If request changes, revise proposal and re-confirm. Do NOT call creation scripts until approved.
+
+## Workflow
+
+1. Read RFC.
+2. Classify + detect capabilities.
+3. Determine structure.
+4. Draft Stories per Story quality + templates.
+5. Show proposal + Confirm.
+6. After confirmation, create via `scripts/jira-create.sh` (one call per issue, Epic first).
+7. Return keys/URLs.
