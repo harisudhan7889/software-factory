@@ -21,6 +21,7 @@ Infer from user input. Only ask for values that cannot be determined:
 | RFC reference | If the ticket originates from an RFC `breakdown` invocation (or the user supplies an RF number/path), append an **RFC reference** to the description: a link `docs/rfc/short-title/overview.md`. Omit when not RFC-driven | 
 | Design exploration | If the user supplies a `design-explorations/<short-name>.selection.md` path, verify the file exists with `Status: Approved`, then append a **Design input** block to the description per `references/templates.md` with the selection path, comparison path, and selected direction. Omit when no approved selection applies. Never accept a conversational selection alone. Show the design references in the confirmation preview. |
 | Epic | Determine the most appropriate Epic for any issue that can belong to an Epic. Search the current Jira project and use the current request, RFC/ADR context, related Jira issues, and originating issue when applicable. Verify the Epic belongs to `$JIRA_PROJECT_KEY`. Never invent an Epic. If no suitable Epic can be determined with reasonable confidence, ask the user. |
+| Links | Optional comma-separated relationships to existing issues: `Relates:KEY` (follow-up / associated work), `Blocks:KEY` (new issue blocks KEY), `BlockedBy:KEY` (new issue is blocked by KEY). Propose from the originating issue and related Jira issues when applicable; show in the confirmation preview; create only after confirmation. Omit entirely when nothing is related — never invent links. |
 
 ## Bug evidence and reproduction rules
 
@@ -65,6 +66,7 @@ Summary: <ticket summary>
 Description: (none)
 Priority: Medium
 Labels: Web, agent-created
+Links: Relates:<ISSUE-KEY> (or Blocks:<ISSUE-KEY> / BlockedBy:<ISSUE-KEY>, or (none))
 ```
 
 Wait for explicit confirmation. The user must explicitly say "create", "confirmed", "yes", "go ahead", or similar affirmation before proceeding. If user request changes, loop back to step 2. **Do NOT call the creation script until the user has explicitly approved.**
@@ -85,6 +87,10 @@ Wait for explicit confirmation. The user must explicitly say "create", "confirme
 6. After confirmation, create the ticket using:
 
 `scripts/jira-create.sh`
+
+Pass relationships via the `links` input (e.g. `"links": "Relates:RARRADAR-6"`).
+Links are created after the issue; a failed link never undoes the creation
+(the script reports which links failed — relay that to the user).
 
 7. Return the Jira key and URL.
 

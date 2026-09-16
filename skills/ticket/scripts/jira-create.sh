@@ -66,6 +66,7 @@ ISSUE_TYPE=$(echo "$INPUT" | jq -r '.issue_type // "Story"')
 PRIORITY=$(echo "$INPUT" | jq -r '.priority // "Low"')
 LABELS=$(echo "$INPUT" | jq -r '.labels // empty')
 PARENT=$(echo "$INPUT" | jq -r '.parent // empty')
+LINKS=$(echo "$INPUT" | jq -r '.links // empty')
 
 # Validate required fields
 if [ -z "$SUMMARY" ]; then
@@ -158,3 +159,58 @@ fi
 echo "Created Jira issue:"
 echo "Key: $ISSUE_KEY"
 echo "URL: $JIRA_BASE_URL/browse/$ISSUE_KEY"
+
+# Optional issue links, comma-separated: "Relates:KEY,Blocks:KEY,BlockedBy:KEY".
+#   Relates   -> new issue relates to KEY (symmetric).
+#   Blocks    -> new issue blocks KEY.
+#   BlockedBy -> new issue is blocked by KEY.
+# Links are created only after the issue exists. A failed link never undoes
+# the creation: the key is already printed above, failures are reported here.
+if [ -n "$LINKS" ]; then
+    LINK_OK=0
+    LINK_FAIL=0
+    OLD_IFS="$IFS"
+    IFS=','
+    for SPEC in $LINKS; do
+        REL="$(echo "$SPEC" | cut -d: -f1 | tr '[:upper:]' '[:lower:]' | tr -d ' -')"
+        TARGET="$(echo "$SPEC" | cut -sd: -f2- | tr -d ' ')"
+        case "$REL" in
+            relates) TYPE="Relates"; INWARD="$TARGET"; OUTWARD="$ISSUE_KEY" ;;
+            blocks) TYPE="Blocks"; INWARD="$TARGET"; OUTWARD="$ISSUE_KEY" ;;
+            blockedby) TYPE="Blocks"; INWARD="$ISSUE_KEY"; OUTWARD="$TARGET" ;;
+            *)
+                echo "Warning: skipping invalid link '$SPEC' (use Relates:KEY, Blocks:KEY, or BlockedBy:KEY)" >&2
+                LINK_FAIL=$((LINK_FAIL + 1))
+                continue
+                ;;
+        esac
+        if [ -z "$TARGET" ]; then
+            echo "Warning: skipping link '$SPEC' (missing issue key)" >&2
+            LINK_FAIL=$((LINK_FAIL + 1))
+            continue
+        fi
+        LINK_RESPONSE=$(curl -sS \
+            -u "$JIRA_EMAIL:$JIRA_API_TOKEN" \
+            -X POST \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            "$JIRA_BASE_URL/rest/api/3/issueLink" \
+            --data "$(jq -n \
+                --arg type "$TYPE" \
+                --arg inward "$INWARD" \
+                --arg outward "$OUTWARD" \
+                '{type: {name: $type}, inwardIssue: {key: $inward}, outwardIssue: {key: $outward}}')")
+        if echo "$LINK_RESPONSE" | jq -e '.errorMessages // .errors // empty' > /dev/null 2>&1; then
+            echo "Warning: link '$SPEC' failed:" >&2
+            echo "$LINK_RESPONSE" | jq . >&2
+            LINK_FAIL=$((LINK_FAIL + 1))
+        else
+            echo "Linked: $ISSUE_KEY $REL $TARGET"
+            LINK_OK=$((LINK_OK + 1))
+        fi
+    done
+    IFS="$OLD_IFS"
+    if [ "$LINK_FAIL" -gt 0 ]; then
+        echo "Warning: $LINK_FAIL of $((LINK_OK + LINK_FAIL)) link(s) failed (issue $ISSUE_KEY was still created)" >&2
+    fi
+fi

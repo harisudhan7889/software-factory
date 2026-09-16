@@ -545,6 +545,11 @@ Example:
 
 Do not push to a remote repository unless the user explicitly asks.
 
+Committing and pushing must not transition the Jira Story. The Story
+stays `In Progress` after commit and after push. The transition to
+`In Review` happens only when the Pull Request is opened and is owned by
+the `/factory pr` skill — never by this workflow.
+
 ## Final report
 
 Report:
@@ -629,23 +634,13 @@ If adding the Jira comment fails:
 - Report that the implementation succeeded but the Jira update failed.
 - Include the commit hash in the final response.
 
-## Phase 14 — Move Jira Story to In Review
+## Phase 14 — In Review transition (not performed here)
 
-After:
+Do not transition the Story to `In Review` in this workflow — not on
+commit and not on push.
 
-- implementation is complete
-- tests pass
-- linting and type checking pass
-- implementation review is complete
-- the local Git commit has been created
-
-transition the Jira Story to `In Review`.
-
-Run:
-
-`skills/ticket/scripts/jira-transition.sh <JIRA-KEY> "In Review"`
-
-Verify that the transition succeeds.
+The transition to `In Review` happens only when the Pull Request is
+opened and is owned by the `/factory pr` skill.
 
 Do not transition the Story to `Done`.
 

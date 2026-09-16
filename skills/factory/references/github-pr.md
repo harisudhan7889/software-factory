@@ -508,6 +508,31 @@ If Jira synchronization fails:
 - Report that GitHub delivery succeeded but Jira synchronization failed.
 - Allow synchronization to be retried.
 
+## Phase 12b — Transition Jira to review status
+
+After the Pull Request comment is posted:
+
+1. Read the Jira issue's available transitions.
+2. If a transition to the review status (`In Review` or the project's
+   equivalent) is available and the issue is not already in that status,
+   transition it.
+3. Report the transition (previous status → new status) alongside the
+   Pull Request comment confirmation.
+4. If no review transition is available, report that fact and continue.
+   Do not fail the Pull Request workflow.
+5. If the issue is already in the review status, skip the transition and
+   report that no change was required.
+
+If the transition call fails:
+
+- Do not undo the Pull Request.
+- Do not remove the Pull Request comment.
+- Report GitHub delivery as successful and the Jira transition as failed.
+- Allow the transition to be retried.
+
+The transition step must be idempotent and must never invent a status
+name. Use only transitions reported as available by Jira.
+
 ## Post-merge Jira synchronization
 
 Post-merge synchronization is handled by GitHub Actions rather than by the
@@ -858,6 +883,9 @@ Latest CI/check status:
 
 Jira synchronization:
 <updated/not updated/not applicable>
+
+Jira transition:
+<transitioned to review / already in review / not available / failed / not applicable>
 
 Self-improvement:
 <none identified / improvements proposed / improvements applied>
