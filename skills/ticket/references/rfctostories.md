@@ -50,6 +50,17 @@ Only actionable work should normally become Jira issues.
 
 Do not create issues for background information, decisions, or speculative future work.
 
+### Foundation/scaffold tripwire
+
+When the RFC's platform files or workstreams assume a framework, scaffold, or platform shell (app router, Xcode/Gradle project, CI pipeline, backend project) that no work item delivers:
+
+1. Stop before proposing the structure.
+2. Verify against the repo whether the foundation already exists.
+3. If it is missing, ask the user whether to add a scaffold/setup story or task (owner of the foundation, depended on by the feature work) — do not silently file only the feature slices, and do not silently invent the scaffold ticket.
+4. Record an assumed-but-unscheduled foundation as an open question in the proposal when the user declines to add it.
+
+An assumed foundation with neither a ticket nor in-repo evidence is a defect in the proposal, not caution.
+
 ## Capability detection
 
 During RFC decomposition, use capability detection when actionable work indicates a specialized implementation capability.

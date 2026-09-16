@@ -244,9 +244,30 @@ Labels:
 Status:
 <current status>
 
+Status change:
+<none / → Ready for development via scripts/jira-transition.sh>
+
 Changes:
 <exact fields that will change>
 ```
+
+### Description format (structured ADF)
+
+Jira Cloud renders the `description` field from Atlassian Document Format
+(ADF) nodes — a `\n` inside a single `text` node does NOT render as a line
+break. Never submit the description as one `paragraph` containing the whole
+text; it renders as a single unformatted block.
+
+Build `description_adf` with structured nodes:
+
+- `heading` (level 2) for each section: Goal, Scope, Acceptance criteria,
+  UI/UX, Additional context (match the issue-type template in
+  `references/templates.md`).
+- `bulletList` for Scope/files, `orderedList` (order 1) for acceptance
+  criteria / reproduction steps.
+- `strong` mark for field labels (e.g. `UX artifact:`), `code` mark for file
+  paths.
+- Plain `paragraph` nodes for body copy.
 
 For description changes, clearly show the resulting description rather than
 only a vague summary.
@@ -278,11 +299,22 @@ If the user changes the requested refinement after the preview:
 
 After explicit confirmation:
 
-1. Update only the approved fields via the project's approved Jira update path (if no `scripts/jira-update.sh` exists, use the approved API call; do not use `scripts/jira-create.sh` for updates — it creates, not updates).
+1. Update only the approved fields via `scripts/jira-update.sh <KEY>`
+   (reads update JSON from stdin: `{"description_adf": {...},
+   "labels": [...], "summary": "...", "priority": "..."}` — include only
+   approved fields). Do not use `scripts/jira-create.sh` for updates —
+   it creates, not updates.
 2. Preserve unrelated ticket data.
-3. Verify the Jira update succeeded.
-4. Re-read the issue when practical.
-5. Confirm the resulting values match the approved proposal.
+3. After the fields update succeeds, move the issue to
+   `Ready for development` via
+   `scripts/jira-transition.sh <KEY> "Ready for development"`.
+   If the issue is already in `Ready for development`, skip the transition.
+   If no transition to `Ready for development` is available from the current
+   status, report it and stop — do not force a different transition.
+4. Verify the Jira update succeeded.
+5. Re-read the issue when practical (including `renderedFields.description`
+   to confirm headings/lists rendered, not a single paragraph block).
+6. Confirm the resulting values and status match the approved proposal.
 
 Do not recreate the Jira issue.
 
@@ -315,6 +347,9 @@ Before each mutating operation:
 - Do not duplicate labels.
 - Do not create duplicate comments when avoidable.
 - Already has `agent-refined` → do not add it again.
+- Already in `Ready for development` → do not transition again.
+- Already renders with structured headings/lists → do not re-submit the
+  description merely for formatting.
 - Preserve all existing labels while adding refinement labels.
 
 Examples:
@@ -350,7 +385,9 @@ The workflow must not silently:
 - Split a ticket into multiple issues without explicit approval.
 - Delete useful existing ticket information.
 - Move the ticket to `Done`.
-- Change workflow status unless the user explicitly requests it.
+- Change workflow status to anything other than the standard refine
+  transition to `Ready for development` (Phase 9 factory default, shown in
+  the preview). Any other status change needs explicit per-ticket approval.
 
 If refinement reveals actionable work outside the ticket:
 
@@ -419,6 +456,9 @@ Changes applied:
 - <field>: <result>
 - <field>: <result>
 
+Status:
+<previous status → current status / transition skipped / failed>
+
 Unchanged:
 - <relevant fields>
 
@@ -457,4 +497,6 @@ Never silently:
 - Remove existing acceptance criteria.
 - Add unrelated design references.
 - Create follow-up Jira work.
+- Submit the description as a single unstructured paragraph.
+- Skip the `Ready for development` transition after a successful refinement.
 - Modify the Jira issue before confirmation.

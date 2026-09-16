@@ -55,9 +55,10 @@ See `references/breakdown.md` for the full procedure.
 Flip an RFC from Proposed to Accepted in its PR, immediately before merge.
 
 1. Resolve the RFC: `NNNN` → `docs/rfc/NNNN-*/overview.md`, or use the given path. If it does not resolve to a single file, ask the user which RFC with the `vscode_ask_questions` tool.
-2. In `docs/rfc/NNNN-*/overview.md`, replace the status cell from **Proposed** with **Accepted**. If it already reads **Accepted**, stop (no-op).
-3. In `docs/rfc/UPDATES.md`, update that RFC's index-row status cell from Proposed to Accepted.
-4. Commit both files on the PR branch via the commit skill (`bash .github/skills/commit/scripts/create-commit.sh "docs: accept RFC"`).
+2. Verify the work-breakdown foundation is scheduled or evidenced: every framework path in the table's `Files` column must resolve to either a scaffold row in the same table or recorded in-repo evidence. If the foundation is assumed but unscheduled, stop — do not flip to Accepted. Report the missing scaffold and ask whether to amend the RFC first.
+3. In `docs/rfc/NNNN-*/overview.md`, replace the status cell from **Proposed** with **Accepted**. If it already reads **Accepted**, stop (no-op).
+4. In `docs/rfc/UPDATES.md`, update that RFC's index-row status cell from Proposed to Accepted.
+5. Commit both files on the PR branch via the commit skill (`bash .github/skills/commit/scripts/create-commit.sh "docs: accept RFC"`).
 
 ## reject
 

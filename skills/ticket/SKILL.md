@@ -77,9 +77,11 @@ When creating any Jira issue that can belong to an Epic:
 
 After ticket operations, confirm with evidence:
 - [ ] Correct reference followed (`create` / `rfctostories` / `refine`) and Epic validated to belong to current project
-- [ ] Ticket preview shown including Epic and user confirmation obtained before calling `scripts/jira-create.sh`
+- [ ] Ticket preview shown in output text including Epic (and status change for `refine`) and user confirmation obtained before calling `scripts/jira-create.sh` (create) or `scripts/jira-update.sh` + `scripts/jira-transition.sh` (refine)
 - [ ] No requirements invented; scope kept per reference templates
-- [ ] Jira key/URL returned after creation
+- [ ] Description written as structured ADF (headings/lists, not a single paragraph) and rendered output verified via `renderedFields`
+- [ ] Refined ticket moved to `Ready for development` (or skip reported when already there)
+- [ ] Jira key/URL returned after creation; key/status returned after refinement
 - [ ] If an Epic was created, `overview.md` was updated with its Jira key and link
 
 ## Common Rationalizations
@@ -87,15 +89,21 @@ After ticket operations, confirm with evidence:
 |---|---|
 | No Epic found, pick the first one | Ask user rather than guessing per :60 — never invent Epic |
 | Skip preview, just create | Do not create without user confirmation per :28 |
+| Plain text with newlines is fine for Jira | ADF ignores bare `\n` in one text node — build structured nodes per `refine.md` Phase 8, and `jira-update.sh` rejects single-paragraph dumps |
+| Refine leaves status alone | `refine` moves the ticket to `Ready for development` per `refine.md` Phase 9 — skipping it is a defect, not caution |
 
 ## Red Flags
 - Jira issue created without Epic preview when Epic applicable
 - Ticket created before explicit "create"/"yes" confirmation
 - Requirements invented not in user request or RFC
+- Refined description renders as one unformatted block (single-paragraph ADF)
+- Refined ticket left in its old status instead of `Ready for development`
+- Preview sent only inside a confirmation prompt instead of output text
 
 ## Policies
 
-Use:
+Use the following project policies when they exist in the workspace
+(absent here — do not treat these links as existing files until added):
 - `policies/guardrails.md` for scope and approval. Do not create or modify Jira issues without user confirmation.
 - `policies/verification.md` for Jira verification and completion evidence.
 - `policies/security.md` for Jira credentials and data protection.

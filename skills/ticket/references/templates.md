@@ -1,6 +1,6 @@
 # Ticket Templates
 
-Templates for the Jira ticket description field, organized by issue type. Lines that serve as section headings (e.g., "Acceptance criteria", "Expected behaviour") are rendered **bold** automatically by the creation script.
+Templates for the Jira ticket description field, organized by issue type. Write them as structured ADF on submit: section headings as `heading` nodes, acceptance criteria / steps as `orderedList`, scope lists as `bulletList` (plain-text newlines alone do not render — see `refine.md` Phase 8).
 
 ## Story / Task
 

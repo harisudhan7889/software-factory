@@ -58,6 +58,7 @@ Follow the structure in `references/overview.md` exactly and create it under `do
 - **Cross-cutting concerns:** Testing, backwards compatibility, logging
 - **Implementation phases:** Sequential phases
 - **Work breakdown:** Proposed implementation tickets as a table (`# | Task | Epic | Platform | Phase | Depends-on | Files | Type | Ticket`) — the deterministic source of truth for what gets built. One row per self-contained ticket; the Phase column references the delivering phase; name each task's owning Epic (default to this RFC's Epic). Fill `Depends-on` with the comma-separated row numbers (or ticket keys) a row must merge after (`-` if none) and `Files` with the comma-separated repo-relative source paths the row edits — these make `rfc build` wave scheduling deterministic. Leave `Ticket` as `TBD` until created.
+- **Foundation check:** before finalizing the table, verify every framework path in `Files` (`app/`, `pages/`, Activities, ViewControllers, Gradle/Xcode project files, CI workflows, backend projects, etc.) against the repo. If the framework/scaffold those paths assume is not present, row 1 must be the scaffold ticket (framework install, router/shell, CI wiring) and every row that needs it lists row 1 in `Depends-on`. If the scaffold already exists, record the evidence instead of a ticket (e.g. `verified: Next.js 14 in package.json`). Never leave the foundation assumed but unscheduled — an RFC whose feature rows cannot build without unlisted setup work must not be accepted.
 - **Alternatives considered:** From context, or leave for team discussion
 
 
@@ -92,6 +93,7 @@ Before completing, verify:
 
 - [ ] `overview.md` has all template sections filled (no placeholder `...` or `<!-- →` comments remaining)
 - [ ] The Work breakdown table is populated (one row per ticket, each mapped to an Epic and a phase); no placeholder rows remain
+- [ ] Foundation is scheduled or verified: no `Files` entry assumes a framework/scaffold that has neither a breakdown row nor recorded in-repo evidence
 - [ ] Platform files match the template structure (APIs, Error Model, Data storage, Code, Degree of constraint, Alternatives, File structure)
 - [ ] Every platform file with server-side data or logic declares **Backend platform** (factory ADR-0002 default by reference, or the project exception ADR) and every Data storage row names its platform service with expiry and secret-boundary notes — no bare "server-side"
 - [ ] Platform file headers link back to `overview.md`
