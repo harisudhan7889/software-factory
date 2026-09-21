@@ -126,6 +126,12 @@ Comparison: design-explorations/<short-name>.html (Direction X — <Name>)
 Selected: Direction X — <Name>
 ```
 
+When the refined ticket references an approved design, its acceptance
+criteria must include design-fidelity criteria (implementation matches the
+approved screen's layout, tokens, states, and responsive/accessibility
+behavior). A design reference without corresponding acceptance criteria
+leaves the ticket unverifiable — never refine a UI ticket into that state.
+
 Omit the `Design exploration:` lines when no approved selection applies. When they apply, verify both files exist and the selection record has `Status: Approved` before adding them. Use only approved selections.
 
 For a non-UI issue:

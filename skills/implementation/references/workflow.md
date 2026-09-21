@@ -71,6 +71,11 @@ Before creating the implementation plan:
    to the current Story.
 5. Use these artifacts when creating the implementation plan.
 
+If no design-tool functions are loaded in the current session, check the
+user's opencode MCP configuration for a configured design integration and
+query it before declaring an external artifact inaccessible. Never print
+or copy credential values; keep keys in per-command shell variables.
+
 ### Design-exploration inputs
 
 When the Jira Story references approved design-exploration artifacts:
@@ -416,6 +421,19 @@ Verify, when applicable:
 
 Method for v1 design-exploration verification: manual browser side-by-side comparison of the running app against the selected direction section of the comparison artifact. Do not add screenshot-diff infrastructure for v1.
 
+### UI fidelity method
+
+Do not translate designs from thumbnails or memory. Extract exact values
+(spacing, type scale, radii, shadows, container widths, colors, fonts)
+from the design artifact's code or token output, and record the source of
+each value family in the implementation plan.
+
+If the session cannot screenshot the running app, report visual
+verification as structural-only: list each surface, what was checked
+(structure, classes, tokens), and what was not verified (rendered pixel
+output). Never claim a pixel or design match that was not visually
+verified.
+
 A UI Story must not be considered fully implemented when it only satisfies
 the Jira acceptance criteria but materially deviates from the approved
 UX/UI design.
@@ -477,6 +495,11 @@ compliance, or other project work outside the current Story:
 6. Link the new Jira item to the current Story when appropriate.
 7. If the user declines, record the item under `Remaining issues`.
 8. Do not expand the current Story's scope without explicit approval.
+
+Deferred visual/styling work on a Story with approved design is
+actionable follow-up work under this rule — "styling arrives later" is
+only valid with a created (or explicitly approved) follow-up ticket.
+A baseline merged without one silently drops the design.
 
 The implementation workflow MUST NOT silently create follow-up Jira items.
 

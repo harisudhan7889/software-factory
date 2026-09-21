@@ -194,6 +194,11 @@ design already exists:
 - Identify the applicable approved UI design.
 - Identify the canonical external design link when available.
 - Include the design reference in the Jira ticket description.
+- Include design-fidelity acceptance criteria in the Jira ticket: the
+implementation must match the approved screen's layout, design tokens,
+states, and responsive/accessibility behavior. A reference link alone is
+not an acceptance criterion and must never be the only design-related
+content in the ticket.
 
 
 
@@ -221,6 +226,9 @@ approved.
 - Include the relevant design artifact path when available.
 - The design link must correspond to the specific work being tracked.
 - Do not add unrelated design links.
+- Add design-fidelity acceptance criteria (layout, tokens, states per the
+approved design). The ticket must be unverifiable as complete without
+them; a reference link alone never counts as design coverage.
 
 For non-UI Jira tickets:
 

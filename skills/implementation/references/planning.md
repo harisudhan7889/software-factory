@@ -138,3 +138,8 @@ Before finalizing the plan, verify:
 - Tests are included.
 - Out-of-scope work is identified.
 - When design-exploration input applies, the plan identifies how the approved selection translates into the UI.
+- When the Story references an approved UX/UI design, the plan includes
+  its visual implementation (layout, tokens, states) — a structure-only
+  baseline with styling deferred is not a complete plan unless the visual
+  work is split into a tracked follow-up ticket at plan time. Deferred
+  styling without a ticket means "never", not "later".
