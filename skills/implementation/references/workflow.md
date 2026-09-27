@@ -76,6 +76,21 @@ user's opencode MCP configuration for a configured design integration and
 query it before declaring an external artifact inaccessible. Never print
 or copy credential values; keep keys in per-command shell variables.
 
+### Stitch design handoff
+
+When the Jira Story references an approved Stitch design:
+
+1. Read the referenced Stitch design information in the Story or approved design artifact.
+2. Read `skills/stitch-handoff/SKILL.md`.
+3. Run the Stitch handoff before creating the implementation plan.
+4. Retrieve and inspect the approved Stitch screenshot.
+5. Treat the screenshot as the primary visual reference.
+6. Treat Stitch HTML and other generated data as supporting references only.
+7. Carry the Stitch handoff details into the implementation plan.
+8. If the required approved screenshot cannot be retrieved, follow the handoff's `BLOCKED`/`UNKNOWN` result and the existing design-access stop rule. Do not proceed by treating HTML as equivalent visual proof.
+
+The Stitch handoff prepares the target reference; it does not implement production code or prove that the implementation matches the design.
+
 ### Design-exploration inputs
 
 When the Jira Story references approved design-exploration artifacts:
@@ -404,6 +419,7 @@ For UI Stories, verify the implementation against:
 2. Approved UI design specification
 3. Referenced external design artifact
 4. Approved design-exploration selection and comparison (when the Story references them)
+5. Approved Stitch screenshot from `stitch-handoff` (when the Story references Stitch)
 
 Verify, when applicable:
 
@@ -417,9 +433,24 @@ Verify, when applicable:
 - Accessibility
 - Design-system usage
 - Selected-direction `Preserve:` decisions and aspirational/gap handling (when design-exploration input applies)
+- Stitch visual fidelity against the approved Stitch screenshot when Stitch input applies
 - No unrelated redesign
 
 Method for v1 design-exploration verification: manual browser side-by-side comparison of the running app against the selected direction section of the comparison artifact. Do not add screenshot-diff infrastructure for v1.
+
+### Stitch fidelity method
+
+When a Story references an approved Stitch design:
+
+1. Render the implemented screen in a real browser.
+2. Capture the implemented screen at the approved target viewport when available.
+3. Compare it with the approved Stitch screenshot.
+4. Use the Stitch HTML only to clarify structure or supporting details; it must not override the screenshot.
+5. Fix material visual differences that are within the Story scope.
+6. Repeat the comparison after fixes.
+7. Do not claim visual fidelity based on HTML inspection alone.
+
+If the running implementation cannot be captured, report visual verification as unverified/structural-only under the existing screenshot limitation rule. Do not claim a design match.
 
 ### UI fidelity method
 
@@ -554,6 +585,7 @@ Before completing the workflow, verify:
 - For UI Stories, the implementation matches the approved UX and UI design
   artifacts, and referenced external design artifacts were inspected when
   available.
+- For UI Stories with approved Stitch design input, the implementation was compared against the approved Stitch screenshot at the relevant target viewport, and HTML was used only as supporting reference.
 - For UI Stories with design-exploration input, the implementation matches the approved selection and comparison artifacts.
 
 ## Phase 12 — Commit

@@ -35,6 +35,7 @@ Do not use when:
 - Do not invent requirements.
 - Do not implement unrelated Jira Stories.
 - When the Story references approved `design-explorations/*.selection.md` and comparison `.html`, consume them per `references/workflow.md` Phase 2/9; never proceed on conversational selection alone; never implement production UI without a Jira Story.
+- When the Story references an approved Stitch design, consume `stitch-handoff` per `references/workflow.md` before implementation planning; treat the approved Stitch screenshot as the primary visual reference and Stitch HTML as supporting information only.
 - Do not modify the codebase during the planning phase.
 - Do not create an ADR for routine implementation details.
 - If a genuinely new architectural decision is required, stop and use
@@ -79,17 +80,23 @@ The `/implementation work` operation must:
 11. Commit the completed implementation locally.
 12. Do not push to a remote unless explicitly requested.
 
+Branch determination (`references/workflow.md` Phases 6.1–6.2) and Jira updates (Phases 13–14) are mandatory gates in the full workflow; the summary above is not a substitute — follow `references/workflow.md` for the complete sequence.
+
 ## Verification
 
-Before commit, confirm per references/workflow.md Phase 11:
-- [ ] Acceptance criteria satisfied, relevant tests/typecheck/lint pass, no unrelated changes, no secrets committed, ADR/RFC alignment verified (and for UI Stories, UX/UI design compliance per Phase 9)
+Before commit, confirm per `references/workflow.md` Phase 11:
+- [ ] Acceptance criteria satisfied per Jira Story
+- [ ] Relevant tests, typecheck, and lint pass with evidence (no claimed passes)
+- [ ] No unrelated changes; no secrets committed
+- [ ] RFC/ADR alignment verified; for UI Stories, UX/UI design compliance verified per Phase 9
+- [ ] For UI Stories with an approved Stitch design, the `stitch-handoff` reference was consumed and the implementation was reviewed against the approved Stitch screenshot per Phase 9 (mark N/A when no Stitch design applies)
 
 ## Common Rationalizations
 | Rationalization | Reality |
 |---|---|
-| Skip inspecting existing codebase, just implement | Inspect repository first per General rules:21 and references/workflow.md Phase 3 |
-| Modify code before plan approval to save time | Do not modify codebase during planning / Wait for explicit approval per :27,67 |
-| Create ADR for every Story change | Do not create ADR for routine details; only when genuinely new architecture decision per :28 |
+| Skip inspecting existing codebase, just implement | Inspect repository first per General rules ("Inspect the existing codebase…") and `references/workflow.md` Phase 3 |
+| Modify code before plan approval to save time | Do not modify the codebase during planning; wait for explicit approval per General rules and `references/workflow.md` Phases 5–6 |
+| Create ADR for every Story change | Do not create an ADR for routine details; only when a genuinely new architectural decision is required per General rules and `references/workflow.md` Phase 4 |
 
 ## Red Flags
 - Implementation modifies code before `references/planning.md` approval

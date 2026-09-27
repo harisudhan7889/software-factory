@@ -9,6 +9,7 @@ The implementation plan must be based on:
 3. Relevant ADRs
 4. The existing codebase
 5. The approved design-exploration selection and comparison (when the Story references them)
+6. The approved Stitch design handoff and primary screenshot (when the Story references Stitch)
 
 ## Goal
 
@@ -65,7 +66,9 @@ Return:
 
 ## Design input
 
-<List the approved selection path and direction plus the comparison path and section when the Story references design-exploration input. Omit when not applicable.>
+<List the approved selection path and direction plus the comparison path and section when the Story references design-exploration input. Omit when not applicable.
+
+When the Story references an approved Stitch design, also include the `stitch-handoff` result: the Stitch screen/reference, primary screenshot, supporting HTML when available, target viewport when available, and important visual notes. Treat the screenshot as the primary visual reference and HTML as supporting information only. Omit Stitch details when not applicable.>
 
 ## Existing code
 
@@ -138,6 +141,7 @@ Before finalizing the plan, verify:
 - Tests are included.
 - Out-of-scope work is identified.
 - When design-exploration input applies, the plan identifies how the approved selection translates into the UI.
+- When Stitch design input applies, the plan identifies the approved Stitch screenshot as the primary visual reference and treats Stitch HTML as supporting information only.
 - When the Story references an approved UX/UI design, the plan includes
   its visual implementation (layout, tokens, states) — a structure-only
   baseline with styling deferred is not a complete plan unless the visual
