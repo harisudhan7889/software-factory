@@ -96,6 +96,7 @@ skills/
   self-improvement/        # shared standard only, no SKILL.md
   simple-english/
   skill-audit/
+  stitch-handoff/
   stripe-best-practices/
   stripe-docs/
   stripe-one-time-payments/
@@ -326,6 +327,14 @@ Location: `skills/self-improvement/references/standard.md`.
 
 Propose a factory change only with real evidence: repeated failure, workaround, user correction, missing control, or repeated manual work. Most runs need no proposal. Each proposal must include finding, root cause, evidence, file path, current behavior, proposed update, and expected benefit. Human approval is required.
 
+### 22. `stitch-handoff` — Prepare a Stitch design for implementation
+
+Purpose: Turn an approved Stitch design into a visual-first handoff for `implementation`.
+
+Use during implementation when an accepted Jira Story references an approved Stitch design. It retrieves the screenshot as the primary visual reference and treats HTML as supporting information only. Result status is `READY`, `BLOCKED`, or `UNKNOWN`.
+
+It does not write production code, create Jira work, or change requirements. Visual verification stays with `implementation`, which compares real browser rendering against the approved screenshot.
+
 ## Agents — Who Does The Work
 
 Agents are focused roles. They use skills to do their job.
@@ -506,7 +515,7 @@ Then run:
 /implementation work <JIRA-KEY>
 ```
 
-The agent builds on branch `feat/<JIRA>-<slug>`. It follows RFC, ADRs, and UX/UI specs. It runs tests, typecheck, lint, and build. It commits locally. It loads `supabase`, `supabase-postgres-best-practices`, or `stripe-best-practices` when relevant. For Stripe docs questions, it uses `stripe-docs`.
+The agent builds on branch `feat/<JIRA>-<slug>`. It follows RFC, ADRs, and UX/UI specs. It runs tests, typecheck, lint, and build. It commits locally. It loads `supabase`, `supabase-postgres-best-practices`, or `stripe-best-practices` when relevant. For Stripe docs questions, it uses `stripe-docs`. For Stories with an approved Stitch design, it runs the `stitch-handoff` skill first and treats the approved screenshot as the primary visual reference.
 
 ### Step 11. Open the PR
 
