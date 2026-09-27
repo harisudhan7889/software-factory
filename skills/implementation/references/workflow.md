@@ -434,6 +434,8 @@ Verify, when applicable:
 - Design-system usage
 - Selected-direction `Preserve:` decisions and aspirational/gap handling (when design-exploration input applies)
 - Stitch visual fidelity against the approved Stitch screenshot when Stitch input applies
+- Running-application screenshot captured at the relevant target viewport when Stitch input applies
+- Final visual comparison result recorded
 - No unrelated redesign
 
 Method for v1 design-exploration verification: manual browser side-by-side comparison of the running app against the selected direction section of the comparison artifact. Do not add screenshot-diff infrastructure for v1.
@@ -451,6 +453,22 @@ When a Story references an approved Stitch design:
 7. Do not claim visual fidelity based on HTML inspection alone.
 
 If the running implementation cannot be captured, report visual verification as unverified/structural-only under the existing screenshot limitation rule. Do not claim a design match.
+
+### Stitch screenshot verification
+
+When a Story references an approved Stitch design:
+
+1. Read `skills/screenshot/SKILL.md`.
+2. Ensure the application is running and the target route/state is reachable.
+3. Capture the implemented screen at the target Stitch viewport using the screenshot capability.
+4. Compare the captured implementation screenshot with the approved Stitch screenshot from `stitch-handoff`.
+5. Use the screenshot as the primary visual authority; use Stitch HTML only to clarify supporting structure or content.
+6. Fix material visual differences that are within the Story scope.
+7. Capture the implementation again after fixes and repeat the comparison.
+8. Record the final visual verification result in the implementation report.
+9. If the screenshot capability or target state is unavailable, report visual verification as `BLOCKED` or `UNVERIFIED`; do not claim visual fidelity.
+
+The `screenshot` capability captures the implementation. It does not decide whether the design match passes.
 
 ### UI fidelity method
 

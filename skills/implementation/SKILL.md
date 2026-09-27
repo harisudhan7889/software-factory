@@ -36,6 +36,7 @@ Do not use when:
 - Do not implement unrelated Jira Stories.
 - When the Story references approved `design-explorations/*.selection.md` and comparison `.html`, consume them per `references/workflow.md` Phase 2/9; never proceed on conversational selection alone; never implement production UI without a Jira Story.
 - When the Story references an approved Stitch design, consume `stitch-handoff` per `references/workflow.md` before implementation planning; treat the approved Stitch screenshot as the primary visual reference and Stitch HTML as supporting information only.
+- When an approved Stitch design applies, use the `screenshot` capability during UI verification to capture the running implementation at the relevant target viewport; do not claim visual fidelity from Stitch HTML or code inspection alone.
 - Do not modify the codebase during the planning phase.
 - Do not create an ADR for routine implementation details.
 - If a genuinely new architectural decision is required, stop and use
@@ -90,6 +91,7 @@ Before commit, confirm per `references/workflow.md` Phase 11:
 - [ ] No unrelated changes; no secrets committed
 - [ ] RFC/ADR alignment verified; for UI Stories, UX/UI design compliance verified per Phase 9
 - [ ] For UI Stories with an approved Stitch design, the `stitch-handoff` reference was consumed and the implementation was reviewed against the approved Stitch screenshot per Phase 9 (mark N/A when no Stitch design applies)
+- [ ] For UI Stories with an approved Stitch design, the `screenshot` capability captured the running implementation at the relevant target viewport and the result was visually compared with the approved Stitch screenshot, or the visual verification status is explicitly `BLOCKED`/`UNVERIFIED` with the reason
 
 ## Common Rationalizations
 | Rationalization | Reality |
