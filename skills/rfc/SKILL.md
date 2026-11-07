@@ -26,6 +26,26 @@ Scaffold a new RFC from free-form `<context>`: read the README + overview.md, as
 
 See `references/create.md` for the full procedure.
 
+## breakdown
+
+**Usage:** `/rfc breakdown <NNNN | path-to-overview.md>`
+
+Create the Jira implementation tickets for an approved RFC. Read the RFC overview and supporting design documents, identify the work items, and determine dependencies and file conflicts using the ticket dependency-planning skill. Present the proposed tickets and dependency plan for user review and obtain explicit approval before creating tickets. Use the existing ticket skill for Jira ticket creation; do not implement code as part of breakdown. After successful creation, update the RFC Work breakdown with the real Jira ticket keys and dependency information. Handle partial failures without creating duplicate tickets on retry.
+
+Refine each created ticket with the appropriate platform expert agents, following the ticket skill's documented refinement workflow.
+
+See `references/breakdown.md` for the full procedure.
+
+## build
+
+**Usage:** `/rfc build <NNNN | path-to-overview.md> [--stacked]`
+
+Implement an RFC's already-filed Work breakdown tickets in dependency-safe waves. Respect phase ordering, dependencies, and file conflicts. Use the ticket dependency-planning skill to determine safe waves, and follow `references/build.md` for preflight, dispatch, isolated worktrees, integration, verification, and recovery. Dispatch individual ticket implementations through the existing implementation skill. Preserve the implementation skill's planning and explicit user-approval gate before coding; wave scheduling must not bypass it. Do not use the ticket skill for implementation or assume a ticket wave operation exists.
+
+Default mode integrates completed tickets onto a single RFC feature branch `feat/rfc-NNNN-<slug>` and opens one PR for the RFC. With --stacked, each wave uses a branch `feat/rfc-NNNN-<slug>-wave<K>` based on the preceding wave (wave 1 starts from the configured default branch, currently main) and opens a PR based on the preceding wave's branch. Stacked mode requires the gh stack extension (`gh extension install github/gh-stack`) and must stop if it is missing. `/rfc breakdown` must run first; no `_TBD_` ticket rows are allowed.
+
+See `references/build.md` for the full procedure.
+
 ## Policies
 
 Use:
@@ -40,15 +60,7 @@ Follow the common self-improvement standard in:
 
 `../self-improvement/references/standard.md`
 
-<!-- ## breakdown
-
-File Jira tickets from an existing RFC's Work breakdown table, one per row under that row's Epic, refine each created ticket with platform expert agents (the `ticket` skill's `refine` subcommand), then write the created keys back into the table. Idempotent — rows already listing a ticket are skipped.
-
-**Input:** an RFC number (`NNNN`) or a path to an `overview.md`.
-
-See `references/breakdown.md` for the full procedure.
-
-## accept
+<!-- ## accept
 
 **Usage:** `/rfc accept <NNNN | path-to-overview.md>`
 
@@ -67,16 +79,6 @@ Flip an RFC from Proposed to Accepted in its PR, immediately before merge.
 Flip an RFC from Proposed to Rejected and record why in the RFC reject memory (`.github/memories/rfc/rejected-1-200.md`), so future creators can learn what the team has already turned down and avoid re-proposing it. The mirror image of `accept`.
 
 See `references/reject.md` for the full procedure.
-
-## build
-
-**Usage:** `/rfc build <NNNN | path-to-overview.md> [--stacked]`
-
-Implement an RFC's already-filed Work breakdown tickets in parallel, enforcing that no wave crosses a dependency edge and no wave co-schedules two tickets that touch the same file. Computes the wave schedule from the table (Phase ordering + Depends-on/Files columns) and dispatches each wave through the `ticket` skill's `wave` subcommand in integrate mode (`--onto`).
-
-Default shape commits every completed ticket onto a single RFC feature branch `feat/rfc-NNNN-<slug>` and opens one PR for the whole RFC (not one per ticket). With `--stacked`, each wave lands on its own branch `feat/rfc-NNNN-<slug>-wave<K>` that stacks on the previous wave's branch (wave 1 off `main`) and becomes one PR whose base is the branch below it, so reviewers see one wave's diff per PR. `--stacked` requires the `gh stack` extension (`gh extension install github/gh-stack`) and aborts if it is missing. Requires `breakdown` to have run first (no `_TBD_` rows).
-
-See `references/build.md` for the full procedure.
 
 ## status
 
