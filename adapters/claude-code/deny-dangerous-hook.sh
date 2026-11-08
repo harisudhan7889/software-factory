@@ -16,7 +16,7 @@ while [ -L "$self" ]; do
     *) self="$(dirname "$self")/$target" ;;
   esac
 done
-here="$(cd "$(dirname "$self")" && pwd)"
+here="$(cd "$(dirname "$self")" && pwd -P)"   # physical path: works when adapters/ is a symlink
 guard="$here/../../hooks/deny-dangerous.sh"
 
 fail() {

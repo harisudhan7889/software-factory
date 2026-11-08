@@ -179,7 +179,7 @@ has_content() { find "$1/" -type f ! -name .DS_Store 2>/dev/null | grep -q .; }
 # (a skill or agent that was removed or renamed in the repository).
 prune_stale() {
   local home="$1" l
-  for l in "$home"/skills/* "$home"/agents/* "$home"/plugins/* "$home/policies" "$home/references"; do
+  for l in "$home"/skills/* "$home"/agents/* "$home"/plugins/* "$home/policies" "$home/references" "$home/adapters"; do
     [ -L "$l" ] || continue
     case "$(readlink "$l")" in "$ROOT"/*)
       # Stale when the target is gone, or is a folder left behind with only
@@ -193,7 +193,7 @@ prune_stale() {
 }
 
 link_shared() {
-  local home="$1" d f
+  local home="$1" tool="${2:-}" d f
   mkdir -p "$home" 2>/dev/null || true
   prune_stale "$home"
   for d in "$ROOT"/skills/*/; do
@@ -203,9 +203,11 @@ link_shared() {
   done
   link_item "$ROOT/policies" "$home/policies"
   link_item "$ROOT/references" "$home/references"
-  for f in "$ROOT"/agents/*.md "$ROOT"/agents/market/*.md; do
-    [ -f "$f" ] && link_item "$f" "$home/agents/$(basename "$f")"
-  done
+  if [ "$tool" != "codex" ]; then   # Codex has no agent-file mechanism
+    for f in "$ROOT"/agents/*.md "$ROOT"/agents/market/*.md; do
+      [ -f "$f" ] && link_item "$f" "$home/agents/$(basename "$f")"
+    done
+  fi
   return 0
 }
 
@@ -223,18 +225,33 @@ unlink_shared() {
   return 0
 }
 
+# Hook command path: prefer the stable path inside the tool folder (linked to
+# the repository); fall back to the repository path if that link is not ours.
+claude_hook_cmd() {
+  local home; home="$(claude_home)"
+  if [ "$DRY" -eq 1 ] || [ "$home/adapters" -ef "$ROOT/adapters" ]; then
+    echo "$home/adapters/claude-code/deny-dangerous-hook.sh"
+  else
+    echo "$ROOT/adapters/claude-code/deny-dangerous-hook.sh"
+  fi
+}
+
 claude_settings_edit() {  # $1 = add|remove
   local settings hook_cmd
   settings="$(claude_home)/settings.json"
-  hook_cmd="$ROOT/adapters/claude-code/deny-dangerous-hook.sh"
+  hook_cmd="$(claude_hook_cmd)"
   if ! command -v python3 >/dev/null 2>&1; then
     warn "python3 not found; add this PreToolUse hook (matcher Bash) to $settings yourself: $hook_cmd"
     return 0
   fi
   [ "$1" = "remove" ] && [ ! -f "$settings" ] && return 0
-  local present=0
-  if [ -f "$settings" ] && grep -qF "$hook_cmd" "$settings"; then present=1; fi
-  if [ "$1" = "add" ] && [ "$present" -eq 1 ]; then return 0; fi
+  local present=0 stale=0 hits
+  if [ -f "$settings" ]; then
+    hits="$(grep -c "/adapters/claude-code/deny-dangerous-hook.sh" "$settings" || true)"
+    [ "${hits:-0}" -gt 0 ] && present=1
+    grep -qF "\"$hook_cmd\"" "$settings" || stale=1
+  fi
+  if [ "$1" = "add" ] && [ "$present" -eq 1 ] && [ "$stale" -eq 0 ]; then return 0; fi
   if [ "$1" = "remove" ] && [ "$present" -eq 0 ]; then return 0; fi
   act "$1 deny-dangerous hook in $settings"
   [ "$DRY" -eq 1 ] && return 0
@@ -251,11 +268,16 @@ hooks = data.setdefault("hooks", {})
 pre = hooks.setdefault("PreToolUse", [])
 def has(entry):
     return any(h.get("command") == cmd for h in entry.get("hooks", []))
+suffix = "/adapters/claude-code/deny-dangerous-hook.sh"
+def ours(entry):
+    return any(str(h.get("command", "")).endswith(suffix) for h in entry.get("hooks", []))
 if action == "add":
+    # Drop older factory entries (for example the repository path), then add the current one.
+    pre[:] = [e for e in pre if not ours(e) or has(e)]
     if not any(has(e) for e in pre):
         pre.append({"matcher": "Bash", "hooks": [{"type": "command", "command": cmd}]})
 else:
-    pre[:] = [e for e in pre if not has(e)]
+    pre[:] = [e for e in pre if not ours(e)]
     if not pre: hooks.pop("PreToolUse", None)
     if not hooks: data.pop("hooks", None)
 with open(path, "w") as f:
@@ -285,11 +307,14 @@ factory_block() {  # $1 = tool
 install_tool() {
   local tool="$1" home; home="$(home_of "$tool")"
   say ""; say "== $(label_of "$tool")  ($home)"
-  link_shared "$home"
+  link_shared "$home" "$tool"
   case "$tool" in
     claude)
       write_block "$home/CLAUDE.md" "$(factory_block claude)"
-      [ "$HOOKS" -eq 1 ] && claude_settings_edit add
+      if [ "$HOOKS" -eq 1 ]; then
+        link_item "$ROOT/adapters" "$home/adapters"
+        claude_settings_edit add
+      fi
       ;;
     opencode)
       write_block "$home/AGENTS.md" "$(factory_block opencode)"
@@ -308,7 +333,7 @@ uninstall_tool() {
   say ""; say "== $(label_of "$tool")  ($home)"
   unlink_shared "$home"
   case "$tool" in
-    claude) remove_block "$home/CLAUDE.md"; claude_settings_edit remove ;;
+    claude) remove_block "$home/CLAUDE.md"; claude_settings_edit remove; unlink_item "$home/adapters" ;;
     opencode) remove_block "$home/AGENTS.md"; unlink_item "$home/plugins/deny-dangerous.ts" ;;
     codex) remove_block "$home/AGENTS.md" ;;
   esac

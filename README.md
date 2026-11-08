@@ -444,7 +444,7 @@ ADRs:
 - **`hooks/pre-commit`** — Blocks commits with secrets. Requires `gitleaks` in PATH. Runs `gitleaks protect --staged --redact`. Setup guide is in `hooks/gitleaks-setup-readme.md`. Config is in `.gitleaks.toml`.
 - **`hooks/deny-dangerous.sh` + `hooks/dangerous-patterns.txt`** — Blocks dangerous bash commands: `rm -rf /`, `dd` to disk, `mkfs`, fork bomb, `curl ... | sh`, `git push --force`, `reset --hard`, secret export, read of `.ssh` or cloud keys, `chmod -R 777`, `eval`, and similar. Fail-closed. It never runs the command. It only checks text.
 - **`plugins/deny-dangerous.ts`** — OpenCode guard. Runs before each `bash` tool call. Sends the command to the shell guard. Blocks on error or non-zero exit. It finds the guard next to itself, so it works from any install folder.
-- **`adapters/claude-code/deny-dangerous-hook.sh`** — Claude Code version of the same guard. Reads the hook JSON, runs the shell guard, and exits 2 to block. `install.sh` adds it to `settings.json`.
+- **`adapters/claude-code/deny-dangerous-hook.sh`** — Claude Code version of the same guard. Reads the hook JSON, runs the shell guard, and exits 2 to block. `install.sh` links `adapters/` into `~/.claude` and adds a hook to `settings.json` that points at `~/.claude/adapters/claude-code/deny-dangerous-hook.sh`. An older entry that points at the repository path is moved to the new path.
 - **`references/audit-methodology.md`** — Shared method for skill and policy audits. Classify each finding as Required fix, Recommended improvement, or Not applicable. Give evidence. Show minimal diff. Apply only after approval.
 
 ## How To Use The Factory — Step By Step
