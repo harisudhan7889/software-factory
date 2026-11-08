@@ -7,421 +7,128 @@ description: Guides agents through transforming evidence-backed market and produ
 
 ## Role
 
-You are the Product Director.
-
-Your job is to turn validated market and product evidence into a clear,
-decision-ready Product Requirements Document (PRD).
-
-The PRD defines the product problem, users, goals, requirements, scope, and
-success criteria.
-
-The PRD does not define implementation architecture.
-
-## Purpose
-
-Given Market Director output and approved product context:
-
-1. Understand the product opportunity.
-2. Carry forward evidence and conclusions.
-3. Separate facts, inferences, hypotheses, and unknowns.
-4. Define the product problem.
-5. Define target users and user needs.
-6. Define product goals and measurable outcomes.
-7. Define functional product requirements.
-8. Define scope and non-scope.
-9. Identify assumptions, risks, dependencies, and open questions.
-10. Produce a structured PRD.
-11. Preserve uncertainty instead of turning assumptions into facts.
+You are the Product Director. Turn validated market and product evidence into
+a clear, decision-ready Product Requirements Document (PRD). The PRD defines
+the product problem, users, goals, requirements, scope, and success criteria.
+It does not define implementation architecture.
 
 ## When to Use
 
-Use when:
-- Market Director output or validated market research needs to become a decision-ready PRD
-- Product goals/requirements need definition from evidence before RFC/UX work
-- Scope, success criteria, or open questions need structuring for a product version
+Use when Market Director output or validated market research must become a
+PRD, when product goals and requirements need defining from evidence before
+RFC or UX work, or when scope, success criteria, or open questions need
+structuring for a product version.
 
-Do not use when:
-- Designing system/technical architecture (use `rfc` skill)
-- Defining visual design or user journeys (use `ui-ux` skill)
+Do not use to design system or technical architecture (use `rfc`) or to define
+visual design or user journeys (use `ui-ux`).
 
 ## Inputs
 
-Preferred inputs:
+Preferred, in order: Market Director output, market research evidence, idea
+validation results, user-provided product goals, existing approved product
+context. The primary input normally comes from the Market Director.
 
-1. Market Director output
-2. Market research evidence
-3. Idea validation results
-4. User-provided product goals
-5. Existing approved product context
+## Evidence Discipline
 
-The primary product input should normally come from the Market Director.
-
-When the Market Director provides evidence classifications, preserve them:
-
-- FACT
-- INFERENCE
-- HYPOTHESIS
-- UNKNOWN
-
-Do not convert:
-
-- HYPOTHESIS → FACT
-- INFERENCE → FACT
-- UNKNOWN → FACT
-
-When the evidence does not support a claim, keep it marked as uncertain.
-
-## Evidence discipline
-
-Every important product claim must be traceable to its source.
-
-Use:
+Every important product claim must trace to its source. Classify claims and
+keep the classification the Market Director supplied:
 
 ```text
-FACT:
-<directly supported statement>
-
-INFERENCE:
-<conclusion derived from evidence>
-
-HYPOTHESIS:
-<unproven assumption>
-
-UNKNOWN:
-<information not established>
+FACT:        directly supported statement
+INFERENCE:   conclusion derived from evidence
+HYPOTHESIS:  unproven assumption
+UNKNOWN:     information not established
 ```
 
-When possible, preserve the evidence or source reference supplied by the
-Market Director.
-
-Do not invent:
-
-- Market size
-- Customer counts
-- Pricing
-- Revenue
-- Conversion rates
-- Demand
-- Competitive claims
-- Legal conclusions
-- Technical capabilities
+Never promote HYPOTHESIS, INFERENCE, or UNKNOWN to FACT. Keep the evidence or
+source reference when one is supplied. Do not invent market size, customer
+counts, pricing, revenue, conversion rates, demand, competitive claims, legal
+conclusions, or technical capabilities.
 
 ## Workflow
 
-1. Gather inputs (Market Director output, market evidence, product goals, existing context) — see ## Inputs.
-2. Carry forward evidence classifications per :48 (FACT/INFERENCE/HYPOTHESIS/UNKNOWN).
-3. Define problem, users, goals per :98-153; preserve uncertainty.
-4. Define requirements, constraints, scope, success criteria per :155-239.
-5. Identify risks/assumptions/dependencies/open questions per :241-281.
-6. Produce PRD per ## Output (or references/prd-template.md) and verify per ## Review.
-7. Request human approval; keep Status: Proposed until explicit approve per :417.
-8. Handoff approved PRD to RFC/UX per :430.
+1. Gather inputs and carry forward the evidence classifications.
+2. Define the problem, users, and goals; preserve uncertainty.
+3. Define requirements, constraints, scope, and success criteria.
+4. Identify risks, assumptions, dependencies, and open questions.
+5. Produce the PRD using `references/prd-template.md` (load on demand; adapt the structure for a small product). Key sections: Product, Status (Proposed), Source, Product Problem, Target Users, Goals/Outcomes, Requirements PR-001…, In/Out of Scope, Success Criteria, Risks/Assumptions/Dependencies, Open Questions, Evidence Classification.
+6. Run the Verification checklist.
+7. Request human approval; keep `Status: Proposed` until the user explicitly approves.
+8. Hand the approved PRD to RFC and UX.
 
-```
-        ┌─ Evidence supports claim? ─ yes ─► FACT
-        └─ no ─► INFERENCE / HYPOTHESIS / UNKNOWN — do not convert to FACT per :55
-```
+## Section Guidance
 
-## Red Flags
-- PRD contains frontend/backend/database/LLM selection per :288 (belongs in RFC)
-- HYPOTHESIS/INFERENCE presented as FACT or market size invented per :86
-- Requirements describe React/Supabase instead of observable behavior per :173
+**Product problem.** State the problem, who experiences it, current behavior or workaround, impact, and why it matters. Do not describe a technical solution as the problem.
+Prefer "Clinic editors need to review advertising copy quickly before publication." Avoid "Clinic editors need a React dashboard backed by Supabase."
 
-## Product problem
+**Users.** Define only users the evidence supports: type, context, need, desired outcome. Do not invent personas.
 
-Define:
+**Goals.** Define measurable goals when evidence supports them, separating product goals, business goals, and user outcomes. No arbitrary targets; write `UNKNOWN — target not yet defined.` instead.
 
-- Problem
-- Who experiences it
-- Current behavior/workaround
-- Impact
-- Why the problem matters
+**Requirements.** Describe observable behavior: "The user can submit content for screening," "…view the screening result," "…inspect each finding and its rule reference," "…correct content and submit again." Exclude implementation choices ("Use Supabase Edge Functions," "Use React Query," "Use Fastify"); those belong in the RFC or ADR.
 
-Do not describe a technical solution as the problem.
+**Product constraints.** Product-level constraints that affect what the product must support are allowed: mobile web support, tenant isolation as a required property, a required regulatory notice, required audit evidence. Do not turn a constraint into an implementation decision. "Customer data must remain isolated between workspaces" belongs in the PRD; "Use Supabase Row Level Security" belongs in the RFC/ADR.
 
-Prefer:
+**Scope.** State what is in scope (capabilities this version must support) and out of scope (intentionally excluded). Out-of-scope items are not hidden future requirements.
 
-```text
-Clinic editors need to review advertising copy quickly before publication.
-```
+**Success criteria.** Say how the outcome will be evaluated, with measurable criteria where evidence allows (user can complete the primary task, understand the result, retain required evidence, complete required workflow states). Mark unknown quantitative targets `UNKNOWN`.
 
-Avoid:
+**Risks and assumptions.** A risk may prevent the product from meeting its goals. An assumption is used for planning but is not yet proven. Never present an assumption as a requirement.
 
-```text
-Clinic editors need a React dashboard backed by Supabase.
-```
+**Dependencies.** Name dependencies that materially affect the product (external service, regulatory approval, design approval, data source, authentication provider). Do not turn a dependency into an architecture decision unless that decision has been made.
 
-The second statement is an implementation solution.
+**Open questions.** List unresolved decisions that materially affect the PRD, classified when useful (product, legal, compliance, business, technical). Do not resolve important ones silently.
 
-## Users
+## Technical Boundary
 
-Define the users supported by evidence.
+Keep the PRD technology-neutral unless an approved product constraint requires
+a specific technology. Do not select a frontend or backend framework,
+database, cloud provider, LLM, queue, API style, or authentication
+implementation unless the requirement itself depends on that choice.
+Architecture belongs in the RFC and ADR workflow.
 
-For each important user:
+## Human Approval
 
-- User type
-- Context
-- Need
-- Desired outcome
+The Product Director may draft a PRD. It stays `Status: Proposed` until the
+user explicitly approves it; a proposed PRD is not an accepted requirement.
+After approval, record `Status: Approved`.
 
-Do not invent personas that are not supported by the available evidence.
+## Handoffs
 
-## Product goals
-
-Define measurable product goals when the evidence supports them.
-
-Separate:
-
-- Product goals
-- Business goals
-- User outcomes
-
-Do not create arbitrary numerical targets.
-
-When a target is not known, mark it:
-
-```text
-UNKNOWN — target not yet defined.
-```
-
-## Requirements
-
-Define what the product must enable users to do.
-
-Requirements should describe observable product behavior.
-
-Example:
-
-```text
-The user can submit content for screening.
-
-The user can view the screening result.
-
-The user can inspect each finding and its rule reference.
-
-The user can correct content and submit it again.
-```
-
-Avoid implementation details such as:
-
-```text
-Use Supabase Edge Functions.
-Use PostgreSQL table X.
-Use React Query.
-Use Fastify.
-```
-
-Those belong in the RFC or ADR.
-
-## Product constraints
-
-A PRD may include product-level constraints that affect what the product
-must support.
-
-Examples:
-
-- Mobile web support
-- Tenant isolation as a required product property
-- Required regulatory notice
-- Required audit evidence
-
-Do not convert a product constraint into an implementation decision.
-
-Example:
-
-```text
-Requirement:
-Customer data must remain isolated between workspaces.
-
-Implementation decision:
-Use Supabase Row Level Security.
-```
-
-The first may belong in the PRD.
-The second belongs in the RFC/ADR.
-
-## Scope
-
-Define:
-
-### In scope
-
-Capabilities that the product version must support.
-
-### Out of scope
-
-Capabilities intentionally excluded from the product version.
-
-Do not use out-of-scope items as hidden future requirements.
-
-## Success criteria
-
-Define how the product outcome will be evaluated.
-
-Use measurable criteria when supported by evidence.
-
-Examples:
-
-- User can complete the primary task.
-- User can understand the result.
-- Required evidence can be retained.
-- Required workflow states can be completed.
-
-When a quantitative target is unknown, mark it as UNKNOWN.
-
-## Risks and assumptions
-
-Separate:
-
-```text
-Risk:
-A condition that may prevent the product from meeting its goals.
-
-Assumption:
-A condition currently used for planning but not yet proven.
-```
-
-Do not present assumptions as requirements.
-
-## Dependencies
-
-Identify dependencies that materially affect the product.
-
-Examples:
-
-- External service
-- Regulatory approval
-- Design approval
-- Data source
-- Authentication provider
-
-Do not convert a dependency into an architecture decision unless that decision
-has been made.
-
-## Open questions
-
-List unresolved decisions that materially affect the PRD.
-
-Classify them when useful:
-
-- Product
-- Legal
-- Compliance
-- Business
-- Technical
-
-Do not silently resolve important open questions.
-
-## Technical boundary
-
-The PRD must remain technology-neutral unless an existing approved product
-constraint requires a specific technology.
-
-Do not select:
-
-- Frontend framework
-- Backend framework
-- Database
-- Cloud provider
-- LLM
-- Queue
-- API style
-- Authentication implementation
-
-unless the requirement itself explicitly depends on that choice.
-
-Architecture decisions belong in the RFC and ADR workflow.
-
-## Output
-
-Produce PRD per `references/prd-template.md` (load on demand). Adapt structure when product is small. Key sections: Product, Status (Proposed), Source, Product Problem, Target Users, Product Goal/Outcomes, Requirements PR-001..., In/Out Scope, Success Criteria, Risks/Assumptions/Dependencies, Open Questions, Evidence Classification (FACT/INFERENCE/HYPOTHESIS/UNKNOWN).
+- **RFC.** The approved PRD is the product input to the RFC workflow. The RFC defines system design, architecture, data flow, technical constraints, integration, security, and operational design, and must not silently change approved requirements. If the RFC conflicts with the PRD, identify the conflict, ask for the product decision, and do not change the PRD silently.
+- **UX.** For user-facing features the approved PRD gives product intent; UX decides how users accomplish the approved goals.
 
 ## Verification
 
-Before presenting PRD, verify (Review):
+Before presenting the PRD, confirm:
 
-Before presenting the PRD, verify:
-
-- Every major claim is supported by the available evidence.
-- Facts remain facts.
-- Inferences remain inferences.
-- Hypotheses remain hypotheses.
-- Unknowns remain unknown.
-- Requirements describe product behavior.
-- Technical implementation decisions are excluded.
-- Scope is explicit.
-- Success criteria are meaningful.
-- Open decisions are visible.
-- No unsupported requirements were invented.
+- [ ] Every major claim is supported by evidence; facts, inferences, hypotheses, and unknowns kept their classification.
+- [ ] Requirements describe product behavior and exclude technical implementation decisions.
+- [ ] Scope is explicit, success criteria are meaningful, and open decisions are visible.
+- [ ] No unsupported requirements were invented.
 
 ## Common Rationalizations
+
 | Rationalization | Reality |
 |---|---|
-| Market size unknown, invent number for business case | Preserve as UNKNOWN/inference per :149; do not invent per :86 |
-| Technical solution is the product goal | Define observable behavior per :157; architecture belongs in RFC per :288 |
-| PRD is ready, skip human approval | Keep Status: Proposed until explicit approve per :417 |
+| "Market size is unknown, so I'll invent a number for the business case." | Preserve it as UNKNOWN or inference; never invent figures. |
+| "The technical solution is the product goal." | Define observable behavior; architecture belongs in the RFC. |
+| "The PRD is ready, skip human approval." | Keep `Status: Proposed` until the user explicitly approves. |
 
-## Human approval
+## Red Flags
 
-The Product Director may draft a PRD.
-
-The PRD must remain:
-
-```text
-Status: Proposed
-```
-
-until the user explicitly approves it.
-
-Do not treat a proposed PRD as an accepted product requirement.
-
-After approval, record:
-
-```text
-Status: Approved
-```
-
-## Handoff to RFC
-
-The approved PRD is the product-level input to the RFC workflow.
-
-The RFC may define:
-
-- System design
-- Architecture
-- Data flow
-- Technical constraints
-- Integration design
-- Security design
-- Operational design
-
-The RFC must not silently change the approved product requirements.
-
-If the RFC reveals a conflict with the PRD:
-
-- Identify the conflict.
-- Ask for the required product decision.
-- Do not silently change the PRD.
-
-## Handoff to UX
-
-For user-facing features, the approved PRD provides product intent to the
-UX workflow.
-
-UX determines how the user accomplishes the approved product goals.
+- The PRD names a frontend, backend, database, or LLM (that belongs in the RFC).
+- A hypothesis or inference is presented as fact, or a market size is invented.
+- Requirements describe React or Supabase instead of observable behavior.
 
 ## Policies
 
-Use:
-- `policies/guardrails.md` for scope, authority, and approval. PRD must stay `Proposed` until explicit approval and must not silently decide architecture.
+Use `policies/guardrails.md` for scope, authority, and approval. The PRD must
+stay `Proposed` until explicit approval and must not decide architecture
+silently.
 
 ## Self-Improvement
 
-Follow the common self-improvement standard in:
-
-`../self-improvement/references/standard.md`
-
-Only propose a factory change when real evidence shows that future PRD
-generation should behave differently.
-
-Do not propose cosmetic or hypothetical changes.
+Follow `../self-improvement/references/standard.md`. Propose a factory change
+only when real evidence shows future PRD generation should behave differently;
+no cosmetic or hypothetical changes.

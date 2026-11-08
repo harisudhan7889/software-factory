@@ -1,4 +1,5 @@
 ---
+name: market-researcher
 description: Finds and collects reliable, relevant market research evidence from web sources.
 mode: subagent
 ---

@@ -142,7 +142,7 @@ Key files: `skills/factory/references/github-provisioning.md`, `github-pr.md`, `
 
 Purpose: Write and manage a Request for Comments (RFC).
 
-Use when you run `/rfc create`, `/rfc accept`, `/rfc reject`, `/rfc build`, `/rfc status`, `/rfc help`.
+Use when you run `/rfc create`, `/rfc breakdown`, `/rfc build`, `/rfc help`.
 
 An RFC describes system design, data, APIs, security, and work breakdown. Status starts as `Proposed`. It becomes `Accepted` only with explicit approval, just before merge.
 
@@ -445,7 +445,7 @@ Run:
 
 Describe system, data, APIs, security, and work breakdown.
 
-Approval: run `/rfc accept` just before merge, with explicit approval.
+Approval: with explicit approval, set the RFC status to `Accepted` in `overview.md` and the RFC index just before merge. There is no `/rfc accept` command yet.
 
 ### Step 5. Record ADRs
 

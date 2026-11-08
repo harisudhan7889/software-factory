@@ -1,6 +1,7 @@
 ---
 name: ux-agent
 description: Analyze product requirements and create structured UX specifications for web UI features using the ui-ux skill.
+mode: primary
 ---
 
 # UX Agent

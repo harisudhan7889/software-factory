@@ -7,383 +7,142 @@ description: Starts or reuses a local web application and captures the actual re
 
 ## Purpose
 
-Capture the **actual rendered web application** so other factory workflows can verify what the user sees.
-
-This skill owns the capture workflow through the factory-owned scripts:
-
-1. identify the target project and capture parameters
-2. invoke `scripts/capture.sh`
-3. let the script start or reuse the local application
-4. let the script wait until the application is reachable
-5. let the script use Playwright + Chromium to capture the requested UI
-6. return the screenshot and evidence metadata
-7. let the script clean up only the process it started
-
-This skill is a screenshot capability.
-
-It does not decide whether the rendered application matches a design.
-
-## Responsibility
-
-This skill answers:
-
-> "What does the running web application actually look like at this viewport?"
-
-It does not answer:
-
-> "Does it match the approved design?"
-
+Capture the **actual rendered web application** so other factory workflows can
+verify what the user sees. The skill answers "what does the running app look
+like at this viewport?" It does not answer "does it match the approved design?"
 Visual comparison belongs to the verification workflow.
+
+The skill owns the capture workflow through the factory scripts. The script
+starts or reuses the local app, waits until it is reachable, drives Playwright
++ Chromium to capture the UI, and cleans up only the process it started.
+
+```text
+screenshot skill → scripts/capture.sh → scripts/capture.mjs → Playwright + Chromium → rendered screenshot
+```
+
+No Playwright MCP server is needed.
 
 ## When to Use
 
-Use when:
+Use when an implementation needs rendered-UI evidence, a Stitch design must be
+compared with the running app, a UI Story requires visual verification, a
+browser screenshot is needed as evidence, or the local app must be started
+before capture.
 
-- an implementation needs rendered UI evidence
-- a Stitch design needs to be compared with the running application
-- a UI Story requires visual verification
-- a browser screenshot is needed for evidence
-- the local application needs to be started before capture
-
-Do not use when:
-
-- there is no web application in the target project
-- no target viewport is available
-- the task is to implement or modify UI
-- the task is to create or approve a design
-- the task is to decide whether two images match
-- the factory-owned screenshot scripts are missing or unusable
+Do not use when the target project has no web application, no target viewport
+is available, the task is to implement or modify UI, create or approve a
+design, or decide whether two images match, or when the factory scripts are
+missing or unusable.
 
 ## Inputs
 
-Required:
+Required: a target project root or an already-running URL, plus viewport width
+and height. If the viewport is not given, use the one the calling workflow
+requires, otherwise ask. Never invent a design viewport.
 
-- target project root, or an already-running web application URL
-- target viewport width
-- target viewport height
+Optional: route, screenshot and metadata output paths, wait condition,
+interaction steps to reach the target state, explicit startup command or
+script name, target URL or port, readiness timeout, and `--keep-app` when the
+caller needs the started app to keep running.
 
-Optional:
+## Workflow
 
-- route/path
-- screenshot output path
-- metadata output path
-- wait condition or page-load condition
-- interaction/state instructions needed to reach the target state
-- explicit startup command when the calling workflow already knows it
-- existing startup script name
-- explicit target URL/port
-- readiness timeout
-- `--keep-app` when the caller explicitly needs the started app to remain running
+1. Determine the project, URL, route, state, and viewport.
+2. Invoke `scripts/capture.sh` (see Invocation) with the project or URL, viewport, and route.
+3. If the app is not running, `capture.sh` discovers and starts an existing project startup command and waits for readiness.
+4. `capture.mjs` captures the rendered page.
+5. Return the screenshot reference and the script's metadata.
+6. Unless `--keep-app` was requested, the script stops only the process it started. Never terminate a process the script did not start.
 
-The factory-owned capture script is the execution mechanism.
-
-When a running URL is provided and reachable, pass it to the script and do not
-start a second copy.
-
-When only a project root is provided, pass the project root to the script. The
-script discovers an existing project startup command from the repository. The
-skill must not invent or add a startup script.
-
-If the target viewport is not specified, use the viewport explicitly required by the calling workflow when provided; otherwise ask for it. Do not invent a design viewport.
-
-## Screenshot Workflow
-
-Follow this order:
-
-1. Determine the target project, URL, route, state, and viewport.
-2. Locate the factory-owned script:
-   `scripts/capture.sh`
-3. Invoke the script with the required project/URL, viewport, and route.
-4. If the application is not already running, allow `capture.sh` to discover
-   and start an existing project startup command.
-5. Allow the script to wait for application readiness.
-6. Allow `capture.mjs` to drive Playwright + Chromium and capture the rendered page.
-7. Return the screenshot path/reference and metadata produced by the script.
-8. Unless the caller explicitly requests `--keep-app`, allow the script to clean
-   up only the process it started.
-
-The skill must not reimplement browser automation in prose or require an MCP
-browser server when the factory capture scripts are available.
-
-Do not kill or otherwise terminate an application process that the factory
-capture script did not start.
+Do not reimplement browser automation in prose.
 
 ## Application Startup
 
-Application startup is executed by the factory-owned script:
+The script discovers an existing project startup command (for example the
+`dev`, `start`, or `preview` script in `package.json`; the project's actual
+configuration is authoritative). Never create or modify a startup script just
+for capture.
 
-`scripts/capture.sh`
-
-The skill supplies the target project and any caller-known startup parameters.
-The script is responsible for:
-
-- discovering an existing project startup script
-- starting the local app when required
-- recording the started process
-- waiting for readiness
-- detecting the application URL when possible
-- cleaning up only the process it started
-
-### Existing project commands
-
-The capture script may use an existing `package.json` script such as:
-
-```text
-dev
-start
-preview
-```
-
-These are examples only. The target project's actual configuration is
-authoritative.
-
-Never create or modify a startup script just for screenshot capture.
-
-### Parallel agents and worktrees
-
-For parallel agents:
-
-- invoke the capture script from the current worktree
-- treat the current worktree as the project boundary
-- do not reuse another worktree's server unless its identity is explicitly
-  established
-- use a project-supported port when a port must be configured
-- do not hijack an occupied port belonging to another process or worktree
-
-### Already-running application
-
-When the target URL is already reachable:
-
-- pass `--url` to `capture.sh`
-- do not start another application instance
-- do not stop the existing process
-
-### Application startup failure
-
-If `capture.sh` reports:
-
-```text
-Status: BLOCKED
-```
-
-do not claim a screenshot was captured.
-
-Report the script's reason exactly and stop the screenshot workflow.
+- **Parallel agents and worktrees:** run the script from the current worktree and treat it as the project boundary. Do not reuse another worktree's server unless its identity is established, use a project-supported port, and never take over a port held by another process.
+- **Already running:** pass `--url`; do not start another instance or stop the existing one.
+- **Startup failure:** if `capture.sh` reports `Status: BLOCKED`, do not claim a screenshot was captured. Report the script's reason exactly and stop.
 
 ## Exact Target State
 
-A screenshot is only useful as visual evidence when the correct state is shown.
+A screenshot is evidence only if it shows the correct state. Record URL,
+viewport, route, state, and interaction steps, and never capture a different
+route or state because it is easier to reach.
 
-Record:
+Capture each requested viewport separately (for example desktop 1440x900,
+tablet 1024x768, mobile 390x844). Do not claim responsive fidelity from one
+viewport. Preserve the screenshot as a project or temporary evidence artifact
+as the calling workflow requires.
 
-```text
-URL:
-Viewport:
-Route:
-State:
-Interaction steps:
-```
-
-Do not capture a different route or state merely because it is easier to reach.
-
-## Screenshot Evidence
-
-Return the canonical `## Output` format below. Always include URL, viewport, route, state, screenshot path/reference, and Status.
-
-When possible, preserve the screenshot as a project artifact or temporary evidence artifact according to the calling workflow.
-
-## Stitch Verification Use
-
-When called for Stitch-based visual verification:
-
-```text
-Approved Stitch screenshot
-        +
-Running application
-        ↓
-screenshot skill
-        ├─ start/reuse local app
-        └─ Playwright capture
-        ↓
-actual rendered screenshot
-        ↓
-verification compares them
-```
-
-This skill does not treat the Stitch screenshot as its own input authority. It
-only captures the implementation.
-
-The approved Stitch screenshot comes from `stitch-handoff`.
-
-## Multiple Viewports
-
-Capture each requested viewport separately.
-
-Example:
-
-```text
-Desktop:
-1440x900
-
-Tablet:
-1024x768
-
-Mobile:
-390x844
-```
-
-Do not claim responsive fidelity from a single viewport.
+For Stitch-based verification, this skill only captures the implementation.
+The approved Stitch screenshot comes from `stitch-handoff`, and the
+verification workflow compares the two.
 
 ## Browser Capability
 
-The factory-standard browser mechanism is Playwright executed by the
-factory-owned scripts:
+Playwright via the factory scripts is the standard mechanism, and the scripts
+manage their own Playwright runtime and Chromium. Do not add Playwright as a
+project dependency just for capture, and do not require a project Playwright
+or Cypress harness. A project test harness may prepare a specific
+authenticated or application state only when the calling workflow explicitly
+requires it.
 
-```text
-scripts/capture.sh
-scripts/capture.mjs
-```
-
-The intended execution path is:
-
-```text
-OpenCode
-   ↓
-screenshot skill
-   ↓
-scripts/capture.sh
-   ↓
-scripts/capture.mjs
-   ↓
-Playwright + Chromium
-   ↓
-actual rendered screenshot
-```
-
-OpenCode does not need a Playwright MCP server for this skill.
-
-Do not substitute:
-
-- HTML inspection
-- DOM-only inspection
-- generated Stitch code
-- a static HTML file
-- visual inference from source code
-
-for an actual browser screenshot.
-
-Do not require a project Playwright/Cypress harness when the factory capture
-scripts are available. A project test harness may be used only for preparing a
-specific authenticated or application state when the calling workflow
-explicitly requires that setup.
-
-The factory scripts manage their own Playwright runtime and Chromium
-installation. Do not add Playwright as a project dependency solely for
-screenshot capture.
-
-If the factory scripts are missing or cannot execute, report:
+Never substitute HTML inspection, DOM-only inspection, generated Stitch code,
+a static HTML file, or inference from source code for a real browser
+screenshot. If the scripts are missing or cannot run, report the following and
+do not fall back to code inspection or claim visual verification:
 
 ```text
 Status: BLOCKED
 Reason: Factory screenshot scripts are unavailable or unusable.
 ```
 
-Do not silently fall back to manual code inspection and do not claim visual
-verification.
-
 ## Browser Safety
 
-Do not:
+Do not submit real payments, send real emails, modify production data, perform
+destructive actions, expose secrets, or bypass authentication improperly. For
+authenticated states use approved test credentials or the project's configured
+testing mechanism.
 
-- submit real payments
-- send real emails
-- modify production data
-- perform destructive actions
-- expose secrets
-- bypass authentication controls improperly
+## Invocation
 
-For authenticated test states, use approved test credentials or the project's configured testing mechanism.
+```bash
+# Project not running
+scripts/capture.sh --project <PROJECT_ROOT> --viewport <WIDTH>x<HEIGHT> --route <ROUTE>
+
+# Application already running
+scripts/capture.sh --url <URL> --viewport <WIDTH>x<HEIGHT> --route <ROUTE>
+```
+
+Optional arguments: `--output <FILE>`, `--metadata-output <FILE>`,
+`--startup-script <NAME>`, `--startup-command <CMD>`, `--timeout <MS>`,
+`--wait-ms <MS>`, `--wait-for-selector <CSS>`, `--state <LABEL>`,
+`--full-page`, `--keep-app`, `--no-start`. Use only what the calling workflow
+needs. The script may install its factory-managed Playwright and Chromium on
+first use; do not install browser tooling into the project.
 
 ## Verification
 
 Before reporting a screenshot as complete:
 
-- [ ] The factory-owned screenshot script executed successfully.
-- [ ] The Playwright browser capture completed successfully.
-- [ ] The application URL was reachable.
-- [ ] If the application was not already running, the factory script discovered
-      and used an existing project startup command.
-- [ ] If the factory script started the application, its PID was recorded.
-- [ ] The requested viewport was used.
-- [ ] The correct route was captured.
-- [ ] The requested state was reached.
-- [ ] The screenshot was actually captured.
+- [ ] The factory script and the Playwright capture ran successfully.
+- [ ] The URL was reachable. If the app was not running, the script used an existing project startup command and recorded its PID.
+- [ ] The requested viewport, route, and state were used, and the screenshot was actually captured.
 - [ ] URL, viewport, route, and state were recorded.
-- [ ] Only a process started by the factory capture script was stopped during
-      cleanup.
-- [ ] No production data was modified.
-- [ ] No secrets were exposed.
-
-
-## Factory Script Invocation
-
-The screenshot skill invokes the factory-owned script:
-
-```text
-scripts/capture.sh
-```
-
-For a project that is not already running:
-
-```bash
-scripts/capture.sh \
-  --project <PROJECT_ROOT> \
-  --viewport <WIDTH>x<HEIGHT> \
-  --route <ROUTE>
-```
-
-For an application that is already running:
-
-```bash
-scripts/capture.sh \
-  --url <URL> \
-  --viewport <WIDTH>x<HEIGHT> \
-  --route <ROUTE>
-```
-
-Supported optional arguments include:
-
-```text
---output <FILE>
---metadata-output <FILE>
---startup-script <NAME>
---startup-command <CMD>
---timeout <MS>
---wait-ms <MS>
---wait-for-selector <CSS>
---state <LABEL>
---full-page
---keep-app
---no-start
-```
-
-Use only the arguments required by the calling workflow.
-
-The capture script may install its factory-managed Playwright runtime and
-Chromium on first use. Do not install browser tooling into the project unless
-the project itself explicitly requires it.
+- [ ] Only a process the script started was stopped during cleanup.
+- [ ] No production data was modified and no secrets were exposed.
 
 ## Output
-
-Keep the output simple:
 
 ```text
 Screenshot
 
 Status:
 PASS | BLOCKED | FAILED
-
-Use script exit definitions: PASS = screenshot captured, BLOCKED = precondition/startup unavailable, FAILED = capture attempt failed. Do not use FAILED for unreachable preconditions.
 
 URL:
 <url>
@@ -404,47 +163,33 @@ Notes:
 <optional>
 ```
 
-## Relationship to the Factory
+Status follows the script's exit definitions: PASS = screenshot captured,
+BLOCKED = precondition or startup unavailable, FAILED = the capture attempt
+failed. Do not use FAILED for unreachable preconditions.
 
-```text
-Stitch
-   ↓
-stitch-handoff
-   ↓
-approved target screenshot
+## Boundaries
 
-implementation
-   ↓
-running application
-   ↑
-screenshot skill starts/reuses app
+Flow: `stitch-handoff` supplies the approved target screenshot,
+`implementation` produces the running app, this skill captures the actual
+screenshot, and verification compares them. This skill does not replace UX, UI
+Design, Stitch, `stitch-handoff`, implementation, or verification.
 
-screenshot skill
-   ↓
-Playwright
-   ↓
-actual rendered screenshot
+## Common Rationalizations
 
-verification
-   ↓
-compare target vs actual
-```
+| Rationalization | Reality |
+|---|---|
+| "The page probably looks fine; skip the capture." | The skill exists to produce evidence of the rendered UI, not assumptions. |
+| "I'll judge visual fidelity from the screenshot too." | Judging fidelity belongs to the verification workflow. |
+| "Fix the UI bug I just saw." | This skill does not modify application code. |
 
-This skill is a reusable capture capability.
+## Red Flags
 
-It does not replace:
-
-- UX
-- UI Design
-- Stitch
-- `stitch-handoff`
-- implementation
-- verification
+- A screenshot was reported without viewport metadata.
+- Capture used ad-hoc commands instead of the factory capture scripts.
+- A server was left running after capture.
 
 ## Self-Improvement
 
-Follow the common self-improvement standard in:
-
-`../self-improvement/references/standard.md`
-
-Only propose changes to this skill when real projects provide repeatable evidence that screenshot capture is missing an important capability or creating recurring reliability problems.
+Follow `../self-improvement/references/standard.md`. Propose changes only when
+real projects show repeatable evidence that capture is missing a capability or
+causing recurring reliability problems.

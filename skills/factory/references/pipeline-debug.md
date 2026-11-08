@@ -1,11 +1,6 @@
----
-name: pipeline-debug
-description: Diagnose and safely resolve GitHub Actions CI, build, test, and pipeline failures using evidence from the failing run and the current project.
----
+# Pipeline Debug Workflow
 
-# Pipeline Debug Skill
-
-This skill diagnoses and, when approved, fixes GitHub Actions CI and pipeline
+This workflow diagnoses and, when approved, fixes GitHub Actions CI and pipeline
 failures.
 
 It is intended for failures involving:

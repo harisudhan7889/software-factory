@@ -1,4 +1,5 @@
 ---
+name: market-analyst
 description: Synthesizes verified market evidence into insights, implications, opportunities, risks, and strategic conclusions.
 mode: subagent
 ---

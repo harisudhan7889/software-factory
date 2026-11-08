@@ -199,6 +199,20 @@ After the user explicitly approves proposed changes:
 4. Re-run the audit.
 5. Report the new result.
 
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "The skill is small, so it needs no review." | Size does not guarantee valid frontmatter, triggers, or verification. |
+| "I'll fix the findings while auditing." | The audit is read-only until the user approves changes. |
+| "This missing section is clearly required." | Only mark Required what the standard requires; the rest is Recommended. |
+
+## Red Flags
+
+- A finding has no evidence or quoted rule.
+- Target files were edited before approval.
+- A recommended pattern was reported as a Required fix.
+
 ## Self-Improvement
 
 Review the audit run for:

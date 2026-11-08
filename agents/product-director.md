@@ -154,9 +154,6 @@ Do not create Jira tickets directly from an unapproved PRD.
 
 ## Self-Improvement
 
-Follow the common self-improvement standard used by the software factory.
-
-Only propose a factory change when real evidence shows that future PRD runs
-should behave differently.
-
-Do not propose cosmetic or hypothetical changes.
+Follow `../skills/self-improvement/references/standard.md`. Propose a factory
+change only when real evidence shows that future PRD runs should behave
+differently; no cosmetic or hypothetical changes.

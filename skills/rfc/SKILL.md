@@ -1,12 +1,22 @@
 ---
 name: rfc
-description: "Create new RFC documents from context. Use when: creating an RFC, writing a design proposal, drafting a technical spec, proposing a new feature, documenting a cross-platform design, filing implementation tickets from an RFC, accepting an RFC before merge, rejecting an RFC and recording why, building an RFC's tickets in dependency-ordered parallel waves, checking an RFC's implementation status. Subcommands: 'create' to scaffold a new RFC from provided context, 'breakdown' to file Jira tickets from an RFC's Work breakdown table, 'accept' to flip an RFC from Proposed to Accepted before merge, 'reject' to flip an RFC from Proposed to Rejected and record the rationale in memory, 'build' to implement an RFC feature branch, 'status' to show a live rollup of ticket and PR state, 'help' to list subcommands."
-argument-hint: "create <context> | breakdown <NNNN | path> | accept <NNNN | path> | reject <NNNN | path> | build <NNNN | path> [--stacked] | status <NNNN | path> | help"
+description: "Creates RFC (Request for Comments) design documents, files Jira tickets from them, and builds them in dependency-ordered parallel waves. Use when the user wants to write an RFC, draft a design proposal or technical spec, propose a new feature or cross-platform design, break an RFC into Jira tickets, or implement an RFC's tickets as a feature branch, even if they do not say 'RFC'. Subcommands: create, breakdown, build, help. Do not use for single-decision records (use adr) or single-ticket work (use ticket)."
+argument-hint: "create <context> | breakdown <NNNN | path> | build <NNNN | path> [--stacked] | help"
 ---
 
 # RFC
 
-Create RFC (Request for Comments) documents for proposed features and cross-platform designs.
+## Overview
+
+Create RFC (Request for Comments) documents for proposed features and cross-platform designs, turn them into Jira tickets, and implement those tickets safely in parallel.
+
+## When to Use
+
+- A feature or cross-platform design needs a written proposal before implementation (`create`).
+- An approved RFC needs Jira implementation tickets (`breakdown`).
+- An RFC's filed tickets are ready to be implemented (`build`).
+
+Do not use for a single architectural decision (use `adr`), a single Jira ticket (use `ticket`), or implementing one story (use `implementation`).
 
 ## Subcommands
 
@@ -14,10 +24,7 @@ Create RFC (Request for Comments) documents for proposed features and cross-plat
 |---|---|
 | `create` | Scaffold a new RFC from the provided context |
 | `breakdown` | File Jira tickets from an RFC's Work breakdown table, each under its listed Epic, then refine each with platform expert agents |
-| `accept` | Flip an RFC from Proposed to Accepted in its PR, immediately before merge |
-| `reject` | Flip an RFC from Proposed to Rejected and record the rationale in memory |
 | `build` | Implement an RFC's filed tickets in dependency- and file-contention-aware parallel waves. Defaults: commit each onto one RFC feature branch (single PR at the end). `--stacked`: land each wave on its own branch stacked on the previous and open one PR per wave |
-| `status` | Show a live rollup of each Work-breakdown ticket's Jira status and PR state |
 | `help` | Show this table |
 
 ## create
@@ -46,6 +53,27 @@ Default mode integrates completed tickets onto a single RFC feature branch `feat
 
 See `references/build.md` for the full procedure.
 
+## Verification
+
+- [ ] `create`: `overview.md`, platform files, and the README index entry all exist and agree.
+- [ ] `breakdown`: user approved the ticket plan before any Jira write; the Work breakdown table holds real ticket keys and no `_TBD_` rows; a retry created no duplicates.
+- [ ] `build`: every ticket went through the `implementation` skill's approval gate; verification evidence is reported per wave.
+- [ ] No secrets appear in any RFC.
+
+## Common Rationalizations
+
+| Rationalization | Reality |
+|---|---|
+| "The RFC is clear, skip user review of the ticket plan." | Jira writes are hard to undo; approval is required before creating tickets. |
+| "These tickets look independent, run them in one wave." | File contention causes merge conflicts; use `ticket-dependency-planning` to set waves. |
+| "Skip the implementation approval gate to save time in `build`." | Wave scheduling must never bypass the `implementation` skill's planning gate. |
+
+## Red Flags
+
+- Tickets created before the user approved the plan.
+- `build` started while `_TBD_` ticket rows remain.
+- Subcommands used that are not in the table above (for example `accept`, `reject`, `status`; they are not implemented here).
+
 ## Policies
 
 Use:
@@ -59,31 +87,3 @@ Use:
 Follow the common self-improvement standard in:
 
 `../self-improvement/references/standard.md`
-
-<!-- ## accept
-
-**Usage:** `/rfc accept <NNNN | path-to-overview.md>`
-
-Flip an RFC from Proposed to Accepted in its PR, immediately before merge.
-
-1. Resolve the RFC: `NNNN` → `docs/rfc/NNNN-*/overview.md`, or use the given path. If it does not resolve to a single file, ask the user which RFC with the `vscode_ask_questions` tool.
-2. Verify the work-breakdown foundation is scheduled or evidenced: every framework path in the table's `Files` column must resolve to either a scaffold row in the same table or recorded in-repo evidence. If the foundation is assumed but unscheduled, stop — do not flip to Accepted. Report the missing scaffold and ask whether to amend the RFC first.
-3. In `docs/rfc/NNNN-*/overview.md`, replace the status cell from **Proposed** with **Accepted**. If it already reads **Accepted**, stop (no-op).
-4. In `docs/rfc/UPDATES.md`, update that RFC's index-row status cell from Proposed to Accepted.
-5. Commit both files on the PR branch via the commit skill (`bash .github/skills/commit/scripts/create-commit.sh "docs: accept RFC"`).
-
-## reject
-
-**Usage:** `/rfc reject <NNNN | path-to-overview.md>`
-
-Flip an RFC from Proposed to Rejected and record why in the RFC reject memory (`.github/memories/rfc/rejected-1-200.md`), so future creators can learn what the team has already turned down and avoid re-proposing it. The mirror image of `accept`.
-
-See `references/reject.md` for the full procedure.
-
-## status
-
-**Usage:** `/rfc status <NNNN | path-to-overview.md>`
-
-Render a read-only rollup of an RFC's implementation — each Work-breakdown ticket's Jira status and PR state (open/merged/none), plus overall progress and the next unblocked wave.
-
-See `references/status.md` for the full procedure. -->

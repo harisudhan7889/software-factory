@@ -1,4 +1,5 @@
 ---
+name: competitor-analyst
 description: Investigates and compares competitors using product, pricing, positioning, customers, and market evidence.
 mode: subagent
 ---

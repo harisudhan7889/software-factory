@@ -1,4 +1,5 @@
 ---
+name: data-miner
 description: Finds, verifies, and structures quantitative market and company data.
 mode: subagent
 ---

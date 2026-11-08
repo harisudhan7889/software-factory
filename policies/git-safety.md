@@ -2,18 +2,18 @@
 
 ## Purpose
 
-Define safe Git rules for the software factory.
-
-The goal is to keep Story work isolated, preserve history, prevent accidental
-cross-Story changes, and avoid destructive Git operations.
+Define safe Git rules for the software factory: keep Story work isolated,
+preserve history, prevent accidental cross-Story changes, and avoid
+destructive Git operations.
 
 ## Scope
 
-Applies to branch, commit, push, merge, rebase, and PR operations for Jira Stories.
+Applies to branch, commit, push, merge, rebase, and Pull Request operations
+for Jira Stories. `guardrails.md` owns the general approval and contamination
+behavior (`GR-APPROVAL-001`, `GR-DESTRUCTIVE-001`, `GR-SCOPE-002`). This policy
+owns the Git mechanics.
 
-## Core Principles
-
-Apply these principles to all factory Git operations:
+## Principles
 
 1. Preserve history.
 2. Keep Story work isolated.
@@ -23,380 +23,237 @@ Apply these principles to all factory Git operations:
 6. Never hide branch ancestry.
 7. Report uncertainty before changing shared history.
 
-## Default Branch
+## Rules
 
-Determine the project's default branch from the repository or GitHub.
+### GIT-BRANCH-001 — Branch base and name
 
-Usually:
+Severity:
+BLOCK
 
-- `main`
-- `master`
+Rule:
+Create a dedicated implementation branch per Jira Story, based on the project
+default branch, named `feat/<JIRA>-<slug>` (for example
+`feat/ADVERIFY-88-tenancy-rbac`).
 
-Do not assume the default branch without checking when the repository state is
-available.
+Trigger:
+A new Jira Story starts.
 
-## Implementation Branch
+Required action:
+Determine the default branch from the repository or GitHub (usually `main` or
+`master`) and do not assume it. Before creating the branch, identify the base,
+verify the base commit, and check whether commits from another Story would
+enter the branch.
 
-For a new Jira Story:
+Forbidden action:
+Base a Story branch on another feature branch because the Stories are related.
 
-- Create a dedicated implementation branch.
-- Base it on the current project default branch unless an explicit dependency
-  requires another base.
-- Use a deterministic branch name derived from the Jira issue: `feat/<JIRA>-<slug>` (evidence: branch name contains JIRA key).
+Exception:
+An explicit, declared dependency. Identify the parent Story, branch, and
+dependency, and prefer waiting for the parent to merge. If work must proceed
+first, mark the dependency, report that the branch contains parent work, keep
+it visible in the Pull Request plan, and never present the Story as
+independent.
 
-Example:
+Evidence:
+The branch name contains the Jira key and `git merge-base` shows the expected
+base.
 
-```text
-feat/ADVERIFY-88-tenancy-rbac
-```
+### GIT-ISOLATION-001 — Cross-Story isolation
 
-Do not create a new Story branch from another feature branch merely because the
-Stories are related. Exception: None — use default branch as base unless explicit dependency is declared per `## Branch Ancestry`.
+Severity:
+BLOCK
 
-## Branch Ancestry
+Rule:
+A branch and Pull Request normally contain work for one Jira Story.
 
-Before creating an implementation branch:
+Trigger:
+Before Pull Request creation, merge, or rebase.
 
-1. Identify the intended base branch.
-2. Verify the base commit.
-3. Inspect branch ancestry when another feature branch is proposed as the
-   base.
-4. Determine whether commits from another Jira Story would become part of the
-   new branch.
+Required action:
+Compare the source branch with the target, inspect the commits unique to the
+source, and identify commits or files that belong to another Story. If
+unrelated work is present, stop, report the issue, branch, and commits, and
+correct the ancestry or get explicit approval for the dependency. After a merge
+or rebase, verify the resulting ancestry, diff, and tests.
 
-If another Story's commits would be included:
+Forbidden action:
+Deliver another Story's work through the current Pull Request, or use merge or
+rebase to hide an ancestry problem.
 
-- Identify the parent Story.
-- Identify the parent branch.
-- Identify the dependency.
-- Prefer waiting for the parent Story to merge.
-- Then create the new branch from the updated default branch.
+Exception:
+A declared dependency on an unmerged parent. Report it, identify the parent
+Pull Request, explain that merging may also deliver parent changes, and get
+explicit approval when the normal workflow expects isolated Stories.
 
-If work must proceed before the parent merges:
+Evidence:
+Use the Evidence block below.
 
-- Mark the dependency explicitly.
-- Report that the dependent branch contains parent work.
-- Keep the dependency visible in the Pull Request plan.
-- Do not present the dependent Story as independent.
+### GIT-PUSH-001 — Push and history safety
 
-## Cross-Story Isolation
+Severity:
+BLOCK for force-push and for rewriting shared or published history. CONFIRM for
+resolving a divergent remote.
 
-A branch and Pull Request should normally contain work for one Jira Story.
+Rule:
+Do not force-push or rewrite shared or published history automatically.
+History-sensitive operations are `git rebase`, `git reset`,
+`git commit --amend`, `git push --force`, `git push --force-with-lease`, and
+replacing published commits.
 
-Before Pull Request creation:
+Trigger:
+A push, or any history-sensitive operation.
 
-1. Compare the source branch with the target branch.
-2. Inspect commits that are unique to the source branch.
-3. Identify commits belonging to another Jira Story.
-4. Identify unintended files or changes from another Story.
+Required action:
+Before pushing, verify the remote repository and branch, compare local and
+remote state, and detect divergence. Do not push when the remote already
+matches. If the remote differs, explain the divergence and find a
+non-destructive resolution. If a force-push or shared-history rewrite is
+required, stop, explain why and the impact, name a safe alternative, and ask for
+explicit approval.
 
-If unrelated Story work is present:
+Forbidden action:
+Force-push by default, or reset the working tree to remove uncertainty.
 
-- Stop.
-- Report the affected Jira issue, branch, and commits.
-- Correct the branch ancestry or obtain explicit approval for the dependency.
-
-Do not silently deliver another Story's work through the current Pull Request.
-
-## Uncommitted Changes
-
-Before branch operations:
-
-- Inspect the working tree.
-- Identify unrelated uncommitted changes.
-
-Do not:
-
-- Silently discard changes.
-- Silently include unrelated changes.
-- Reset the working tree to remove uncertainty.
-
-If unrelated changes exist:
-
-- Show them.
-- Ask whether to stash, commit separately, or stop.
-
-## Remote Branches
-
-Before pushing:
-
-1. Verify the remote repository.
-2. Check whether the branch already exists remotely.
-3. Compare local and remote state.
-4. Detect divergence.
-
-If the remote branch matches local state:
-
-- Do not push unnecessarily.
-
-If the remote branch differs:
-
-- Do not force-push automatically.
-- Explain the divergence.
-- Determine a non-destructive resolution when possible.
-
-## Push Safety
-
-Severity: BLOCK for force-push; CONFIRM for divergence resolution.
-
-Normal pushes may proceed when:
-
-- The repository is correct.
-- The source branch is correct.
-- The target remote is correct.
-- The push is non-destructive.
-- No force-push is required.
-
-Do not force-push by default.
-
-If force-push is required:
-
-1. Stop.
-2. Explain why.
-3. Explain the possible impact.
-4. Identify a safe alternative if one exists.
-5. Ask for explicit approval.
-
-## History Rewriting
-
-Severity: BLOCK for shared history; CONFIRM for local unpublished rewrite.
-
-Treat these operations as history-sensitive:
-
-- `git rebase`
-- `git reset`
-- `git commit --amend`
-- `git push --force`
-- `git push --force-with-lease`
-- Replacing published commits
-
-Do not rewrite shared or published history automatically.
-
-A local, unpublished history rewrite may be acceptable when:
-
-- It is necessary.
-- It does not discard unrelated work.
-- The operation is within the current task.
-- The workflow explicitly permits it.
-
+Exception:
+A local, unpublished rewrite is allowed only when it is necessary, discards no
+unrelated work, stays within the current task, and the workflow permits it.
 When uncertain, stop and ask.
 
-## Merge and Rebase
+Evidence:
+Remote state is confirmed after the push.
 
-Prefer the strategy that preserves the intended Story boundaries and shared
-history.
+### GIT-TREE-001 — Uncommitted changes and conflicts
 
-Before merging or rebasing:
+Severity:
+CONFIRM
 
-- Identify source and target.
-- Determine whether commits from another Story are involved.
-- Inspect current branch state.
-- Check whether local changes are present.
+Rule:
+Never silently discard or include unrelated changes.
 
-After the operation:
+Trigger:
+A branch operation with a dirty working tree, or a merge conflict.
 
-- Verify the resulting ancestry.
-- Verify the diff.
-- Run relevant tests.
+Required action:
+Inspect the working tree first. If unrelated changes exist, show them and ask
+whether to stash, commit separately, or stop. For conflicts, understand both
+sides, and use `/factory pr resolve-conflicts` for a Pull Request.
 
-Do not use merge or rebase only to hide a branch ancestry problem.
+Forbidden action:
+Discard changes silently, or resolve a conflict by choosing the newer commit,
+the target branch, or one side without evidence.
 
-## Conflict Safety
+Exception:
+None.
 
-When conflicts occur:
+Evidence:
+The working tree status is reported before and after the operation.
 
-- Use the conflict-resolution workflow.
-- Understand both sides before resolving.
-- Do not choose the newer commit automatically.
-- Do not choose the target branch automatically.
-- Do not discard one side without evidence.
+### GIT-PROTECT-001 — Protected branches and deletion
 
-Use:
+Severity:
+BLOCK
 
-`/factory pr resolve-conflicts`
+Rule:
+Do not modify branch protection or delete work automatically.
 
-when the current Pull Request requires conflict resolution.
+Trigger:
+Branch protection blocks a required action, or a branch is a deletion
+candidate.
 
-## Pull Request Base Safety
+Required action:
+Report the block and use an approved workflow alternative. Ask when a protected
+setting must change. Treat branch cleanup as a separate controlled capability.
 
-Before creating a Pull Request:
+Forbidden action:
+Disable required reviews, status checks, protection rules, or security controls
+only to ease a merge. Delete another Story's branch, a protected branch, a
+remote branch that belongs to other work, or unmerged work.
 
-Verify:
+Exception:
+None without explicit approval.
 
-- Source branch.
-- Target branch.
-- Repository.
-- Jira issue.
-- Source branch ancestry.
-- Unique commits.
-- Changed files.
-
-A Pull Request must not silently include another Story's implementation.
-
-If the Pull Request is intentionally dependent on an unmerged parent:
-
-- Report the dependency.
-- Identify the parent Pull Request.
-- Explain that merging the dependent Pull Request may also deliver parent
-  changes.
-- Require explicit approval before using that strategy when the normal workflow
-  would expect isolated Stories.
-
-## Protected Branches
-
-Do not modify branch protection automatically.
-
-Do not disable:
-
-- Required reviews
-- Required status checks
-- Protection rules
-- Security controls
-
-only to make a Pull Request easier to merge.
-
-If branch protection blocks a required action:
-
-- Report the block.
-- Use an approved workflow alternative.
-- Ask when a protected setting must change.
-
-## Delete Operations
-
-Do not automatically delete:
-
-- Another Story's branch
-- Protected branches
-- Remote branches belonging to other work
-- Unmerged work
-
-Branch cleanup is a separate controlled capability.
+Evidence:
+The report names the blocking rule and the approved alternative.
 
 ## Safe Inspection Commands
 
-Inspection should prefer non-mutating commands such as:
+Prefer non-mutating commands, and never run destructive commands only to
+inspect state:
 
 ```bash
 git status
 git branch --show-current
 git log --oneline --decorate --graph --all
 git diff --stat
-git diff
 git merge-base <source> <target>
 git log <target>..<source> --oneline
 ```
 
-Use additional commands when needed.
+## Pull Request Base Safety
 
-Do not run destructive commands merely to inspect state.
-
-## Verification
-
-Before reporting branch or Git work as complete, verify:
-
-- [ ] Correct repository.
-- [ ] Correct current branch.
-- [ ] Correct base branch.
-- [ ] Expected commit ancestry.
-- [ ] No unintended cross-Story commits.
-- [ ] No unrelated working-tree changes were included.
-- [ ] Final diff is understood.
-- [ ] Required tests were run.
-- [ ] Remote state is confirmed after push.
-- [ ] Pull Request source and target are correct.
-
-## Evidence
-
-When a branch decision is important, report evidence such as:
-
-```text
-Base branch:
-master
-
-Base commit:
-<commit>
-
-Implementation branch:
-feat/ADVERIFY-88-tenancy-rbac
-
-Parent dependency:
-ADVERIFY-87
-
-Parent commit included:
-<commit>
-
-Cross-Story commits detected:
-Yes / No
-```
-
-Do not claim branch isolation without checking ancestry when the situation
-could contain dependent work.
-
-## Exceptions
-
-Exception: Local unpublished history rewrite allowed only per `## History Rewriting` conditions; otherwise `Exception: None.`
-
-## Enforcement
-
-Pre-commit/-push hooks, branch protection, `git merge-base` / `git log target..source` checks, CI, human approval for force-push.
-
-## Relationship to Other Policies
-
-Use:
-
-- `security.md` for security and data protection.
-- `verification.md` for verification requirements and evidence.
-- `guardrails.md` for agent behavior controls.
-- `dependency-safety.md` for dependency safety.
-- `web-best-practices.md` for web app best practices.
-- `observability.md` for factory execution records.
-
-Do not duplicate complete workflows across policy files.
-
-## Decision Boundaries
-
-Stop and ask when force-push, history rewrite on shared branches, or cross-story contamination is detected. See `## Exceptions` for local-rewrite allowance.
+Before creating a Pull Request, verify the source branch, target branch,
+repository, Jira issue, source branch ancestry, unique commits, and changed
+files. A Pull Request must not silently include another Story's
+implementation (`GIT-ISOLATION-001`).
 
 ## Failure Handling
 
-### Wrong base branch
+- **Wrong base branch:** stop delivery, identify the correct base, preserve current commits, and look for a non-destructive correction.
+- **Cross-Story contamination:** stop Pull Request creation, identify the other Story, commits, and branch relationship, then correct the ancestry or request approval for an intentional dependency.
+- **Remote divergence:** do not force-push. Explain the divergence and find a safe path.
+- **Destructive operation required:** stop, explain the operation and risk, and ask for approval.
 
-- Stop before further delivery.
-- Identify the correct base.
-- Preserve current commits.
-- Determine whether a non-destructive correction is possible.
+## Decision Boundaries
 
-### Cross-Story contamination
+Stop and ask when a force-push, a shared-history rewrite, or cross-Story
+contamination is detected.
 
-- Stop Pull Request creation.
-- Identify the other Story.
-- Identify the commits and branch relationship.
-- Correct the ancestry or request approval for an intentional dependency.
+## Exceptions
 
-### Remote divergence
+Exceptions are stated per rule. A local unpublished history rewrite is allowed
+only under `GIT-PUSH-001`.
 
-- Do not force-push.
-- Explain the divergence.
-- Determine a safe path.
+## Enforcement
 
-### Destructive operation required
+Pre-commit and pre-push hooks, branch protection, `git merge-base` and
+`git log target..source` checks, CI, and human approval for force-push.
 
-- Stop.
-- Explain the operation and risk.
-- Ask for approval.
+## Evidence
+
+When a branch decision matters, report:
+
+```text
+Base branch / Base commit:
+Implementation branch:
+Parent dependency / Parent commit included:
+Cross-Story commits detected: Yes / No
+```
+
+Do not claim branch isolation without checking ancestry when the branch could
+contain dependent work.
+
+## Verification
+
+Before reporting Git work complete, verify:
+
+- [ ] Correct repository, current branch, and base branch.
+- [ ] Expected commit ancestry and no unintended cross-Story commits.
+- [ ] No unrelated working-tree changes were included.
+- [ ] The final diff is understood and required tests were run.
+- [ ] Remote state is confirmed after push.
+- [ ] Pull Request source and target are correct.
+
+## Relationship to Other Policies
+
+`guardrails.md` owns approval, destructive-action, and contamination behavior.
+`security.md` owns security and secrets. `verification.md` owns completion
+evidence. `dependency-safety.md`, `web-best-practices.md`, and
+`observability.md` own their own areas. Do not duplicate complete workflows
+across policy files.
 
 ## Self-Improvement
 
-Review Git operations for:
-
-- Wrong branch base.
-- Cross-Story contamination.
-- Repeated ancestry problems.
-- Unsafe Git workarounds.
-- Missing branch checks.
-- Repeated manual recovery steps.
-
-Only propose a factory change when real evidence shows that future Git
-operations should behave differently.
-
-Do not propose cosmetic or hypothetical changes.
+Review Git operations for wrong branch base, cross-Story contamination,
+repeated ancestry problems, unsafe workarounds, missing checks, and repeated
+manual recovery. Propose a factory change only when real evidence shows future
+Git operations should behave differently; no cosmetic or hypothetical changes.

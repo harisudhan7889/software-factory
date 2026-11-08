@@ -3,421 +3,175 @@
 ## Purpose
 
 Define what the software factory must verify before it reports work as
-complete.
-
-Verification must produce evidence.
-
-An agent must not claim that work passed, succeeded, or is complete without
-evidence that supports the claim.
+complete. Verification must produce evidence. An agent must not claim that work
+passed, succeeded, or is complete without evidence that supports the claim.
 
 ## Scope
 
-Applies to all factory work that reports completion — Jira Stories, PRs, builds, tests, security, UI, Git, and CI. All verification must match the change.
+Applies to all factory work that reports completion: Jira Stories, Pull
+Requests, builds, tests, security, UI, Git, and CI. Verification must match the
+change.
 
-## Verification Principles
-
-Apply these principles:
+## Principles
 
 1. Verify the actual result, not only the intended change.
-2. Use the smallest sufficient verification set.
+2. Use the smallest sufficient verification set, at the correct level.
 3. Prefer direct evidence.
-4. Verify at the correct level.
-5. Report failures and unknowns clearly.
-6. Never turn "not run" into "passed".
-7. Do not hide skipped checks.
-8. Re-run relevant checks after a corrective change.
+4. Report failures and unknowns clearly.
+5. Never turn "not run" into "passed", and do not hide skipped checks.
+6. Re-run relevant checks after a corrective change.
 
-## Verification Levels
+## Rules
 
-Use the level required by the current task.
+### VER-EVIDENCE-001 — Every claim has evidence
 
-### Level 1 — Static verification
+Severity:
+BLOCK
 
-Use when appropriate:
+Rule:
+Every completion or success claim has supporting evidence and an explicit
+status value.
 
-- File existence
-- Configuration validation
-- Formatting
-- Schema validation
-- Static analysis
+Trigger:
+An agent reports a check, build, test, push, Pull Request, Jira update, or CI
+result.
 
-### Level 2 — Code verification
+Required action:
+Report one status from the list below with the evidence.
 
-Use when code changes exist:
+Forbidden action:
+Report `passed` for a check that was not run, convert an unknown or
+inaccessible status into success, or include secrets in the evidence.
 
-- Unit tests
-- Integration tests
-- Typecheck
-- Lint
-- Build
+Exception:
+None. Report a skipped check as `NOT RUN` with the reason.
 
-### Level 3 — System verification
+Evidence:
+Command and exit status, test, build, lint, or typecheck output, commit hash,
+Pull Request URL, CI run result, Jira read-back, design artifact inspection, or
+a security scan result.
 
-Use when the change affects multiple components:
+### VER-COMPLETION-001 — Completion gate
 
-- End-to-end tests
-- Service integration
-- Database behavior
-- Authentication
-- Authorization
-- Tenant isolation
-- External service integration
+Severity:
+BLOCK
 
-### Level 4 — Delivery verification
+Rule:
+A task is reported complete only when all of these hold:
 
-Use for delivery workflows:
+- Required acceptance criteria are verified.
+- Required tests, static checks, and security checks pass.
+- Required design checks pass for UI work.
+- Relevant RFC and ADR requirements are satisfied.
+- Required delivery checks are satisfied.
+- No unresolved blocking issue remains.
 
-- Commit exists
-- Correct branch
-- Pull Request exists
-- CI status is known
-- Jira update is confirmed
+Trigger:
+An agent is about to report full completion.
 
-Do not run every possible level for every change. Run all checks required by
-the change and project rules.
+Required action:
+If any required check is not verified, do not report full completion. State
+the missing verification and what blocks completion.
 
-## Acceptance Criteria
+Exception:
+None.
 
-For Jira implementation work:
-
-1. Read the acceptance criteria.
-2. Map each criterion to an implementation or verification result.
-3. Verify every applicable criterion.
-4. Report any criterion that is not verified.
-
-Use:
-
-```text
-Acceptance criteria:
-- AC1: PASS — <evidence>
-- AC2: PASS — <evidence>
-- AC3: NOT VERIFIED — <reason>
-```
-
-Do not mark the Jira Story complete when required acceptance criteria remain
-unverified.
-
-## Tests
-
-When tests apply:
-
-- Run the relevant tests.
-- Use the project's normal test command.
-- Prefer focused tests for the changed area.
-- Run broader tests when the change can affect other areas.
-- Report the actual result.
-
-Example:
-
-```text
-Tests:
-- Unit: 24 passed
-- Integration: 8 passed
-```
-
-Do not report:
-
-```text
-Tests: passed
-```
-
-when tests were not run.
-
-## Build
-
-When a build is relevant:
-
-- Run the project's build command.
-- Confirm the command completed successfully.
-- Record the relevant result.
-
-A successful typecheck is not proof that the production build succeeds.
-
-A local build is not proof that GitHub Actions succeeds.
-
-## Lint
-
-When linting is part of the project workflow:
-
-- Run the project's lint command.
-- Report pass, failure, or not run.
-- Do not hide warnings that affect the acceptance decision.
-
-## Typecheck
-
-When a typed project requires typechecking:
-
-- Run the project's typecheck command.
-- Report the actual result.
-- Do not assume a successful build means typechecking was independently
-  verified unless the build includes that check.
-
-## UI Verification
-
-For UI Stories:
-
-1. Read the approved UX specification.
-2. Read the approved UI design specification.
-3. Inspect the approved external design artifact (evidence: artifact URL + inspection notes).
-4. Verify the implementation against the approved design.
-
-Check for all UI Stories:
-
-- Screen structure
-- Layout
-- Visual hierarchy
-- Components
-- States
-- Interaction behavior
-- Responsive behavior
-- Accessibility requirements
-- Design-system usage
-
-Exception: External artifact may be skipped only when no approved artifact exists — evidence: `NOT APPLICABLE — no artifact`.
-
-Functional tests alone are not sufficient to verify visual design.
-
-Do not claim design compliance when the design was not inspected.
-
-## Security Verification
-
-For security-sensitive changes, run the relevant security checks.
-
-Examples:
-
-- Authentication tests
-- Authorization tests
-- RLS tests
-- Tenant isolation tests
-- Secret scanning
-- Dependency security checks
-- Permission checks
-
-Use the project's security policy to determine the required controls.
-
-Do not report a security-sensitive implementation as verified when a required
-security check was not completed.
-
-## RFC and ADR Verification
-
-When an implementation is governed by an approved RFC or ADR:
-
-- Verify the implementation against the applicable requirements.
-- Verify that accepted architectural decisions were followed.
-- Identify deviations.
-
-If a deviation is intentional:
-
-- Record the reason.
-- Verify that the required approval exists.
-
-Do not silently treat an architecture deviation as compliant.
-
-## Jira Verification
-
-For Jira operations, verify the actual Jira state.
-
-Examples:
-
-```text
-Issue:
-ADVERIFY-88
-
-Update:
-Description updated — confirmed
-
-Comment:
-Added — confirmed
-
-Transition:
-In Review — confirmed
-```
-
-Do not claim a Jira update succeeded only because the command returned without
-an obvious error.
-
-Re-read the issue to confirm the state persisted.
-
-## Git Verification
-
-Before reporting a commit or branch operation as complete:
-
-- Verify the current branch.
-- Verify the expected commit exists.
-- Verify the working tree state.
-- Inspect the final diff when relevant.
-- Verify the remote state after a push.
-
-Do not claim a push succeeded without confirmation.
-
-## Pull Request Verification
-
-Before reporting Pull Request delivery as complete:
-
-Verify:
-
-- Correct repository
-- Correct source branch
-- Correct target branch
-- Pull Request exists
-- Jira reference is correct when required
-- Description is present
-- CI/check status is known
-
-Separate these states:
-
-```text
-Pull Request:
-Success
-
-CI:
-Failure
-```
-
-A successful Pull Request creation does not mean CI passed.
-
-A `gh pr checks` permission error does not automatically mean CI failed.
-Use an approved fallback: `gh run list` / workflow-run status — evidence: run URL and status.
-
-## CI Verification
-
-When CI is required:
-
-- Inspect the relevant workflow run.
-- Identify its status.
-- Distinguish failure from access errors.
-- Distinguish pending from success.
-- Use the `pipeline-debug` workflow for a failed build or check when applicable.
-
-Allowed states include:
-
-- success
-- failure
-- pending
-- cancelled
-- neutral
-- skipped
-- no run
-- unknown
-
-Do not convert an unknown or inaccessible status into success.
-
-## Evidence Requirements
-
-Every completion claim should have supporting evidence.
-
-Useful evidence includes:
-
-- Command and exit status
-- Test output
-- Build output
-- Lint output
-- Typecheck output
-- Git commit hash
-- GitHub Pull Request URL
-- CI run result
-- Jira read-back
-- Design artifact inspection
-- Security scan result
-
-Do not include secrets in verification evidence.
+Evidence:
+The verification report below.
 
 ## Verification Status
 
-Use explicit status values:
+Use these values:
 
-```text
-PASS
-FAIL
-NOT RUN
-NOT VERIFIED
-BLOCKED
-UNKNOWN
-```
+- **PASS:** the check ran and the required result was confirmed.
+- **FAIL:** the check ran and did not satisfy the requirement.
+- **NOT RUN:** the check was not executed.
+- **NOT VERIFIED:** the check may have happened indirectly, but the evidence cannot confirm the result.
+- **BLOCKED:** the check could not run because a dependency, permission, or decision is missing.
+- **UNKNOWN:** the evidence is insufficient to determine the result.
 
-Meaning:
+## Verification Levels
 
-### PASS
+Use the level the task requires. Do not run every level for every change.
 
-The check ran and the required result was confirmed.
+1. **Static:** file existence, configuration and schema validation, formatting, static analysis.
+2. **Code:** unit and integration tests, typecheck, lint, build.
+3. **System:** end-to-end tests, service integration, database behavior, authentication, authorization, tenant isolation, external services.
+4. **Delivery:** commit exists, correct branch, Pull Request exists, CI status known, Jira update confirmed.
 
-### FAIL
+Verification must match the change. Running only unrelated tests or only a
+formatting check gives false confidence. For an authentication change, run
+authentication and authorization tests, typecheck, and relevant integration
+tests.
 
-The check ran and did not satisfy the requirement.
+## Check-Specific Rules
 
-### NOT RUN
+**Acceptance criteria.** Read the criteria, map each to an implementation or
+verification result, verify every applicable one, and report any that are not
+verified (`AC1: PASS — <evidence>`, `AC3: NOT VERIFIED — <reason>`). Do not mark
+a Story complete while required criteria are unverified.
 
-The check was not executed.
+**Tests.** Run the project's normal test command, focused on the changed area,
+and broaden it when other areas can be affected. Report actual counts such as
+`Unit: 24 passed`.
 
-### NOT VERIFIED
+**Build, lint, typecheck.** Run the project's command and report pass, fail, or
+not run. A typecheck does not prove the production build succeeds, a build does
+not prove typechecking unless it includes that check, and a local build does
+not prove GitHub Actions succeeds. Do not hide warnings that affect the
+acceptance decision.
 
-The check may have happened indirectly, but there is not enough evidence to
-confirm the required result.
+**UI.** For UI Stories read the approved UX specification and UI design
+specification, inspect the approved external design artifact (record the
+artifact URL and inspection notes), and verify the implementation against it:
+structure, layout, hierarchy, components, states, interaction, responsive
+behavior, accessibility, and design-system usage. Functional tests alone do not
+verify visual design, and design compliance cannot be claimed without
+inspection. Record `NOT APPLICABLE — no artifact` only when no approved
+artifact exists.
 
-### BLOCKED
+**Security.** For security-sensitive changes run the relevant checks
+(authentication, authorization, RLS, tenant isolation, secret scan,
+dependency checks, permission checks) as `security.md` requires. Do not report
+the change verified when a required check is incomplete.
 
-The check could not run because a required dependency, permission, or
-decision is missing.
+**RFC and ADR.** Verify the implementation against the applicable requirements
+and accepted decisions, and identify deviations. For an intentional deviation,
+record the reason and confirm the required approval. Never treat a deviation as
+compliant silently.
 
-### UNKNOWN
+**Jira.** Verify the actual Jira state by re-reading the issue, for example
+`Description updated — confirmed`, `Transition: In Review — confirmed`. A
+command returning without an obvious error is not confirmation.
 
-The available evidence is insufficient to determine the result.
+**Git.** Verify the current branch, the expected commit, the working tree
+state, and the final diff when relevant, and confirm the remote state after a
+push. `git-safety.md` owns the Git rules.
 
-## Scope of Verification
+**Pull Request.** Verify the repository, source and target branches, that the
+Pull Request exists, the Jira reference when required, that a description is
+present, and that CI status is known. Report these separately, for example
+`Pull Request: Success`, `CI: Failure`. Creating a Pull Request does not mean CI
+passed.
 
-Verification must match the change.
-
-Do not create false confidence by running only unrelated tests.
-
-For example:
-
-```text
-Changed:
-Authentication
-
-Required:
-Authentication tests
-Authorization tests
-Typecheck
-Relevant integration tests
-```
-
-Running only a formatting check is not sufficient.
+**CI.** Inspect the relevant workflow run. Distinguish failure from access
+errors and pending from success. A `gh pr checks` permission error does not mean
+CI failed. Use an approved fallback such as `gh run list` or workflow-run
+status, and record the run URL and status. For a failed build or check, use the
+pipeline-debug workflow. Allowed states are success, failure, pending,
+cancelled, neutral, skipped, no run, and unknown.
 
 ## After a Fix
 
 When a failed check is fixed:
 
-1. Re-run the failed check.
-2. Run relevant regression checks.
-3. Verify that the original failure is gone.
-4. Check for new failures.
-5. Report both the original and regression results.
+1. Re-run the failed check and the relevant regression checks.
+2. Confirm the original failure is gone and check for new failures.
+3. Report the original and the regression results.
 
-Do not declare the issue fixed after changing code without re-verification.
-
-## Completion Gate
-
-A task may be reported as complete only when:
-
-- Required acceptance criteria are verified.
-- Required tests pass.
-- Required static checks pass.
-- Required security checks pass.
-- Required design checks pass for UI work.
-- Relevant RFC/ADR requirements are satisfied.
-- Required delivery checks are satisfied.
-- No unresolved blocking issue remains.
-
-If any required check is not verified:
-
-- Do not report full completion.
-- State the missing verification.
-- State what blocks completion.
+Do not declare an issue fixed after changing code without re-verification.
 
 ## Verification Report
-
-Use:
 
 ```text
 ## Verification
@@ -425,25 +179,10 @@ Use:
 Acceptance criteria:
 - <criterion>: PASS — <evidence>
 
-Tests:
-- <test>: PASS/FAIL/NOT RUN — <result>
-
-Build:
+Tests / Build / Lint / Typecheck / Security:
 - PASS/FAIL/NOT RUN — <result>
 
-Lint:
-- PASS/FAIL/NOT RUN — <result>
-
-Typecheck:
-- PASS/FAIL/NOT RUN — <result>
-
-Security:
-- PASS/FAIL/NOT RUN — <result>
-
-UI/Design:
-- PASS/FAIL/NOT VERIFIED/NOT APPLICABLE — <result>
-
-RFC/ADR:
+UI/Design, RFC/ADR:
 - PASS/FAIL/NOT VERIFIED/NOT APPLICABLE — <result>
 
 CI:
@@ -457,52 +196,38 @@ PASS / FAIL / PARTIAL / BLOCKED
 
 Stop and ask when:
 
-- Required verification cannot run (permission missing, environment unavailable) → `BLOCKED`.
-- Evidence is insufficient to determine PASS/FAIL → `UNKNOWN` / `NOT VERIFIED`.
-- Completion is requested but required acceptance criteria remain unverified → BLOCK per `## Completion Gate`.
+- Required verification cannot run (permission missing, environment unavailable). Status is `BLOCKED`.
+- Evidence is insufficient to decide. Status is `UNKNOWN` or `NOT VERIFIED`.
+- Completion is requested while required acceptance criteria remain unverified. `VER-COMPLETION-001` blocks.
 
 ## Exceptions
 
-Exception: None. Skipped checks must be reported as `NOT RUN` with reason; do not convert to `PASS`. See `## Verification Status`.
+None. Skipped checks are `NOT RUN` with the reason and never become `PASS`.
 
 ## Enforcement
 
-Automated: CI checks, `pipeline-debug` workflow, required status checks. Manual: checklists in `## Verification Report` and peer diff review. Policy does not substitute for technical enforcement.
+Automated: CI checks, the pipeline-debug workflow, and required status checks.
+Manual: the verification report and peer diff review. Policy does not replace
+technical enforcement.
 
-## Separation of Concerns
+## Verification
 
-Use:
-
-- `policies/verification.md` for what must be verified.
-- The relevant workflow for how to perform the work.
-- Specialized skills for detailed diagnostics.
-- CI and hooks for automated enforcement when available.
-
-Do not duplicate entire verification workflows inside every skill.
+Compliance with this policy is shown by a verification report in which every
+required check has a status and evidence, and by the absence of any completion
+claim that lacks one.
 
 ## Relationship to Other Policies
 
-Use 
-
-- `security.md` for security and data protection.
-- `git-safety.md` for Git safety.
-- `guardrails.md` for agent behavior controls.
-- `dependency-safety.md` for dependency safety.
-- `web-best-practices.md` for web app best practices.
-- `observability.md` for factory execution records.
+This policy owns what must be verified. The relevant workflow owns how to do
+the work, and specialized skills own detailed diagnostics. `security.md` owns
+security, `git-safety.md` Git, `guardrails.md` agent behavior,
+`dependency-safety.md` dependencies, `web-best-practices.md` web quality, and
+`observability.md` execution records. Do not duplicate whole verification
+workflows inside skills.
 
 ## Self-Improvement
 
-Review verification runs for:
-
-- Missing checks
-- False completion claims
-- Repeated manual verification
-- Checks that provide little value
-- Important failures that were hard to detect
-- Opportunities for automated enforcement
-
-Only propose a factory change when real evidence shows that verification
-should change for future runs.
-
-Do not propose cosmetic or hypothetical changes.
+Review verification runs for missing checks, false completion claims, repeated
+manual verification, low-value checks, hard-to-detect failures, and chances to
+automate. Propose a change only when real evidence shows future runs should
+verify differently; no cosmetic or hypothetical changes.

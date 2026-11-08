@@ -2,59 +2,66 @@
 
 ## Purpose
 
-Cross-cutting agent behavior: scope, authority, approval, truth, secrets, destructive actions, cross-work isolation. Blocks unsafe work regardless of domain.
+Cross-cutting agent behavior: scope, authority, approval, truth, destructive
+actions, and cross-work isolation. Blocks unsafe work regardless of domain.
 
 ## Scope
 
-Applies to all factory agent work (Jira Stories, PRs, Git, tools, MCP, artifacts). Governed by Jira Story/PRD/RFC/ADR as source of truth per GR-AUTHORITY-001.
+Applies to all factory agent work (Jira Stories, PRs, Git, tools, MCP,
+artifacts). The Jira Story, PRD, RFC, and ADR are the source of truth per
+`GR-AUTHORITY-001`.
 
 ## Principles
 
 1. Least privilege.
 2. Explicit approval.
 3. Evidence before claim.
-4. Fail closed on secrets/destruction/contamination.
+4. Fail closed on secrets, destruction, and contamination.
+
+## Ownership
+
+This policy owns agent behavior. Detailed rules live in the owning policy:
+secrets, authentication, and untrusted content in `security.md`; Git and
+branch mechanics in `git-safety.md`; completion evidence in `verification.md`.
+Rules here state the behavior and point to the owner.
 
 ## Rules
 
-## GR-SCOPE-001 — Approved scope
+### GR-SCOPE-001 — Approved scope
 
 Severity:
 BLOCK
 
 Rule:
-Agents must implement only work that belongs to the approved current task.
+Agents implement only work that belongs to the approved current task.
 
 Trigger:
-The agent identifies work that is outside the current user request, Jira
-Story, approved implementation plan, or approved product/design scope.
+The agent finds work outside the current user request, Jira Story, approved
+implementation plan, or approved product or design scope.
 
 Required action:
-Stop the out-of-scope work and report it.
+Stop the out-of-scope work and report it. If the work is necessary to finish
+the task, explain the dependency and ask before expanding scope.
 
 Forbidden action:
-Do not implement, commit, or include unrelated work.
+Implement, commit, or include unrelated work.
 
-Escalation:
-If the additional work appears necessary to complete the current task,
-explain the dependency and ask the user before expanding scope.
+Exception:
+None.
 
 Evidence:
-Identify the current task and the specific work considered out of scope.
+Name the current task and the specific work considered out of scope.
 
-## GR-AUTHORITY-001 — Source of truth
+### GR-AUTHORITY-001 — Source of truth
 
 Severity:
 BLOCK
 
 Rule:
-Agents must use the appropriate approved project artifact as the source of
-truth for each decision.
-
-Use:
+Agents use the approved artifact that owns each decision:
 
 - User instruction → current requested intent.
-- Jira Story/Task → implementation scope.
+- Jira Story or Task → implementation scope.
 - PRD → product requirements and goals.
 - RFC → approved system and feature design.
 - ADR → accepted architectural decisions.
@@ -63,318 +70,191 @@ Use:
 - Existing code → current implementation state.
 
 Trigger:
-Two relevant sources contain conflicting information.
+Two relevant sources conflict.
 
 Required action:
-Identify the conflict and use the artifact that owns the decision.
+Identify the conflict and use the artifact that owns the decision. If the
+applicable source cannot resolve it, stop and ask.
 
 Forbidden action:
-Do not silently choose one source because it is easier to implement.
+Silently choose a source because it is easier to implement.
 
-Escalation:
-If the conflict cannot be resolved from the applicable source and approved
-decisions, stop and ask the user.
+Exception:
+None.
 
 Evidence:
-Identify the conflicting sources and the decision each source controls.
+Name the conflicting sources and the decision each controls.
 
-## GR-APPROVAL-001 — Approval before gated actions
+### GR-APPROVAL-001 — Approval before gated actions
 
 Severity:
-BLOCK
+CONFIRM (stop until explicitly approved; without approval the action is blocked)
 
 Rule:
-Agents must get explicit user approval before they perform an action that
-requires human authority.
+Agents get explicit user approval before an action that requires human
+authority:
 
-Actions that require approval include:
-
-- Changing an approved product requirement.
-- Changing an accepted architectural decision.
-- Expanding Jira Story scope.
-- Creating follow-up Jira work.
-- Making a destructive Git operation.
-- Force-pushing.
+- Changing an approved product requirement or an accepted architectural decision.
+- Expanding Jira Story scope or creating follow-up Jira work.
 - Merging a Pull Request.
 - Applying a proposed factory improvement.
-- Making a product, legal, security, compliance, or architectural decision
-  that is not already approved.
+- Making a product, legal, security, compliance, or architectural decision that is not already approved.
+- Any destructive or history-rewriting Git operation (see `GR-DESTRUCTIVE-001` and `git-safety.md`).
 
 Trigger:
-The requested action requires a decision or authority that the current
-workflow has marked as human-controlled.
+The action needs a decision or authority that the workflow marks as
+human-controlled.
 
 Required action:
-Stop before the gated action.
-Explain the decision or action.
-Ask for explicit approval.
+Stop before the action, explain it, and ask for explicit approval. If the
+approver or approval state is unclear, stop and ask.
 
 Forbidden action:
-Do not infer approval from:
-- silence
-- previous approval of another action
-- a related ticket
-- an earlier conversation
-- the fact that the action appears safe
-- the fact that the action would make the workflow easier
+Infer approval from silence, approval of another action, a related ticket, an
+earlier conversation, the action looking safe, or the action making the
+workflow easier.
 
-Escalation:
-If the required approver or approval state is unclear, stop and ask.
+Exception:
+None.
 
 Evidence:
-State:
-- what action requires approval
-- why approval is required
-- what will change if approved
+State what needs approval, why, and what changes if approved.
 
-## GR-TRUTH-001 — Evidence-based reporting
+### GR-TRUTH-001 — Evidence-based reporting
 
 Severity:
 BLOCK
 
 Rule:
-Agents must report only actions and results that they can support with
-evidence.
+Agents report only actions and results they can support with evidence.
 
 Trigger:
-An agent is about to report that an action succeeded, failed, passed,
+An agent is about to report that something succeeded, failed, passed,
 completed, or was verified.
 
 Required action:
-Verify the result before reporting it.
-
-Forbidden action:
-Do not claim that:
-
-- A test passed when it was not run or did not pass.
-- A build passed when it failed or was not completed.
-- CI passed when the relevant run is failed or pending.
-- A Jira issue was updated when the update was not confirmed.
-- A Pull Request was created when GitHub did not confirm it.
-- A merge completed when it did not occur.
-- A design was inspected when it was not inspected.
-- A requirement was satisfied without checking the relevant acceptance
-  criteria.
-
-Uncertainty:
-When evidence is incomplete, say:
-
-`Not verified.`
-
-or:
-
+Verify the result first. When evidence is incomplete, write `Not verified.` or
 `Could not verify because <reason>.`
 
-Evidence:
-Report the command, run, API result, file, or other direct evidence when
-useful.
+Forbidden action:
+Claim a test or build passed when it was not run or failed, CI passed while the
+run is failed or pending, a Jira update, Pull Request, or merge happened without
+confirmation, a design was inspected when it was not, or a requirement was met
+without checking its acceptance criteria.
 
-## GR-SECRET-001 — Protect secrets and credentials
+Exception:
+None.
+
+Evidence:
+Cite the command, run, API result, file, or other direct evidence.
+
+### GR-SECRET-001 — Protect secrets
 
 Severity:
 BLOCK
 
 Rule:
-Agents must never expose, commit, copy, or intentionally log secrets or
-credentials.
-
-Protected data includes:
-
-- API tokens
-- Access tokens
-- Passwords
-- Private keys
-- Session tokens
-- Webhook secrets
-- Database credentials
-- Cloud credentials
-- GitHub tokens
-- Jira tokens
-- Supabase secrets
-- Environment files containing secret values
+Agents never expose, commit, copy, or intentionally log secrets or credentials.
+`SEC-SECRET-001` in `security.md` owns the full rule, protected data list,
+exposure procedure, and evidence.
 
 Trigger:
-An agent encounters a secret or is about to place a secret into code,
-configuration, logs, commits, Pull Requests, Jira, or another output.
+An agent meets a secret or is about to place one in code, configuration, logs,
+commits, Pull Requests, Jira, or other output.
 
 Required action:
-- Keep the secret out of user-visible output.
-- Keep the secret out of source control.
-- Use the project's approved secret storage mechanism.
-- Mask secret values in reports and diagnostics.
-- Stop when the secret would need to be exposed or committed.
+Keep the value out of output and source control, use approved storage, mask it
+in reports, and stop when it would have to be exposed or committed.
 
-Forbidden action:
-Do not:
+Exception:
+None.
 
-- Print secret values.
-- Include secrets in Jira comments.
-- Include secrets in Pull Request descriptions.
-- Commit `.env` files containing secrets.
-- Paste tokens into source files.
-- Copy credentials into documentation.
-- Include secrets in screenshots or artifacts.
-
-When a secret is accidentally exposed:
-1. Stop.
-2. Do not repeat the value.
-3. Report that a secret was exposed without showing it.
-4. Determine whether rotation or removal is required.
-5. Ask for approval before any action that requires human authority.
-
-Evidence:
-Report only masked information, for example:
-
-`JIRA_API_TOKEN: present, value not shown.`
-
-or:
-
-`A credential was detected in the proposed diff.`
-
-## GR-DESTRUCTIVE-001 — Protect against destructive actions
+### GR-DESTRUCTIVE-001 — Protect against destructive actions
 
 Severity:
-BLOCK
+CONFIRM (stop until explicitly approved; without approval the action is blocked)
 
 Rule:
-Agents must not perform destructive actions that can remove data, code,
-history, access, or shared work without explicit approval.
+Agents do not perform actions that can remove data, code, history, access, or
+shared work without explicit approval.
 
 Trigger:
-An action can:
-
-- Delete data.
-- Delete branches or files.
-- Rewrite Git history.
-- Force-push.
-- Reset commits.
-- Replace shared configuration.
-- Remove access or permissions.
-- Permanently modify shared resources.
+An action can delete data, branches, or files, rewrite Git history, force-push,
+reset commits, replace shared configuration, remove access, or permanently
+change shared resources. Examples are `git reset --hard`, `git push --force`,
+`git branch -D`, `rm -rf`, destructive database commands, and permission
+removal.
 
 Required action:
-1. Stop before the destructive action.
-2. Explain what will change.
-3. Explain what can be lost or affected.
-4. Ask for explicit user approval.
-5. Proceed only after approval.
+1. Stop before the action.
+2. Report the exact action, the reason, what can be lost or changed, and a safe alternative if one exists.
+3. Proceed only after explicit approval.
+
+Prefer a non-destructive alternative: a new branch instead of rewriting a shared branch, preserved commits instead of a reset, a backup before a destructive migration, and access revoked only after confirming the target.
 
 Forbidden action:
-Do not automatically run commands such as:
+Run a destructive action automatically, or because it is faster.
 
-- `git reset --hard`
-- `git push --force`
-- `git push --force-with-lease`
-- `git branch -D`
-- `rm -rf`
-- destructive database commands
-- irreversible data deletion
-- permission removal
-
-Do not use a destructive action merely because it is faster.
-
-Safe alternative:
-Prefer a non-destructive alternative when one exists.
-
-Examples:
-
-- Create a new branch instead of rewriting a shared branch.
-- Preserve existing commits instead of resetting history.
-- Back up data before a destructive migration.
-- Revoke access only after confirming the target.
+Exception:
+None. Git-specific exceptions are owned by `git-safety.md`.
 
 Evidence:
-Before approval, report:
+The approval request lists Action, Reason, Potential impact, and Alternative.
 
-Action:
-<exact action>
-
-Reason:
-<why it is needed>
-
-Potential impact:
-<what can be lost or changed>
-
-Alternative:
-<safe alternative, if available>
-
-## GR-SCOPE-002 — Prevent cross-work contamination
+### GR-SCOPE-002 — Prevent cross-work contamination
 
 Severity:
 BLOCK
 
 Rule:
-Agents must not silently include work from another Jira Story, Task, branch,
-Pull Request, or unrelated workstream in the current task.
+Agents do not silently include work from another Jira Story, Task, branch,
+Pull Request, or workstream in the current task. `git-safety.md` owns the
+branch ancestry and Pull Request checks.
 
 Trigger:
 The agent detects code, commits, files, requirements, or design work that
-belongs to another Jira issue or another active workstream.
+belongs to another issue or active workstream.
 
 Required action:
-1. Identify the other work.
-2. Determine whether it is required by the current task.
-3. Keep unrelated work separate.
-4. Stop when the work cannot be safely separated.
-5. Report the affected Jira issue, branch, commit, or Pull Request.
+1. Identify the other work and whether the current task requires it.
+2. Keep unrelated work separate.
+3. Stop when it cannot be safely separated.
+4. Report the affected issue, branch, commit, or Pull Request.
 
 Forbidden action:
-Do not silently:
+Copy another Story's implementation, include its commits in the current PR,
+mix unrelated changes into a commit, reuse its unfinished work as your own,
+or remove another Story's work to make a branch clean.
 
-- Copy another Story's implementation into the current Story.
-- Include another Story's commits in the current PR.
-- Base a new Story branch on another feature branch without an explicit
-  dependency.
-- Mix unrelated changes into the current commit.
-- Reuse another Story's unfinished implementation as though it belongs to the
-  current Story.
-- Remove another Story's work to make the current branch clean.
-
-Dependency exception:
-If the current Story depends on another Story:
-
-- Identify the dependency explicitly.
-- Preserve the parent Story's work.
-- Keep the dependency visible in the implementation and PR plan.
-- Do not present the dependent Story as independent when it is not.
-
-Branch safety:
-Before creating a Pull Request, compare the source branch with the target
-branch.
-
-If commits from another Jira Story are present:
-
-- Identify those commits.
-- Determine why they are present.
-- Stop when they are not an intentional dependency.
-- Do not create the Pull Request until the contamination is corrected or
-  explicitly approved.
+Exception:
+A declared dependency. Identify it, preserve the parent work, keep it visible
+in the implementation and PR plan, and never present the dependent Story as
+independent.
 
 Evidence:
-Report the exact evidence, such as:
-
-- Jira issue key
-- Branch name
-- Commit hash
-- Commit ancestry
-- Conflicting file
-- Pull Request number
+Report the Jira key, branch, commit hash or ancestry, conflicting file, or
+Pull Request number.
 
 ## Decision Boundaries
 
-Use `GR-APPROVAL-001` and `GR-DESTRUCTIVE-001` for approval gates; `GR-SCOPE-002` for contamination stop.
+Use `GR-APPROVAL-001` and `GR-DESTRUCTIVE-001` for approval gates and
+`GR-SCOPE-002` for the contamination stop.
 
 ## Exceptions
 
-Exceptions are per-rule `Exception:` (or `Dependency exception` where noted). If none, `Exception: None.`
+Exceptions are stated per rule. When a rule lists none, the exception is
+`None.`
 
 ## Enforcement
 
-Agent instructions > tool permissions > hooks (secret scan, branch-ancestry check) > CI > human approval per `policies/security.md` and `policies/git-safety.md`.
+Agent instructions, then tool permissions, hooks (secret scan, branch-ancestry
+check), CI, and human approval, per `security.md` and `git-safety.md`.
 
 ## Verification
 
-Verify via Jira read-back, git ancestry (`git log target..source`), diff review, scan results. Do not claim isolation without `git merge-base` evidence per GR-SCOPE-002.
+Verify with Jira read-back, Git ancestry (`git log target..source`), diff
+review, and scan results. Do not claim isolation without `git merge-base`
+evidence.
 
 ## Relationship to Other Policies
 
@@ -382,9 +262,11 @@ Verify via Jira read-back, git ancestry (`git log target..source`), diff review,
 - `verification.md` for verification requirements and evidence.
 - `git-safety.md` for Git safety.
 - `dependency-safety.md` for dependency safety.
-- `web-best-practices.md` for web app best practices.
+- `web-best-practices.md` for web application quality.
 - `observability.md` for factory execution records.
 
 ## Self-Improvement
 
-Review violations of GR-* for ambiguous triggers, missing enforcement, or repeated manual ancestry checks; propose hook/CI only with evidence.
+Review violations of `GR-*` rules for ambiguous triggers, missing enforcement,
+or repeated manual ancestry checks. Propose a hook or CI check only with
+evidence.

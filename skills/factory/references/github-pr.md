@@ -424,14 +424,14 @@ If the relevant CI checks are passing:
 If the relevant CI checks have failed:
 
 1. Identify the failed workflow, job, and step.
-2. Invoke the `pipeline-debug` skill for diagnosis.
+2. Follow the `pipeline-debug` workflow (`references/pipeline-debug.md`) for diagnosis.
 3. Pass the Pull Request, workflow/run information, branch, commit SHA, and
    available failure logs as context.
 4. Require `pipeline-debug` to diagnose the failure before proposing any
    change.
 5. Do not modify the repository automatically merely because CI failed.
 
-The `pipeline-debug` skill should determine:
+The `pipeline-debug` workflow should determine:
 
 - Exact failure location
 - Failure classification

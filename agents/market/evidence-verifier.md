@@ -1,4 +1,5 @@
 ---
+name: evidence-verifier
 description: Verifies important research claims, evaluates source quality, and resolves conflicting evidence.
 mode: subagent
 ---

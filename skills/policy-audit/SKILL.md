@@ -7,308 +7,97 @@ description: Audits factory policy files against the Policy Anatomy standard and
 
 ## Overview
 
-Audit a policy against the factory Policy Anatomy standard.
-
-The audit is read-only by default.
-
-The goal is to find required fixes and useful improvements without duplicating
-the policy standard or changing files automatically.
+Audit a policy against the factory Policy Anatomy standard. The audit is
+read-only by default. Find required fixes and useful improvements without
+duplicating the standard or changing files automatically.
 
 ## When to Use
 
-Use when:
-
-- A new policy needs review.
-- An existing policy needs validation.
-- Policies need standardization.
+- A new policy needs review, or an existing policy needs validation.
+- Policies need standardization, or may conflict, duplicate each other, or be too large.
 - A policy has unclear rules or boundaries.
-- Policies may conflict or duplicate each other.
-- A policy may be too large or difficult to maintain.
 - The user asks for a policy audit.
 
-Do not use this skill to:
-
-- Implement application features.
-- Change runtime enforcement.
-- Modify a policy without approval.
-- Invent policy requirements that are not supported by the Policy Anatomy
-  standard or approved factory decisions.
+Do not use to implement application features, change runtime enforcement,
+modify a policy without approval, or invent requirements that the Policy
+Anatomy standard or approved factory decisions do not support.
 
 ## Inputs
 
-Read:
-
 1. The target policy.
-2. `~/.opencode/policies/policy-anatomy.md` (canonical; `policies/policy-anatomy.md` when running from repo root).
-3. Related policies when needed to check ownership, duplication, or conflict.
+2. `~/.opencode/policies/policy-anatomy.md` (canonical; `policies/policy-anatomy.md` from the repo root).
+3. Related policies, only when needed to check ownership, duplication, or conflict.
 
-Read only the files required to verify findings.
-
-Note: Finding Classification, Evidence, and Proposed Changes follow `references/audit-methodology.md` (shared with `skill-audit`).
+Finding Classification, Evidence, Proposed Changes, and the Read-Only Boundary
+follow `references/audit-methodology.md` (shared with `skill-audit`). Classify
+each finding as exactly one of Required fix, Recommended improvement, or Not
+applicable. Every finding needs rule, evidence, impact, and recommended change.
 
 ## Audit Process
 
-### 1. Locate the policy
+Read only the files needed to verify a finding. Do not require a section that
+does not apply.
 
-Determine:
-
-- Policy path.
-- Policy name.
-- Related policies.
-- Referenced enforcement mechanisms.
-- Referenced supporting documents.
-
-### 2. Compare against Policy Anatomy
-
-Check:
-
-- Purpose
-- Scope
-- Principles
-- Rules
-- Decision boundaries
-- Exceptions
-- Enforcement
-- Verification
-- Policy ownership
-- Single source of truth
-- Policy status when applicable
-- Change control
-- Naming
-- Cross-policy references
-- Progressive disclosure
-- Self-improvement
-
-Do not require a section when it is not applicable.
-
-### 3. Audit rule quality
-
-For each important rule, check:
-
-- Is the rule specific?
-- Is the trigger clear?
-- Is the required behavior clear?
-- Is forbidden behavior clear when needed?
-- Are exceptions explicit?
-- Is the rule testable?
-- Can a human understand what compliance means?
-
-Reject vague rules such as:
-
-```text
-Be careful with security.
-```
-
-Prefer rules such as:
-
-```text
-If a secret is detected in a proposed commit, stop the commit.
-```
-
-### 4. Audit severity
-
-Check that severity is used consistently:
-
-- `BLOCK`
-- `CONFIRM`
-- `WARN`
-- `INFO`
-
-Verify that the action associated with each severity is clear.
-
-Do not add severity where it does not improve the policy.
-
-### 5. Audit ownership and boundaries
-
-Determine whether each rule belongs in the target policy.
-
-Look for:
-
-- Product requirements placed in policies.
-- Architecture decisions placed in policies.
-- Workflow procedures copied into policies.
-- Rules owned by another policy.
-- Duplicate rules across policies.
-
-Recommend a direct reference to the owning policy instead of duplicated
-detailed rules.
-
-### 6. Audit enforcement
-
-Check whether the policy clearly separates:
-
-- Policy rule
-- Enforcement mechanism
-- Verification
-
-If a rule can be reliably enforced by code, hooks, scanners, CI, or tool
-permissions, identify that opportunity.
-
-Do not require executable enforcement for rules that need human judgment.
-
-### 7. Audit exceptions and decision boundaries
-
-Check that high-impact exceptions are explicit.
-
-Verify that the policy states when an agent must:
-
-- Stop
-- Ask for approval
-- Continue with a warning
-- Record an observation
-
-Do not allow agents to infer important exceptions.
-
-### 8. Audit verification
-
-Check that important rules have evidence that can prove compliance.
-
-Prefer evidence such as:
-
-- Test results
-- Static checks
-- Secret scans
-- Git state
-- CI results
-- Tool results
-- Diff review
-- Audit records
-
-Do not accept:
-
-```text
-Looks correct.
-```
-
-as sufficient evidence for a required control.
-
-### 9. Audit consistency
-
-Check the target policy against related policies.
-
-Look for:
-
-- Contradictory rules
-- Conflicting severity
-- Different definitions of the same term
-- Different approval requirements
-- Duplicate sources of truth
-
-When a conflict cannot be resolved from policy ownership, report it and ask
-for a decision.
-
-### 10. Audit context efficiency
-
-Check whether the policy is focused.
-
-Identify content that should move to:
-
-- Another policy
-- A supporting reference
-- A workflow document
-- An executable enforcement mechanism
-
-Do not split a small policy without a clear maintenance or context benefit.
-
-## Finding Classification
-
-Follow `references/audit-methodology.md` — Finding Classification. Classify every finding as exactly one of Required fix / Recommended improvement / Not applicable. Do not convert recommended patterns into mandatory requirements. See shared file for full definitions (Required fix = violates Policy Anatomy or causes unsafe behavior).
-
-## Evidence
-
-Follow `references/audit-methodology.md` — Evidence. Every finding must include rule, evidence, impact, recommended change; no defect without evidence, no invented content.
-
-## Proposed Changes
-
-Follow `references/audit-methodology.md` — Proposed Changes. Provide focused minimal diff (exact insertion/replacement text); after approval show diff, validate, re-run audit, report new result.
-
-## Read-Only Boundary
-
-The audit is read-only by default.
-
-Do not:
-
-- Edit the policy.
-- Delete files.
-- Rename files.
-- Move policies.
-- Change enforcement.
-- Change related policies.
-
-After explicit user approval:
-
-1. Apply only the approved changes.
-2. Show the diff.
-3. Validate the changed policy.
-4. Re-run the audit.
-5. Report the new result.
+1. **Locate the policy.** Path, name, related policies, referenced enforcement mechanisms and supporting documents.
+2. **Compare against Policy Anatomy.** Purpose, scope, principles, rules, decision boundaries, exceptions, enforcement, verification, ownership, single source of truth, status, change control, naming, cross-policy references, progressive disclosure, self-improvement.
+3. **Audit rule quality.** Each important rule needs a clear trigger, required behavior, forbidden behavior when needed, explicit exceptions, and testable compliance. Reject "Be careful with security." Prefer "If a secret is detected in a proposed commit, stop the commit."
+4. **Audit severity.** `BLOCK`, `CONFIRM`, `WARN`, `INFO` must each map to a clear action and be used consistently. Do not add severity where it adds nothing.
+5. **Audit ownership.** Look for product requirements, architecture decisions, or workflow procedures inside the policy, rules owned by another policy, and duplicates. Recommend a direct reference to the owning policy.
+6. **Audit enforcement.** The policy should separate rule, enforcement mechanism, and verification. Point out rules that code, hooks, scanners, CI, or tool permissions could enforce. Do not require executable enforcement for rules that need human judgment.
+7. **Audit exceptions and decision boundaries.** High-impact exceptions must be explicit. The policy must say when an agent must stop, ask for approval, continue with a warning, or record an observation. Agents must not infer important exceptions.
+8. **Audit verification.** Important rules need provable evidence: test results, static checks, secret scans, git state, CI results, tool results, diff review, audit records. "Looks correct" is not evidence for a required control.
+9. **Audit consistency.** Check for contradictory rules, conflicting severity, differing definitions or approval requirements, and duplicate sources of truth. If ownership cannot settle a conflict, report it and ask for a decision.
+10. **Audit context efficiency.** Identify content that belongs in another policy, a reference, a workflow document, or executable enforcement. Do not split a small policy without a clear benefit.
 
 ## Verification
 
 Before completing the audit, confirm:
 
 - [ ] Policy Anatomy was read.
-- [ ] Purpose and scope were checked.
-- [ ] Rules were checked for specificity and testability.
-- [ ] Severity was checked.
-- [ ] Exceptions and decision boundaries were checked.
-- [ ] Enforcement and verification were checked.
-- [ ] Ownership and duplication were checked.
-- [ ] Related policy conflicts were checked when relevant.
+- [ ] Purpose, scope, rules (specificity, testability), and severity were checked.
+- [ ] Exceptions, decision boundaries, enforcement, and verification were checked.
+- [ ] Ownership, duplication, and related-policy conflicts were checked.
 - [ ] Context efficiency was checked.
 - [ ] Findings are evidence-based.
-- [ ] Report was generated per `## Report` template and audit stopped.
+- [ ] The report follows the template below and the audit stopped there.
 
 ## Report
-
-Use:
 
 ```text
 # Policy Audit
 
 ## Policy
-
 <name>
 
 ## Path
-
 <path>
 
 ## Result
-
 PASS / PASS WITH RECOMMENDATIONS / FAIL
 
 ## Summary
-
 <short summary>
 
 ## Required Fixes
-
 - ...
 
 ## Recommended Improvements
-
 - ...
 
 ## Not Applicable
-
 - ...
 
 ## Context Efficiency
-
 Lines: <number>
 Assessment: <focused / should extract ...>
 
 ## Findings
-
 <evidence-backed detail>
 
 ## Proposed Changes
-
 <focused changes or diff>
 
 ## Verification
-
 - [x] ...
 - [ ] ...
 ```
@@ -325,35 +114,15 @@ Assessment: <focused / should extract ...>
 
 ## Red Flags
 
-Treat these as audit signals:
-
-- A rule uses vague terms such as "be careful" or "use best judgment" without
-  defining the boundary.
-- A required rule has no verification method.
-- The same rule appears in multiple policies.
-- A policy contains workflow steps that belong in a reference.
-- A policy contains product or architecture decisions.
-- A severity is defined without behavior.
-- An exception is implied but not stated.
-- A policy says "must" but provides no enforcement or verification path.
-- Policies disagree on the same control.
+- A rule uses vague terms ("be careful", "use best judgment") without a boundary.
+- A required rule has no verification method, or says "must" with no enforcement path.
+- The same rule appears in multiple policies, or policies disagree on one control.
+- A policy contains workflow steps, product decisions, or architecture decisions.
+- A severity is defined without behavior, or an exception is implied but not stated.
 
 ## Self-Improvement
 
-Review the audit run for:
-
-- False positives.
-- False negatives.
-- Missed Policy Anatomy rules.
-- Repeated manual audit steps.
-- Missing validation.
-- Confusing findings.
-
-Only propose a factory change when real evidence shows that future policy
-audits should behave differently.
-
-Do not propose cosmetic or hypothetical changes.
-
-Follow the common self-improvement standard in:
-
-../self-improvement/references/standard.md
+Follow `../self-improvement/references/standard.md`. Review the run for false
+positives, false negatives, missed Policy Anatomy rules, repeated manual steps,
+and confusing findings. Propose a factory change only when real evidence shows
+future audits should behave differently; no cosmetic or hypothetical changes.

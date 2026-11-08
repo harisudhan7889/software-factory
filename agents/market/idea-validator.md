@@ -1,4 +1,5 @@
 ---
+name: idea-validator
 description: Validates a business idea or market using pain, purchasing power, ease of targeting, and market growth.
 mode: subagent
 ---

@@ -1,4 +1,5 @@
 ---
+name: market-director
 description: Orchestrates market research and produces evidence-backed, decision-ready intelligence.
 mode: primary
 ---

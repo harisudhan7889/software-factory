@@ -7,402 +7,132 @@ description: Guides agents through analyzing approved product and technical work
 
 ## Purpose
 
-Identify and organize dependencies between Jira tickets so the software factory can determine:
-
-- Which tickets are ready to start
-- Which tickets are blocked
-- Which tickets can be implemented in parallel
-- Which tickets should be done first
-
-This skill plans dependency relationships.
-
-It does not implement the tickets.
+Identify and organize dependencies between Jira tickets so the factory can
+tell which tickets are ready, which are blocked, which can run in parallel, and
+which should be done first. This skill plans dependency relationships. It does
+not implement tickets.
 
 ## When to Use
 
-Use when:
-- Planning execution order for a set of Jira tickets from PRD/RFC/ADR/Jira sources
-- Determining which tickets are READY vs BLOCKED
-- Identifying safe parallel work or dependency levels
-- Checking dependencies for a newly created or materially changed Jira ticket
+Use when planning execution order for a set of tickets from PRD/RFC/ADR/Jira
+sources, determining READY vs BLOCKED, identifying safe parallel work or
+dependency levels, or checking dependencies for a newly created or materially
+changed ticket.
 
-Do not use when:
-- Implementing code (use `implementation`)
-- Creating or refining tickets (use `ticket`)
-- Changing requirements or architecture (use `rfc` / `adr`)
+Do not use to implement code (`implementation`), create or refine tickets
+(`ticket`), or change requirements or architecture (`rfc` / `adr`).
 
 ## Inputs
 
-Use the most relevant approved sources available:
-
-- PRD
-- RFC
-- ADR
-- UX/UI decisions when they create implementation dependencies
-- Jira tickets
-- Existing repository state when needed
-
-Treat each source according to its approval authority. Do not reinterpret PRD/RFC/ADR/Jira beyond what that source approves.
-
-Do not invent requirements that are not supported by the source material.
+Use the most relevant approved sources: PRD, RFC, ADR, UX/UI decisions that
+create implementation dependencies, Jira tickets, and repository state when
+needed. Treat each source by its approval authority, do not reinterpret it
+beyond what it approves, and do not invent requirements.
 
 ## Workflow
 
-Follow this order:
-
-1. Gather the most relevant approved sources from `Inputs`.
-2. Draft the dependency graph using `Dependency Model`, recording reason, source, evidence, and confidence for each edge.
-3. Classify tickets as READY, BLOCKED, or parallel candidates per `Ready Tickets`, `Blocked Tickets`, and `Parallel Work`.
-4. Derive execution levels and check for cycles per `Execution Levels` and `Cycles`.
-5. Run `Verification`, then request `Human Review` when required.
-6. Report per `Output` without modifying Jira unless explicitly authorized.
+1. Gather the approved sources.
+2. Draft the dependency graph (Dependency Model), recording reason, source, evidence, and confidence for each edge.
+3. Classify tickets as READY, BLOCKED, or parallel candidates.
+4. Derive execution levels and check for cycles.
+5. Run Verification, and request Human Review when required.
+6. Report per Output without modifying Jira unless explicitly authorized.
 
 ## Capability Detection
 
-Dependency planning may use capability-specific detection skills when a new or materially
-changed ticket suggests a specialized implementation capability.
-
-For Stripe recurring subscriptions, use `stripe-subscriptions` as a capability detector. For Stripe one-time payments, use `stripe-one-time-payments` as a capability detector. Route each capability separately and never merge them merely because both use Stripe.
-
-The capability detector:
-
-- identifies whether the requirement needs the relevant Stripe capability (recurring subscriptions or one-time payments)
-- identifies high-level candidate capability areas
-- provides reason, source, evidence, confidence, existing work, and unknowns
-
-The capability detector does not:
-
-- create or modify Jira tickets
-- create Jira dependency links
-- decide final ticket dependencies
-- own the persistent dependency graph
-- implement the capability
-
-After capability detection, continue this skill's normal dependency analysis.
-
-Treat capability output as candidate evidence, not as an automatic dependency.
-
-For Stripe work, implementation guidance belongs to `stripe-best-practices`; consult current Stripe documentation directly (use a docs-lookup skill only when `skills/stripe-docs/SKILL.md` exists). Do not duplicate those implementation responsibilities here.
+When a new or materially changed ticket suggests a specialized capability
+(Stripe subscriptions or one-time payments), route to the matching detector
+skill and treat its output as candidate evidence only. Read
+`references/capability-detection.md` for routing rules and boundaries.
 
 ## Dependency Model
 
-Represent a dependency as:
+`A blocks B` means B cannot be completed correctly until A is completed. Use a
+dependency only with a meaningful reason. For each, record: blocking ticket,
+dependent ticket, reason, source, evidence, and confidence (`FACT`,
+`INFERENCE`, `HYPOTHESIS`, or `UNKNOWN`).
 
-```text
-Ticket A
-  ↓ blocks
-Ticket B
-```
+**Reason.** Good: "A blocks B because B requires the database structure created by A." Weak: "A probably comes first." Never create a dependency only because one ticket has a lower number, was created earlier, sounds more important, shares an Epic, or makes a convenient order.
 
-Meaning:
+**Evidence order.** Prefer: (1) an explicit dependency in an approved source, (2) a technical requirement in the RFC, (3) an architectural constraint in an ADR, (4) a clear requirement in the Jira ticket, (5) repository evidence, (6) reasoned inference. Never present inference as fact.
 
-```text
-Ticket B cannot be completed correctly until Ticket A is completed.
-```
+**Types.** A *hard* dependency means the dependent ticket cannot reasonably proceed (database schema → feature using it). A *soft* dependency means work can start but finishes more easily after the other (shared UI component → feature polish). Use soft dependencies only when they give useful guidance, and never turn a sequencing preference into a hard one.
 
-Use a dependency only when there is a meaningful reason.
+## Ticket States
 
-For each dependency, record:
+- **READY:** within approved scope, all required dependencies complete, source information available, no known blocker. It means ready from a planning perspective only, and a ticket may be READY while unrelated tickets are incomplete.
+- **BLOCKED:** one or more required dependencies are incomplete; name the blocking tickets (for example `ADVERIFY-104 BLOCKED by ADVERIFY-101, ADVERIFY-103`). Do not block a ticket for unrelated incomplete work.
 
-```text
-Blocking ticket
-Dependent ticket
-Reason
-Source
-Evidence
-Confidence
-```
+## Parallel Work and Levels
 
-Use these confidence labels:
+After A completes, B and C may proceed independently. Do not recommend
+parallel execution when tickets depend on each other, modify the same critical
+area in conflicting ways, need a shared unfinished foundation, or have a safety
+or sequencing requirement. When uncertain, mark `UNKNOWN` or request review.
 
-```text
-FACT
-INFERENCE
-HYPOTHESIS
-UNKNOWN
-```
-
-## Dependency Reason
-
-Every proposed dependency must have a clear reason.
-
-Good:
-
-```text
-A blocks B because B requires the database structure created by A.
-```
-
-Weak:
-
-```text
-A probably comes first.
-```
-
-Do not create dependencies only because:
-
-- One ticket has a lower number
-- One ticket was created earlier
-- One ticket sounds more important
-- The tickets are in the same Epic
-- A particular implementation order feels convenient
-
-## Dependency Sources
-
-Prefer evidence in this order for dependency reasoning:
-
-1. Explicit dependency stated in an approved source
-2. Technical requirement in the RFC
-3. Architectural constraint in an ADR
-4. Clear implementation requirement in the Jira ticket
-5. Repository evidence
-6. Reasoned inference
-
-Do not present inference as fact.
-
-## Dependency Types
-
-Use simple dependency types when they improve clarity.
-
-### Hard dependency
-
-The dependent ticket cannot reasonably proceed without the blocking ticket.
-
-Example:
-
-```text
-Database schema
-  ↓
-Feature using that schema
-```
-
-### Soft dependency
-
-Work can begin, but completion or integration is easier after another ticket.
-
-Example:
-
-```text
-Shared UI component
-  ↓
-Feature polish
-```
-
-Only use soft dependencies when they provide useful execution guidance.
-
-Do not turn normal sequencing preferences into hard dependencies.
-
-## Ready Tickets
-
-A ticket is `READY` when:
-
-- It is within approved scope.
-- All required dependencies are complete.
-- Required source information is available.
-- No known blocking condition prevents implementation.
-
-`READY` means the ticket is ready from a dependency and planning perspective.
-It does not guarantee that every implementation prerequisite is available.
-
-A ticket may be ready even when unrelated tickets are still incomplete.
-
-## Blocked Tickets
-
-A ticket is `BLOCKED` when one or more required dependencies are incomplete.
-
-Record the blocking tickets.
-
-Example:
-
-```text
-ADVERIFY-104
-Status: BLOCKED
-Blocked by:
-- ADVERIFY-101
-- ADVERIFY-103
-```
-
-Do not mark a ticket blocked because unrelated work is incomplete.
-
-## Parallel Work
-
-Identify tickets that can safely run in parallel.
-
-Example:
-
-```text
-A
-├── B
-└── C
-```
-
-After A is complete, B and C can proceed independently.
-
-Do not recommend parallel execution when the tickets:
-
-- Modify the same critical area in conflicting ways
-- Depend on each other
-- Require a shared unfinished foundation
-- Have a safety or sequencing requirement that prevents parallel work
-
-When uncertain, mark the relationship as `UNKNOWN` or request review.
-
-## Execution Levels
-
-A useful representation is a set of dependency levels:
-
-```text
-Level 0:
-A, B
-
-Level 1:
-C, D
-
-Level 2:
-E
-```
-
-Tickets in the same level may be candidates for parallel execution, subject to implementation and Git safety checks.
-
-Levels are an execution aid, not a replacement for the dependency graph.
+Execution levels (Level 0: A, B; Level 1: C, D; Level 2: E) are an aid.
+Tickets in one level may be parallel candidates, subject to implementation and
+Git safety checks. Levels do not replace the graph.
 
 ## Cycles
 
-A dependency graph should normally be acyclic.
-
-Example of an invalid cycle:
-
-```text
-A → B
-B → C
-C → A
-```
-
-If a cycle is detected:
-
-- Do not silently break it.
-- Report the cycle.
-- Identify the assumptions causing it.
-- Request human clarification when the cycle cannot be resolved from the approved sources.
-
-## Graph Output
-
-The planner should produce a simple graph or equivalent structured record.
-
-Example:
-
-```text
-ADVERIFY-101
-  ├── blocks → ADVERIFY-104
-  └── blocks → ADVERIFY-105
-
-ADVERIFY-102
-  └── blocks → ADVERIFY-105
-```
-
-Then summarize:
-
-```text
-READY:
-- ADVERIFY-101
-- ADVERIFY-102
-
-BLOCKED:
-- ADVERIFY-104 ← ADVERIFY-101
-- ADVERIFY-105 ← ADVERIFY-101, ADVERIFY-102
-```
+The graph should be acyclic (A → B → C → A is invalid). If a cycle appears, do
+not break it silently: report it, identify the assumptions causing it, and ask
+for clarification when approved sources cannot resolve it.
 
 ## Jira Relationship
 
-When Jira supports dependency links, use the appropriate relationship, such as:
-
-```text
-blocks
-is blocked by
-```
-
-Do not modify Jira automatically unless the task explicitly authorizes Jira updates.
-
-Drafting a dependency graph and writing dependency links to Jira are separate actions.
+When Jira supports dependency links, use `blocks` / `is blocked by`. Drafting a
+graph and writing links to Jira are separate actions; do not modify Jira
+unless the task explicitly authorizes it.
 
 ## Human Review
 
-Dependency analysis should be treated as a draft when any important relationship is inferred.
-
-Human review should be requested when:
-
-- A dependency materially changes execution order.
-- A dependency is uncertain.
-- A dependency affects multiple teams or major system areas.
-- A cycle is detected.
-- The proposed dependency conflicts with an approved source.
-- Adding the dependency would substantially change approved scope.
-
-Do not hide uncertainty to make the graph look complete.
-
-Reporting an uncertain graph as DRAFT does not require blocking; do not write Jira dependency links until the required review is approved.
+Treat the analysis as a draft when any important relationship is inferred.
+Request review when a dependency materially changes execution order, is
+uncertain, affects multiple teams or major system areas, creates a cycle,
+conflicts with an approved source, or substantially changes approved scope.
+Do not hide uncertainty to make the graph look complete. Reporting an
+uncertain graph as DRAFT need not block; just do not write Jira links until
+the required review is approved.
 
 ## Changes to the Graph
 
-Dependencies may change when:
+Dependencies change when PRD, RFC, ADR, or Jira scope changes, or when the
+repository reveals new constraints. Re-evaluate affected dependencies, keep
+the reason and source for the change, do not silently rewrite approved
+decisions, and recalculate READY and BLOCKED. For tickets that are new or
+changed, follow the Incremental Dependency Check below.
 
-- PRD requirements change
-- RFC design changes
-- ADR decisions change
-- Jira scope changes
-- Repository implementation reveals new constraints
+## Incremental Dependency Check
 
-When this happens:
+When a ticket is created or changes materially, re-evaluate its dependencies
+in both directions, update the graph, and recalculate READY/BLOCKED. Read
+`references/incremental-check.md` for the procedure and persistence rules.
 
-1. Re-evaluate affected dependencies.
-2. Preserve the reason and source for the change.
-3. Do not silently rewrite approved dependency decisions.
-4. Recalculate READY and BLOCKED states.
+## Scope Control and Policies
 
-## Scope Control
+This skill must not implement tickets, change requirements or architecture,
+create Jira scope without approval, change Git history, or merge Pull Requests.
 
-This skill must not:
-
-- Implement Jira tickets
-- Change product requirements
-- Change architecture
-- Create new Jira scope without approval
-- Change Git history
-- Merge Pull Requests
-
-It plans work relationships.
-
-To implement tickets, use `implementation`. To create or refine tickets, use `ticket`. To change product or technical decisions, use `rfc` / `adr`.
-
-## Policy References
-
-Read only the policies required by the current task.
-
-Potentially relevant policies include:
-
-- `policies/guardrails.md` — scope, authority, approval, and safety boundaries
-- `policies/verification.md` — verification and evidence requirements
-- `policies/git-safety.md` — when evaluating parallel implementation safety
-- `policies/security.md` — when security or sensitive data affects dependency planning
-- `policies/observability.md` — when recording significant planning events
-- `policies/dependency-safety.md` — when dependency relationships affect the plan
-
-Do not load policies that are not relevant to the current task.
+Read only the relevant policies: `policies/guardrails.md` (scope, approval),
+`policies/verification.md` (evidence), `policies/git-safety.md` (parallel
+safety), `policies/security.md`, `policies/observability.md`,
+`policies/dependency-safety.md`. For significant runs record run ID, agent,
+task or Epic, tickets analyzed, dependencies proposed and changed, and the
+verification result.
 
 ## Verification
 
-Before reporting the dependency plan:
+Before reporting the plan:
 
-- [ ] Every hard dependency has a reason.
-- [ ] The source or evidence is recorded when available.
-- [ ] FACT / INFERENCE / HYPOTHESIS / UNKNOWN is preserved.
-- [ ] READY tickets have no unresolved required dependencies.
-- [ ] BLOCKED tickets identify their blockers.
-- [ ] Parallel candidates do not have known conflicting dependencies.
-- [ ] Cycles are detected and reported.
-- [ ] The graph matches the approved source material.
-- [ ] No Jira dependency links were created or changed unless explicitly authorized (drafting the graph ≠ writing to Jira).
-- [ ] New or materially changed tickets were checked against existing tickets in both directions.
-- [ ] The reported graph reflects all relationship changes since the prior report (deltas listed or “no changes”).
+- [ ] Every hard dependency has a reason, with source or evidence recorded when available, and FACT / INFERENCE / HYPOTHESIS / UNKNOWN preserved.
+- [ ] READY tickets have no unresolved required dependencies; BLOCKED tickets name their blockers.
+- [ ] Parallel candidates have no known conflicting dependencies.
+- [ ] Cycles are detected and reported, and the graph matches the approved sources.
+- [ ] No Jira dependency links were created or changed unless explicitly authorized.
+- [ ] New or changed tickets were checked against existing tickets in both directions.
+- [ ] The report lists graph deltas since the prior report, or "no changes".
 
 Use the statuses and evidence rules in `policies/verification.md`.
 
@@ -410,41 +140,23 @@ Use the statuses and evidence rules in `policies/verification.md`.
 
 | Rationalization | Reality |
 |---|---|
-| Skip the reason, the order is obvious | Every hard dependency needs a reason per `Dependency Reason` — obvious orders still need evidence |
-| Lower ticket number means it comes first | Do not create dependencies from ticket numbers, creation order, or importance per `Dependency Reason` |
-| Mark uncertain edges as FACT to look complete | Do not present inference as fact; preserve FACT / INFERENCE / HYPOTHESIS / UNKNOWN and request review |
+| "The order is obvious, skip the reason." | Every hard dependency needs a reason and evidence. |
+| "A lower ticket number comes first." | Never derive dependencies from ticket numbers, creation order, or importance. |
+| "Mark uncertain edges as FACT to look complete." | Preserve the classification and request review. |
 
 ## Red Flags
 
-- Hard dependency without reason, source, or evidence
-- BLOCKED ticket without named blockers, or READY ticket with unresolved required dependencies
-- Parallel work proposed for tickets with conflicting dependencies or shared unfinished foundation
-- Cycle silently broken instead of reported with assumptions
-- Jira links changed without explicit authorization
-
-## Observability
-
-For significant dependency-planning runs, record enough information to trace:
-
-```text
-Run ID
-Agent
-Task or Epic
-Tickets analyzed
-Dependencies proposed
-Dependencies changed
-Verification result
-```
-
-Follow `policies/observability.md`.
+- A hard dependency without reason, source, or evidence.
+- A BLOCKED ticket with no named blockers, or a READY ticket with unresolved dependencies.
+- Parallel work proposed for tickets with conflicting dependencies or a shared unfinished foundation.
+- A cycle broken silently, or Jira links changed without authorization.
 
 ## Output
 
-Keep the result simple.
-
-`UNKNOWN:` in the output is a category for uncertain relationships, not a confidence value. Always include `Reason / Evidence / Confidence:` with Confidence as one of `FACT / INFERENCE / HYPOTHESIS / UNKNOWN`.
-
-The preferred output is:
+Keep it simple and skip detail when the structure is simple. `UNKNOWN:` in the
+output is a category for uncertain relationships, not a confidence value;
+always include `Reason / Evidence / Confidence:` with Confidence as FACT,
+INFERENCE, HYPOTHESIS, or UNKNOWN.
 
 ```text
 Dependency Graph
@@ -472,45 +184,6 @@ Evidence: ...
 Confidence: INFERENCE
 ```
 
-Do not produce unnecessary detail when the dependency structure is simple.
-
-## Incremental Dependency Check
-
-When a new Jira ticket is created or an existing ticket changes materially,
-re-evaluate its dependency relationships.
-
-Check both directions:
-
-1. Does the new or changed ticket depend on existing tickets?
-2. Do existing tickets depend on the new or changed ticket?
-
-When a dependency is identified:
-
-- Update the dependency graph.
-- Record the reason, source, evidence, and confidence.
-- Recalculate READY and BLOCKED states.
-- Identify any newly available parallel work.
-
-Updating Jira dependency links is a separate action.
-
-Only apply Jira dependency links when:
-
-- The dependency is supported by approved source material; or
-- The dependency has been explicitly approved.
-
-For an uncertain dependency:
-
-- Mark the relationship as `INFERENCE`, `HYPOTHESIS`, or `UNKNOWN`.
-- Do not automatically create the Jira dependency link.
-- Request review when required.
-
-The dependency graph is a persistent planning artifact and must be updated
-rather than recreated as an isolated result for each ticket.
-
-Persist the graph as the `Dependency Graph` + `READY/BLOCKED/PARALLEL` section in the report output and carry it forward to the next run; deltas (added/removed edges with reason/source/confidence) are the evidence for the verification checkbox. Storage: include the full section in this run's report; when a project dependency record exists (e.g. docs/plan/dependency-graph.md or agreed Jira parent comment), update it and cite path/URL in Output; otherwise state 'No persistent store configured — graph lives only in this report.'
-
 ## Self-Improvement
 
-Follow the common self-improvement standard in:
-
-`../self-improvement/references/standard.md`
+Follow `../self-improvement/references/standard.md`.
