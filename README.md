@@ -114,10 +114,61 @@ policies/
 instructions/AGENTS.md     # global rules for all agents
 hooks/                     # pre-commit, secret scan, dangerous-command guard
 plugins/deny-dangerous.ts  # OpenCode guard for bash commands
+adapters/claude-code/     # Claude Code hook adapter for the same guard
+install.sh                # installs the factory into your AI tools
+install.command           # double-click launcher (macOS)
+update.sh                 # pulls the latest factory and refreshes your tools
+update.command           # double-click launcher (macOS)
 references/audit-methodology.md
 ```
 
 Factory rules live here. Product RFCs, ADRs, code, and Jira work live in your product repo.
+
+## Install — Use The Factory In Your AI Tool
+
+The factory works in Claude Code, OpenCode, and Codex. Run the installer once. It finds the tools you have and links the factory into each one.
+
+```sh
+./install.sh            # install into every tool it finds
+./install.sh --dry-run  # show what would change, change nothing
+```
+
+On macOS you can also double-click `install.command`.
+
+| Tool | Skills | Agents | Global rules | Command guard |
+|---|---|---|---|---|
+| Claude Code (`~/.claude`) | yes | yes | `CLAUDE.md` block | `PreToolUse` hook in `settings.json` |
+| OpenCode (`~/.config/opencode`) | yes | yes | `AGENTS.md` block | `plugins/deny-dangerous.ts` |
+| Codex (`~/.codex`) | yes | no | `AGENTS.md` block | no |
+
+Options: `--tool claude|opencode|codex|all`, `--copy` (copy files instead of linking), `--no-hooks` (skip the command guard), `--uninstall`, `--yes`.
+
+How it behaves:
+
+- By default it links to this folder. Run `git pull` here and every tool gets the update. Do not move or delete this folder, or run the installer again after you move it.
+- It never overwrites a file or folder it does not own. It skips the item and tells you.
+- It edits `CLAUDE.md`, `AGENTS.md`, and `settings.json` only inside a marked block (or one hook entry), and saves a `.factory-backup-<time>` copy first. `--uninstall` removes only what it added.
+- Config folders can be changed with `CLAUDE_HOME`, `OPENCODE_HOME`, and `CODEX_HOME`.
+- It needs `bash`. The Claude Code hook needs `jq` or `python3`. Windows needs WSL or Git Bash.
+- Restart your tool after you install.
+
+## Update — Get The Latest Skills And Agents
+
+```sh
+./update.sh             # pull the latest changes, then refresh your tools
+./update.sh --dry-run   # show what is new and what would change
+./update.sh --no-pull   # only refresh links (after you add a skill or agent yourself)
+```
+
+On macOS you can also double-click `update.command`.
+
+What it does:
+
+1. Runs `git fetch` and shows the new commits. It fast-forwards only. It never merges or rewrites your history. If you have unpushed local commits, or local edits that conflict, it stops and changes nothing.
+2. Re-runs the installer for the tools that already have the factory. New skills and agents are linked. Skills and agents that were removed or renamed are cleaned up. Your own files are never removed.
+3. Existing skills and agents change by themselves, because the tool folders link to this folder.
+
+Restart your AI tool after an update. If you installed with `--copy`, run `./install.sh --uninstall` and install again instead, because copies do not update by themselves.
 
 ## Skills — What Each Skill Does
 
@@ -392,7 +443,8 @@ ADRs:
 
 - **`hooks/pre-commit`** — Blocks commits with secrets. Requires `gitleaks` in PATH. Runs `gitleaks protect --staged --redact`. Setup guide is in `hooks/gitleaks-setup-readme.md`. Config is in `.gitleaks.toml`.
 - **`hooks/deny-dangerous.sh` + `hooks/dangerous-patterns.txt`** — Blocks dangerous bash commands: `rm -rf /`, `dd` to disk, `mkfs`, fork bomb, `curl ... | sh`, `git push --force`, `reset --hard`, secret export, read of `.ssh` or cloud keys, `chmod -R 777`, `eval`, and similar. Fail-closed. It never runs the command. It only checks text.
-- **`plugins/deny-dangerous.ts`** — OpenCode guard. Runs before each `bash` tool call. Sends the command to the shell guard. Blocks on error or non-zero exit.
+- **`plugins/deny-dangerous.ts`** — OpenCode guard. Runs before each `bash` tool call. Sends the command to the shell guard. Blocks on error or non-zero exit. It finds the guard next to itself, so it works from any install folder.
+- **`adapters/claude-code/deny-dangerous-hook.sh`** — Claude Code version of the same guard. Reads the hook JSON, runs the shell guard, and exits 2 to block. `install.sh` adds it to `settings.json`.
 - **`references/audit-methodology.md`** — Shared method for skill and policy audits. Classify each finding as Required fix, Recommended improvement, or Not applicable. Give evidence. Show minimal diff. Apply only after approval.
 
 ## How To Use The Factory — Step By Step

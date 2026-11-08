@@ -25,7 +25,7 @@ Anatomy standard or approved factory decisions do not support.
 ## Inputs
 
 1. The target policy.
-2. `~/.opencode/policies/policy-anatomy.md` (canonical; `policies/policy-anatomy.md` from the repo root).
+2. `policies/policy-anatomy.md` (canonical). Resolve it from the factory root: the repository root, or the tool's config directory where `install.sh` linked `policies/`.
 3. Related policies, only when needed to check ownership, duplication, or conflict.
 
 Finding Classification, Evidence, Proposed Changes, and the Read-Only Boundary

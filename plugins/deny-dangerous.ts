@@ -1,16 +1,20 @@
 import type { Plugin } from "@opencode-ai/plugin";
 import { spawnSync } from "node:child_process";
-import { homedir } from "node:os";
-import { join } from "node:path";
+import { realpathSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 // Factory-owned guard. DENY_DANGEROUS_GUARD overrides the path for
-// testing/alternate deploys only; the default is always the factory script.
+// testing/alternate deploys only. Otherwise the guard is found relative to
+// this plugin file (resolving symlinks), so the plugin works from any install
+// location: <factory>/plugins/deny-dangerous.ts -> <factory>/hooks/deny-dangerous.sh
 function guardPath(): string {
   const override = process.env.DENY_DANGEROUS_GUARD;
   if (typeof override === "string" && override.length > 0) {
     return override;
   }
-  return join(homedir(), ".opencode", "hooks", "deny-dangerous.sh");
+  const pluginFile = realpathSync(fileURLToPath(import.meta.url));
+  return join(dirname(pluginFile), "..", "hooks", "deny-dangerous.sh");
 }
 
 export const DenyDangerous: Plugin = async () => {
