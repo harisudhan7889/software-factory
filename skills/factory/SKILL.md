@@ -14,6 +14,7 @@ delivery, and continuous improvement.
 - `/factory pr open` — prepare, review, and create a GitHub Pull Request for completed implementation work according to the GitHub Pull Request workflow.
 - `/factory pr resolve-conflicts` — diagnose and resolve Git merge conflicts for the current Pull Request or implementation branch.
 - `/factory pr fix-build` — diagnose and resolve failed GitHub Actions builds for the current Pull Request.
+- `/factory pr review <PR#|branch>` — produce a local, read-only review report for a single Pull Request. For several PRs in one request, dispatch the `pr-review-orchestrator` agent instead.
 
 ## Scope
 
@@ -76,7 +77,7 @@ Discovery
 ## Workflow
 
 1. Identify factory operation from ## Available operations.
-2. Read the corresponding reference: `references/github-provisioning.md`, `references/github-pr.md`, `references/conflict-resolution.md`, or `references/pipeline-debug.md` — see ## References.
+2. Read the corresponding reference: `references/github-provisioning.md`, `references/github-pr.md`, `references/conflict-resolution.md`, `references/pipeline-debug.md`, or `references/pr-review.md` — see ## References.
 3. Follow the reference's numbered phases and approval boundaries.
 4. Verify completion per reference verification steps and propose self-improvement only with evidence.
 
@@ -161,9 +162,15 @@ approval boundaries, safety rules, and verification steps.
 Read `references/github-pr.md` when the user invokes `/factory pr open`.
 Read `references/conflict-resolution.md` when the user invokes `/factory pr resolve-conflicts`.
 Read `references/pipeline-debug.md` when the user invokes `/factory pr fix-build`.
+Read `references/pr-review.md` when the user invokes `/factory pr review`.
 
 The GitHub PR reference defines the branch, push, Pull Request, CI,
 Jira synchronization, approval, idempotency, and self-improvement rules.
+
+The PR review reference defines the local, read-only review procedure
+(context acquisition, then review-and-render), the R1 report template,
+and when to dispatch the `pr-review-orchestrator` agent for several PRs
+at once (RFC-0004). It never posts to GitHub, commits, or merges.
 
 ## Policies
 
