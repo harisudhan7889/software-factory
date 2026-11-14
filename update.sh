@@ -35,7 +35,7 @@ while [ $# -gt 0 ]; do
     --dry-run) DRY=1; PASS+=("--dry-run"); shift ;;
     --yes|-y) PASS+=("--yes"); shift ;;
     --no-hooks) PASS+=("--no-hooks"); shift ;;
-    -h|--help) sed -n '2,19p' "$self" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,18p' "$self" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "Unknown option: $1 (try --help)" >&2; exit 2 ;;
   esac
 done

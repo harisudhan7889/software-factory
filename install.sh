@@ -47,7 +47,7 @@ while [ $# -gt 0 ]; do
     --dry-run) DRY=1; shift ;;
     --uninstall) UNINSTALL=1; shift ;;
     --yes|-y) ASSUME_YES=1; shift ;;
-    -h|--help) sed -n '2,22p' "$self" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h|--help) sed -n '2,19p' "$self" | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) echo "Unknown option: $1 (try --help)" >&2; exit 2 ;;
   esac
 done
@@ -179,7 +179,7 @@ has_content() { find "$1/" -type f ! -name .DS_Store 2>/dev/null | grep -q .; }
 # (a skill or agent that was removed or renamed in the repository).
 prune_stale() {
   local home="$1" l
-  for l in "$home"/skills/* "$home"/agents/* "$home"/plugins/* "$home/policies" "$home/references" "$home/adapters"; do
+  for l in "$home"/skills/* "$home"/agents/* "$home"/plugins/* "$home/policies" "$home/references" "$home/adapters" "$home/factory"; do
     [ -L "$l" ] || continue
     case "$(readlink "$l")" in "$ROOT"/*)
       # Stale when the target is gone, or is a folder left behind with only
@@ -203,6 +203,7 @@ link_shared() {
   done
   link_item "$ROOT/policies" "$home/policies"
   link_item "$ROOT/references" "$home/references"
+  link_item "$ROOT/factory" "$home/factory"
   if [ "$tool" != "codex" ]; then   # Codex has no agent-file mechanism
     for f in "$ROOT"/agents/*.md "$ROOT"/agents/market/*.md; do
       [ -f "$f" ] && link_item "$f" "$home/agents/$(basename "$f")"
@@ -216,6 +217,7 @@ unlink_shared() {
   for d in "$ROOT"/skills/*/; do d="${d%/}"; unlink_item "$home/skills/$(basename "$d")"; done
   unlink_item "$home/policies"
   unlink_item "$home/references"
+  unlink_item "$home/factory"
   for f in "$ROOT"/agents/*.md "$ROOT"/agents/market/*.md; do
     [ -f "$f" ] && unlink_item "$home/agents/$(basename "$f")"
   done
@@ -291,7 +293,7 @@ factory_block() {  # $1 = tool
     claude)
       echo "# Software Factory"
       echo "@$ROOT/instructions/AGENTS.md"
-      echo "Factory skills, policies, and references are linked under \`$home\`."
+      echo "Factory skills, policies, references, and factory docs (RFCs, ADRs, self-improvement memory) are linked under \`$home\`."
       ;;
     *)
       echo "# Software Factory"
@@ -299,7 +301,7 @@ factory_block() {  # $1 = tool
       sed '1{/^# /d;}' "$ROOT/instructions/AGENTS.md" | sed '1{/^$/d;}'
       echo
       echo "Factory skills are in \`$home/skills/<name>/SKILL.md\`. When a task matches a skill, read its SKILL.md and follow it."
-      echo "Factory policies are in \`$home/policies/\` and shared references are in \`$home/references/\`."
+      echo "Factory policies are in \`$home/policies/\`, shared references are in \`$home/references/\`, and factory docs (RFCs, ADRs, self-improvement memory) are in \`$home/factory/docs/\`."
       ;;
   esac
 }
