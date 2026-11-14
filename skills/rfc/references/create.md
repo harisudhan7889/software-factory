@@ -17,7 +17,7 @@ Then read the templates:
 - `references/overview.md` — structure for the shared overview
 - `references/platform.md` — structure for each platform file
 
-Also read the RFC reject memory (`/memories/rfc/rejected-1-200.md`, plus any higher-numbered `rejected-*.md` files) if it exists. If the requested RFC substantially overlaps a previously rejected one, do **NOT** silently re-propose it: surface the prior rejection and its rationale to the user via the `vscode_askQuestions` tool and confirm they still want to proceed before scaffolding.
+Also read `../../../factory/docs/self-improvement/rejected-proposals.md` (the factory's shared record of declined proposals — see `../../self-improvement/references/standard.md`) if it exists. If the requested RFC substantially overlaps a previously rejected one, do **NOT** silently re-propose it: surface the prior rejection and its rationale to the user and confirm they still want to proceed before scaffolding.
 
 ## Step 2: Ask clarifying questions
 

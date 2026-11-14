@@ -191,4 +191,11 @@ Factory RFCs and ADRs are stored under:
 Use the global `rfc` and `adr` skills when creating or reviewing these
 documents.
 
+Factory self-improvement memory — known limitations and rejected
+proposals that didn't result in an immediate change — is stored under
+`/factory/docs/self-improvement/`. A project's own, project-scoped
+memory lives in that project's `.factory/memory.md`. See the `## Memory`
+sections of `../self-improvement/references/standard.md` for when each
+gets read and written.
+
 Do not duplicate the RFC or ADR skill inside the factory skill.

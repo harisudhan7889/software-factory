@@ -198,6 +198,7 @@ The plan must include:
 - Local Git changes
 - Whether code will be pushed
 - Whether `.factory/project.yml` will be created or modified
+- Whether `.factory/memory.md` will be created
 - Any other externally visible or potentially destructive actions
 
 Example:
@@ -220,11 +221,21 @@ Planned actions:
 4. Push local main branch
 5. Verify GitHub Actions
 6. Create/update .factory/project.yml
+7. Create .factory/memory.md if it does not already exist
 
 External repository creation requires approval.
 
 Proceed?
 ```
+
+If `.factory/memory.md` does not already exist, create it empty (header
+only, no entries) alongside `.factory/project.yml`. It holds this
+project's own self-improvement memory — classification #1
+(informational observation) and #3 (project-specific issue) findings
+from `../self-improvement/references/standard.md` — and is never
+promoted to the shared factory memory without going through that
+standard's promotion step. Never write a secret into it
+(`SEC-SECRET-001`).
 
 ## GitHub Actions verification
 
