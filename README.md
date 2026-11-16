@@ -433,6 +433,7 @@ RFCs:
 - **`0001-github-repository-provisioning` (Accepted).** How `/factory provision` creates a private repo, configures it, connects remote, pushes, and verifies. Idempotent and retry-safe.
 - **`0002-github-pull-request-workflow` (Accepted).** How `/factory pr open` validates the branch, pushes, detects existing PRs, asks for approval, creates the PR, checks CI, and updates Jira. No auto-merge. PR state and CI state stay separate. Post-merge Action moves Jira to Done.
 - **`0003-headless-agent-orchestration` (Proposed).** How one Jira ticket maps to one isolated worktree and one headless worker, with pause on questions and safe PR creation. No auto-merge or deploy in v1.
+- **`0005-jira-project-provisioning` (Accepted).** How a future `/factory provision-jira` creates a Jira project, verifies it, and records its key in `.env` and `.factory/project.yml` so the existing `ticket` skill can use it. Approval required before creation; never duplicates or overwrites an existing project.
 
 ADRs:
 
