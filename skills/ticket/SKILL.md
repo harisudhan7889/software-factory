@@ -54,6 +54,13 @@ Use the scripts in:
 
 Do not duplicate Jira API implementation logic in the skill instructions.
 
+`scripts/jira-project-check.sh` and `scripts/jira-project-create.sh`
+operate at the Jira *project* level (existence check, creation), not the
+issue level. They are owned by this skill's Jira API implementation but
+are invoked by the `factory` skill's `/factory provision-jira` workflow
+(`skills/factory/references/jira-provisioning.md`, RFC-0005, ADR-0003),
+not by any `/ticket` command.
+
 ## Epic assignment
 
 When creating any Jira issue that can belong to an Epic:

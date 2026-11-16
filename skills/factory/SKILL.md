@@ -1,6 +1,6 @@
 ---
 name: factory
-description: Guides agents through managing and evolving the software factory itself. Use for factory-level architecture, provisioning, workflow design, capability planning, and self-improvement when working on factory capabilities, repository provisioning, or GitHub PR workflows.
+description: Guides agents through managing and evolving the software factory itself. Use for factory-level architecture, provisioning, workflow design, capability planning, and self-improvement when working on factory capabilities, repository provisioning, Jira project provisioning, or GitHub PR workflows.
 ---
 
 # Software Factory
@@ -11,6 +11,7 @@ delivery, and continuous improvement.
 
 ## Available operations
 - `/factory provision` — inspect and provision the current project's GitHub repository according to the factory GitHub provisioning specification.
+- `/factory provision-jira` — inspect and provision the current project's Jira project according to the factory Jira provisioning specification (RFC-0005, ADR-0003).
 - `/factory pr open` — prepare, review, and create a GitHub Pull Request for completed implementation work according to the GitHub Pull Request workflow.
 - `/factory pr resolve-conflicts` — diagnose and resolve Git merge conflicts for the current Pull Request or implementation branch.
 - `/factory pr fix-build` — diagnose and resolve failed GitHub Actions builds for the current Pull Request.
@@ -27,6 +28,7 @@ Factory-level concerns include:
 - Global skills and workflows
 - Repository provisioning
 - GitHub integration
+- Jira project provisioning
 - CI/CD provisioning
 - Factory security and permissions
 - Factory self-improvement
@@ -39,7 +41,7 @@ Jira tickets, and source code.
 
 Use when:
 - Inspecting, provisioning, or changing the factory itself (architecture, capabilities, global skills/workflows)
-- Running `/factory provision`, `/factory pr open`, `pr resolve-conflicts`, or `pr fix-build`
+- Running `/factory provision`, `/factory provision-jira`, `/factory pr open`, `pr resolve-conflicts`, or `pr fix-build`
 - Planning capability improvements or self-improvement evaluations
 
 Do not use when:
@@ -77,7 +79,7 @@ Discovery
 ## Workflow
 
 1. Identify factory operation from ## Available operations.
-2. Read the corresponding reference: `references/github-provisioning.md`, `references/github-pr.md`, `references/conflict-resolution.md`, `references/pipeline-debug.md`, or `references/pr-review.md` — see ## References.
+2. Read the corresponding reference: `references/github-provisioning.md`, `references/jira-provisioning.md`, `references/github-pr.md`, `references/conflict-resolution.md`, `references/pipeline-debug.md`, or `references/pr-review.md` — see ## References.
 3. Follow the reference's numbered phases and approval boundaries.
 4. Verify completion per reference verification steps and propose self-improvement only with evidence.
 
@@ -131,6 +133,7 @@ After a factory operation, confirm with evidence:
 |---|---|
 | It’s just a small factory tweak, skip RFC | Significant capabilities require RFC/ADR per Factory capability development :63 |
 | Provisioning can silently fix repo settings | Follow references/github-provisioning.md approval boundaries and verification steps |
+| ADR-0003 is basically accepted already, skip asking | A Proposed ADR is not approved; follow references/jira-provisioning.md and ask before creating a Jira project |
 
 ## Red Flags
 - Project-specific requirement encoded into global instruction
@@ -158,6 +161,14 @@ Read `references/github-provisioning.md` when the user invokes
 
 The GitHub provisioning reference defines the detailed workflow,
 approval boundaries, safety rules, and verification steps.
+
+Read `references/jira-provisioning.md` when the user invokes
+`/factory provision-jira`.
+
+The Jira provisioning reference defines the detailed workflow, approval
+boundaries, safety rules, and verification steps for creating and
+recording a Jira project (RFC-0005, ADR-0003). It reuses the `ticket`
+skill's Jira API scripts rather than duplicating Jira API logic.
 
 Read `references/github-pr.md` when the user invokes `/factory pr open`.
 Read `references/conflict-resolution.md` when the user invokes `/factory pr resolve-conflicts`.
