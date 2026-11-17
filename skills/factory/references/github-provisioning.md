@@ -105,6 +105,17 @@ Using the configured GitHub authentication:
      validate with `zsh -c 'source ~/.zshrc; gh auth status'` and
      `zsh -c 'source ~/.zshrc; gh repo view <owner>/<repo> --json name,visibility'`,
      then restart the factory shell before retrying.
+   - Once authentication is confirmed valid, run `gh auth setup-git` to
+     configure git's own HTTPS credential helper from the authenticated
+     `gh` session. This is required before any plain `git push` or
+     `git pull` in this workflow (or in `/factory pr open`): `gh repo
+     create --push`'s one bundled push succeeds without it because `gh`
+     handles that push internally, but GITHUB_TOKEN alone does not
+     satisfy git's normal HTTPS credential flow for a later plain
+     `git push` — that fails with "Invalid username or token. Password
+     authentication is not supported for Git operations." even though
+     `gh auth status` reports a valid login. Do this once per shell
+     environment, not per push.
 2. Determine whether the expected repository exists.
 3. If `.factory/project.yml` contains GitHub metadata, compare it with the
    actual GitHub state.

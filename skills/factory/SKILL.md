@@ -59,6 +59,10 @@ Do not use when:
 6. Every factory capability should have a clear purpose, inputs, outputs,
    permissions, and failure behavior.
 7. Improve the factory from observed evidence rather than speculation.
+8. When a default depends on external-system state that varies by site,
+   account, or plan (for example, which Jira project template a site
+   supports), verify against real state and fall back through an
+   evidence-grounded sequence — never hardcode a single untested guess.
 
 ## Factory lifecycle
 
