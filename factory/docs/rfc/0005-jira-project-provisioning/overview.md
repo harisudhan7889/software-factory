@@ -346,8 +346,14 @@ These capabilities are outside the first version.
 
 1. Whether project key derivation should be fully automatic or always
    require user confirmation of the final key.
-2. Which project template (team-managed vs. company-managed software
-   project) should be the factory default.
+2. ~~Which project template (team-managed vs. company-managed software
+   project) should be the factory default.~~ Resolved by evidence from a
+   real run (2026-11-16, propmatey.atlassian.net): the implementation
+   tries `com.pyxis.greenhopper.jira:gh-simplified-agility` (team-managed)
+   first, then falls back to `com.pyxis.greenhopper.jira:gh-kanban-template`
+   (classic/company-managed), since the team-managed template returned
+   "template does not exist" on that site. See
+   `skills/ticket/scripts/jira-project-create.sh`.
 3. Whether the "create project" Jira permission check should be a
    separate preflight call or inferred from the creation call's failure
    mode.

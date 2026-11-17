@@ -198,12 +198,19 @@ Only after explicit approval:
    ```
 
    Pass `project_type_key` / `template_key` only when the user explicitly
-   asked for something other than the script's documented default
-   ("software" / `com.pyxis.greenhopper.jira:gh-simplified-agility`,
-   Atlassian's own example for a team-managed software project).
-3. If creation fails, report the Jira error verbatim (never retry
-   destructively) and stop — the local project files must not be touched
-   until creation succeeds.
+   asked for a specific template. Otherwise let the script's built-in
+   fallback run: it tries `gh-simplified-agility` (team-managed), then
+   `gh-kanban-template` (classic/company-managed — confirmed working on
+   sites without team-managed project support) and stops at whichever one
+   Jira accepts. It stops immediately on 401/403 without trying further
+   templates, since a permission failure can't be fixed by changing the
+   template.
+3. Record which template the script reports as `Template:` in its output
+   — that is the template actually used, which may differ from the first
+   candidate tried. This is the value to show in the Final result.
+4. If creation fails for every candidate template, report the Jira error
+   verbatim (never retry destructively) and stop — the local project
+   files must not be touched until creation succeeds.
 
 ## Phase 5 — Record local metadata
 
@@ -235,7 +242,8 @@ Run `jira-project-check.sh "<KEY>"` again and confirm:
   assuming it — do not treat project creation alone as proof the `ticket`
   skill will work end-to-end.
 - The create-project permission line is reported (even if "unknown");
-  never upgrade "unknown" to "verified" in the final report.
+  never upgrade "unknown" to "verified" in the final report. Carry this
+  exact line into the Final result below.
 
 ## Final result
 
@@ -250,8 +258,16 @@ Project:
 Type:
 <projectTypeKey> / <style>
 
+Template used:
+<the projectTemplateKey that actually succeeded — on first creation only;
+omit this line when reporting an already-provisioned project, since the
+template used at creation time isn't returned by the project-check call>
+
 Issue types:
 <list, or "gap: missing <types>">
+
+Create-project permission for <JIRA_EMAIL>:
+<true / false / unknown>
 
 Base URL:
 <JIRA_BASE_URL>
@@ -304,6 +320,7 @@ After a provisioning run, confirm with evidence:
 - [ ] `.env` and `.factory/project.yml` were only written after successful creation (or were left untouched on failure)
 - [ ] The Jira API token was never printed, logged, or written to a file
 - [ ] The final report states the issue-type check result explicitly (pass or named gap), never silently assumed
+- [ ] On first creation, the final report names the template that actually succeeded and the create-project permission result for the authenticating identity
 - [ ] If ADR-0003 was still Proposed, that was surfaced to the user before creating anything
 
 ## Self-improvement
@@ -314,8 +331,12 @@ following the same procedure as GitHub provisioning
 Review") and the common standard in
 `../self-improvement/references/standard.md`. In particular, watch for:
 
-- The default project template proving wrong for this site/workflow
-  (open question #2 in RFC-0005).
+- The default project template still failing on some sites even with the
+  current two-candidate fallback (team-managed `gh-simplified-agility`,
+  then classic `gh-kanban-template`) — if a third distinct failure mode
+  is observed, propose extending `template_keys` with real evidence
+  rather than guessing another candidate key (open question #2 in
+  RFC-0005).
 - The `mypermissions` best-effort check never returning a usable result
   for this Jira site.
 - Any workaround needed to authenticate non-interactively, mirroring the
