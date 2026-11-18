@@ -109,16 +109,34 @@ Prefer extending existing patterns over introducing new interaction models.
 
 Do not redesign unrelated parts of the application.
 
+## Ticket and Branch Precondition
+
+Before drafting or saving the UX artifact, confirm the current branch maps to
+an open ticket for this UX work. If it does not (or no ticket exists yet),
+use the existing `ticket` skill's documented create workflow to create one,
+then create a dedicated branch off the project's default branch per
+`policies/git-safety.md` (`GIT-BRANCH-001`) — before writing anything.
+
+Skip this only when:
+- The user explicitly says to use the current branch, or
+- This UX work is an in-scope part of a Story already being implemented on
+  the current branch (for example, updating that Story's own UX artifact as
+  part of implementing it), not a freestanding new document.
+
+Do not invent ticket-creation or branch-naming logic here; follow the
+`ticket` skill and `policies/git-safety.md` exactly as written.
+
 ## Workflow
 
-1. Gather strongest inputs (RFC, ADRs, existing UX/UI artifacts, product requirements, current app behavior) — see ## Inputs.
-2. Inspect existing approved UX/design for reuse — see ## Existing approved UX/design.
-3. Clarify user goals — see ## User goal.
-4. Define journeys, flows, information architecture, and screens/navigation.
-5. Define interactions, validation, and all applicable UI states (including edge cases, empty/loading/error/success/permission).
-6. Consider responsive and accessibility implications for the journey.
-7. Classify scope (new journey / modification / new screen / modification / small UI change) — see ## Determine UX scope.
-8. Produce `docs/ux/<feature-or-rfc>/overview.md` artifact and request human approval.
+1. Confirm the ticket and branch precondition — see ## Ticket and Branch Precondition.
+2. Gather strongest inputs (RFC, ADRs, existing UX/UI artifacts, product requirements, current app behavior) — see ## Inputs.
+3. Inspect existing approved UX/design for reuse — see ## Existing approved UX/design.
+4. Clarify user goals — see ## User goal.
+5. Define journeys, flows, information architecture, and screens/navigation.
+6. Define interactions, validation, and all applicable UI states (including edge cases, empty/loading/error/success/permission).
+7. Consider responsive and accessibility implications for the journey.
+8. Classify scope (new journey / modification / new screen / modification / small UI change) — see ## Determine UX scope.
+9. Produce `docs/ux/<feature-or-rfc>/overview.md` artifact and request human approval.
 
 ```
          ┌─ Existing approved UX satisfies requirement? ─ yes ─► Reuse / Extend
@@ -190,6 +208,7 @@ The user can understand the findings and decide what to correct.
 ## Verification
 
 After completing UX analysis, confirm with evidence:
+- [ ] Ticket and branch precondition satisfied (an open ticket confirmed, or a new one created via the `ticket` skill, and a dedicated branch created before the artifact was written) — or a recorded exception per ## Ticket and Branch Precondition
 - [ ] UX artifact at `docs/ux/<feature>/overview.md` exists and lists user goals, journeys/flows, screens/navigation, interactions, and applicable states (validation, error, empty, loading, success, permission)
 - [ ] Existing approved UX/design was inspected; reuse/extension or conflict was recorded
 - [ ] Responsive and accessibility considerations documented
@@ -206,6 +225,7 @@ Approved UX spec becomes input to `ui-design` skill. Preserve user goals, journe
 | No RFC exists, so invent requirements in UX | Use strongest available product context; stop and request clarification if requirement is missing |
 | Existing UX is old, so discard it silently | Reuse/extend where it satisfies current requirement; identify conflict explicitly before redesigning |
 | Small UI change needs no UX check | Perform minimum UX analysis to confirm existing experience remains valid — see Determine UX scope #5 |
+| Already on a branch, so skip the ticket check | Verify the branch's ticket actually covers this UX work; do not assume — see ## Ticket and Branch Precondition |
 
 ## Red Flags
 - New UX discards existing approved journey without requirement-driven reason
@@ -213,6 +233,7 @@ Approved UX spec becomes input to `ui-design` skill. Preserve user goals, journe
 - States beyond happy-path (error, empty, permission) not documented
 - Responsive text/content behavior not considered
 - Unapproved UX handed to ui-design as final
+- UX artifact written or committed on a branch with no corresponding ticket
 
 ## Policies
 

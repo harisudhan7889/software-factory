@@ -15,9 +15,12 @@ behavior; define visual hierarchy, screen layouts, reusable components,
 visual states, responsive layouts, and accessibility considerations; reuse
 existing design-system patterns; produce a structured specification; obtain
 human approval; then materialize the approved specification in the project's
-design tool (for example Stitch) and record the canonical links. That last
-step is mandatory unless the user explicitly waives it (record the waiver and
-reason in the artifact).
+design tool and record the canonical links. Default to this factory's
+`stitch` skill (Google Stitch) when no other design tool is explicitly
+configured for the project; use Figma or another MCP/adapter only when the
+project configures one instead. That materialization step is mandatory
+unless the user explicitly waives it (record the waiver and reason in the
+artifact).
 
 ## When to Use
 
@@ -86,15 +89,34 @@ silently change user flow, business behavior, product rules, or permissions.
 If the visual design seems to need a UX change, identify the conflict, explain
 why the current UX cannot be satisfied, and stop to request the UX decision.
 
+## Ticket and Branch Precondition
+
+Before drafting or saving the UI design artifact, confirm the current branch
+maps to an open ticket for this UI design work. If it does not (or no ticket
+exists yet), use the existing `ticket` skill's documented create workflow to
+create one, then create a dedicated branch off the project's default branch
+per `policies/git-safety.md` (`GIT-BRANCH-001`) — before writing anything.
+
+Skip this only when:
+- The user explicitly says to use the current branch, or
+- This UI design work is an in-scope part of a Story already being
+  implemented on the current branch (for example, updating that Story's own
+  design artifact as part of implementing it), not a freestanding new
+  document.
+
+Do not invent ticket-creation or branch-naming logic here; follow the
+`ticket` skill and `policies/git-safety.md` exactly as written.
+
 ## Workflow
 
-1. Gather the strongest inputs (see Inputs).
-2. Inspect existing designs and reusable components, and establish the tokens to reuse (minimum tokens if no system exists).
-3. Verify UX preservation. If the visual design requires a UX change, stop and request a UX decision.
-4. Classify the design scope (below).
-5. Design screens, components, and visual foundations.
-6. Produce `docs/ui/design/<feature>/overview.md` with status `Proposed` and request human approval.
-7. After approval, materialize the specification in the design tool and record the links (see External Design Tools), or record a user waiver with reason.
+1. Confirm the ticket and branch precondition — see ## Ticket and Branch Precondition.
+2. Gather the strongest inputs (see Inputs).
+3. Inspect existing designs and reusable components, and establish the tokens to reuse (minimum tokens if no system exists).
+4. Verify UX preservation. If the visual design requires a UX change, stop and request a UX decision.
+5. Classify the design scope (below).
+6. Design screens, components, and visual foundations.
+7. Produce `docs/ui/design/<feature>/overview.md` with status `Proposed` and request human approval.
+8. After approval, materialize the specification in the design tool and record the links (see External Design Tools), or record a user waiver with reason.
 
 ```text
 UX decision unresolved?           yes → stop, request clarification
@@ -146,10 +168,13 @@ rules:
 
 ## External Design Tools
 
-The workflow is tool-agnostic (Figma, Stitch, or another MCP/adapter), and the
-tool-neutral Markdown specification stays the source of truth. After the
-specification is approved, materializing it in the design tool is mandatory
-unless the user explicitly waives it. Follow
+Default to this factory's `stitch` skill (Google Stitch) when the project has
+no other design tool configured; follow `skills/stitch/SKILL.md` for the
+actual CLI commands. The workflow stays tool-agnostic for a project that
+explicitly configures Figma or another MCP/adapter instead, and the
+tool-neutral Markdown specification stays the source of truth either way.
+After the specification is approved, materializing it in the design tool is
+mandatory unless the user explicitly waives it. Follow
 `references/external-design-tools.md` for the procedure, the completion test,
 and how to handle generation timeouts and late-arriving screens without
 creating duplicates.
@@ -199,6 +224,7 @@ implementation verification.
 
 After completing visual design, confirm with evidence:
 
+- [ ] Ticket and branch precondition satisfied (an open ticket confirmed, or a new one created via the `ticket` skill, and a dedicated branch created before the artifact was written) — or a recorded exception per ## Ticket and Branch Precondition
 - [ ] The artifact exists and lists feature, status, UX reference, screens, components, states, responsive behavior, accessibility, open questions, and the tool link if applicable.
 - [ ] The approved UX journey, navigation, and permission behavior are unchanged (or the conflict was escalated).
 - [ ] Existing design-system tokens and components were reused where possible; new tokens are justified and recorded.
@@ -216,6 +242,7 @@ After completing visual design, confirm with evidence:
 | "This reference looks better, so override the UX." | Approved UX/RFC/ADR wins over references; keep the requirement and explain the conflict. |
 | "No design-tool project exists, so skip the tool output silently." | Request the target (create new vs use existing); skipping needs evidence and an explicit user waiver. |
 | "Generation timed out, so retry immediately." | A timeout is not a failure; poll with backoff and re-check before any retry. |
+| Already on a branch, so skip the ticket check | Verify the branch's ticket actually covers this UI design work; do not assume — see ## Ticket and Branch Precondition |
 
 ## Red Flags
 
@@ -224,6 +251,7 @@ After completing visual design, confirm with evidence:
 - A screen is designed only for desktop or only for the happy path.
 - The design-tool link is missing without a recorded user waiver.
 - A Proposed design is passed to implementation as final.
+- UI design artifact written or committed on a branch with no corresponding ticket
 
 ## Policies
 
