@@ -145,7 +145,14 @@ factory-level entry.
 
 **Why this lives in the repository.** This factory's own coding tool
 may keep a private, per-account memory of its own. That mechanism does
-not substitute for the memory defined here: it is invisible to a
+not substitute for the memory defined here, and recording a finding
+only there does not satisfy this standard: it is invisible to a
 teammate, to a different AI tool executing the same factory, and to
 anyone reviewing a change in a Pull Request. Factory and project memory
 must be ordinary committed files for the same reason RFCs and ADRs are.
+Before closing out any run that identified a classification 1-3
+finding, confirm the entry was actually written to the table above
+(`known-limitations.md`, `rejected-proposals.md`, or the project's
+`.factory/memory.md`) — a note saved only to a private memory tool is
+the same, for this standard's purposes, as not having recorded it at
+all.
