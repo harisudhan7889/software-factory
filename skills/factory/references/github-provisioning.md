@@ -233,6 +233,10 @@ Planned actions:
 5. Verify GitHub Actions
 6. Create/update .factory/project.yml
 7. Create .factory/memory.md if it does not already exist
+8. Add .github/workflows/jira-sync.yml and JIRA_BASE_URL/JIRA_EMAIL/
+   JIRA_API_TOKEN repository secrets (only when a Jira project is
+   configured; step 3 requires separate confirmation before any secret
+   is written)
 
 External repository creation requires approval.
 
@@ -247,6 +251,35 @@ from `../self-improvement/references/standard.md` — and is never
 promoted to the shared factory memory without going through that
 standard's promotion step. Never write a secret into it
 (`SEC-SECRET-001`).
+
+## Phase 6a — Provision Jira post-merge sync
+
+When `.factory/project.yml` records a configured Jira project for this
+repository, provision the post-merge Jira sync described in
+`skills/factory/references/github-pr.md` ("Post-merge Jira
+synchronization") so a merged Pull Request's Jira issue(s) actually
+reach `Done`, instead of depending on an external integration whose
+behavior this factory does not control:
+
+1. Copy `skills/ticket/templates/jira-sync.yml` to
+   `.github/workflows/jira-sync.yml` in the target repository, unless an
+   equivalent workflow already exists there (inspect first; do not
+   create a duplicate).
+2. Add this as its own line item in the provisioning plan (Phase 6)
+   before writing anything, the same as any other externally visible
+   action.
+3. Before adding any GitHub Actions secret, confirm with the user —
+   this writes the user's Jira credentials into GitHub's secret store,
+   which `policies/security.md` treats as a sensitive action regardless
+   of what wrote the credentials locally. On confirmation, add
+   `JIRA_BASE_URL`, `JIRA_EMAIL`, and `JIRA_API_TOKEN` as repository
+   secrets (`gh secret set`) from the same values the `ticket` skill's
+   scripts already use locally. Never print a secret value, write it to
+   a file other than the GitHub secret store, or include it in a log,
+   comment, or report.
+4. If no Jira project is configured for this repository, skip this
+   phase entirely and report it as `NOT APPLICABLE` — do not create the
+   workflow file without the secrets it depends on.
 
 ## GitHub Actions verification
 

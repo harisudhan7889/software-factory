@@ -161,8 +161,16 @@ For each wave, in dependency order:
     or branch.
 4.  Ensure each worktree starts from the correct wave base. No agents
     share a worktree.
-5.  Before dispatching implementation work for a wave, present the user with the proposed wave plan and the implementation plans for all tickets in that wave. Obtain one explicit user approval for the wave. That approval covers the reviewed plans for all tickets in the approved wave. If a ticket's scope, implementation plan, dependencies, or material risks change after approval, pause that ticket and obtain renewed approval for the changed plan. Do not bypass the existing implementation skill's planning and approval requirements.    
-6.  Dispatch each ticket through the existing implementation workflow,
+5.  Before dispatching implementation work for a wave, present the user with the proposed wave plan and the implementation plans for all tickets in that wave. Obtain one explicit user approval for the wave. That approval covers the reviewed plans for all tickets in the approved wave. If a ticket's scope, implementation plan, dependencies, or material risks change after approval, pause that ticket and obtain renewed approval for the changed plan. Do not bypass the existing implementation skill's planning and approval requirements.
+6.  For each ticket about to be dispatched, transition it to `In
+    Progress` with `skills/ticket/scripts/jira-transition.sh <JIRA-KEY>
+    "In Progress"` if it is not already in or past that status — do not
+    rely on the dispatched implementation workflow to perform this; a
+    dispatched sub-agent's own Phase 6.2 has been observed not firing
+    reliably across the dispatch boundary. If the transition fails,
+    record it and continue — do not block dispatch on a failed Jira
+    call.
+7.  Dispatch each ticket through the existing implementation workflow,
     providing:
     -   Jira key and full ticket details
     -   RFC overview and relevant platform design
@@ -172,13 +180,13 @@ For each wave, in dependency order:
     -   approved scope and required verification
     -   instruction to report changed files, commits, test evidence,
         blockers, and newly discovered dependencies/conflicts
-7.  Use only an agent/task dispatch mechanism actually available in this
+8.  Use only an agent/task dispatch mechanism actually available in this
     OpenCode environment. If separate dispatch is unavailable, do not
     pretend to run tickets concurrently; ask whether to run the safe
     wave sequentially or stop until dispatch is configured.
-8.  Do not dispatch tickets with incomplete dependencies, ambiguous
+9.  Do not dispatch tickets with incomplete dependencies, ambiguous
     scope, or unknown safety status.
-9.  Wait for every ticket in a wave to finish or fail before integrating
+10. Wait for every ticket in a wave to finish or fail before integrating
     the wave. Do not start dependent waves early.
 
 Do not allow ticket agents to merge to the default branch or change the
@@ -251,7 +259,12 @@ After intended tickets are integrated:
     claim the RFC is fully verified.
 7.  Create/update PRs only after relevant checks and Git safety
     requirements are satisfied. Do not merge unless the workflow and
-    user explicitly authorize it.
+    user explicitly authorize it. Create the PR through
+    `skills/factory/references/github-pr.md` (the `/factory pr` skill) —
+    pass it the full ticket inventory from Phase 2 so its Jira
+    review-status transition (Phase 12b) and post-merge `Done` sync
+    cover every bundled ticket, not only the first one found in the
+    branch name or commit message.
 
 ## Phase 9: Cleanup
 

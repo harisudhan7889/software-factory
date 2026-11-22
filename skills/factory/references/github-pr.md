@@ -66,8 +66,13 @@ Before changing local Git or GitHub state:
 4. Inspect the working tree.
 5. Inspect configured remotes.
 6. Determine the expected GitHub repository.
-7. Determine the Jira issue associated with the implementation when
-   available.
+7. Determine the Jira issue(s) associated with the implementation when
+   available. A Pull Request delivering a single Jira Story has one; a
+   Pull Request delivering an RFC's bundled tickets (`rfc build`
+   default mode, one RFC branch and one final PR) has many — read the
+   full set from the RFC's Work breakdown table or the ticket
+   inventory `rfc build` Phase 2 assembled, not just the first key
+   found in a branch name or commit message.
 8. Detect whether a relevant Pull Request already exists.
 9. Read `.factory/project.yml` when present.
 
@@ -510,9 +515,11 @@ If Jira synchronization fails:
 
 ## Phase 12b — Transition Jira to review status
 
-After the Pull Request comment is posted:
+After the Pull Request comment is posted, repeat the following for
+**every** Jira issue identified in Phase 1 step 7 — one issue for a
+single-Story PR, or the full bundled set for an RFC's one-PR delivery:
 
-1. Read the Jira issue's available transitions.
+1. Read that issue's available transitions.
 2. If a transition to the review status (`In Review` or the project's
    equivalent) is available and the issue is not already in that status,
    transition it.
@@ -523,12 +530,15 @@ After the Pull Request comment is posted:
 5. If the issue is already in the review status, skip the transition and
    report that no change was required.
 
-If the transition call fails:
+If the transition call fails for one issue:
 
 - Do not undo the Pull Request.
 - Do not remove the Pull Request comment.
-- Report GitHub delivery as successful and the Jira transition as failed.
-- Allow the transition to be retried.
+- Report GitHub delivery as successful and that issue's Jira transition
+  as failed.
+- Continue transitioning the remaining issues in the set; one failure
+  must not block the others.
+- Allow the failed transition to be retried.
 
 The transition step must be idempotent and must never invent a status
 name. Use only transitions reported as available by Jira.
@@ -548,22 +558,34 @@ The workflow must continue only when:
 
 When a Pull Request is merged:
 
-1. Identify the originating Jira issue.
-2. Read the Jira issue's available transitions.
-3. If `Done` is available, transition the issue to `Done`.
-4. Add a Jira comment containing the Pull Request URL and merge information.
-5. Report GitHub merge and Jira synchronization separately.
+1. Identify the originating Jira issue(s) — parse every issue key referenced
+   in the Pull Request title, body, or branch name, not just the first
+   match. A Pull Request delivering an RFC's bundled tickets (`rfc build`
+   default mode) references many keys, typically one per Work breakdown
+   row linked in the PR description; a single-Story Pull Request has one.
+2. For each identified issue, independently:
+   a. Read its available transitions.
+   b. If `Done` is available, transition it to `Done`.
+   c. Add a Jira comment containing the Pull Request URL and merge
+      information.
+3. Report GitHub merge and Jira synchronization separately, listing each
+   issue's outcome individually — do not report one combined status for
+   a multi-issue Pull Request.
+
+If one issue's transition or comment fails, continue with the remaining
+issues; one failure must not block the others or be reported as if it
+affected all of them.
 
 If the Pull Request is closed without being merged:
 
-- Do not transition the Jira issue to `Done`.
+- Do not transition any Jira issue to `Done`.
 - Do not add a misleading merge comment.
 
 If Jira synchronization fails:
 
 - Do not undo or modify the GitHub merge.
 - Report the GitHub merge as successful.
-- Report Jira synchronization as failed.
+- Report Jira synchronization as failed, per affected issue.
 - Allow Jira synchronization to be retried.
 
 The workflow must be idempotent and avoid unnecessary duplicate comments or

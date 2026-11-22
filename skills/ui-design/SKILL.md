@@ -97,6 +97,13 @@ exists yet), use the existing `ticket` skill's documented create workflow to
 create one, then create a dedicated branch off the project's default branch
 per `policies/git-safety.md` (`GIT-BRANCH-001`) — before writing anything.
 
+Once the branch exists, transition the ticket to `In Progress` with
+`skills/ticket/scripts/jira-transition.sh <JIRA-KEY> "In Progress"`, the
+same step `implementation`'s workflow performs at its own Phase 6.2, if
+the ticket is not already in or past that status. If the transition
+fails, report it and continue — do not block the UI design work on a
+failed Jira call.
+
 Skip this only when:
 - The user explicitly says to use the current branch, or
 - This UI design work is an in-scope part of a Story already being
@@ -225,6 +232,7 @@ implementation verification.
 After completing visual design, confirm with evidence:
 
 - [ ] Ticket and branch precondition satisfied (an open ticket confirmed, or a new one created via the `ticket` skill, and a dedicated branch created before the artifact was written) — or a recorded exception per ## Ticket and Branch Precondition
+- [ ] Ticket transitioned to `In Progress` once the branch existed, or the transition failure was reported
 - [ ] The artifact exists and lists feature, status, UX reference, screens, components, states, responsive behavior, accessibility, open questions, and the tool link if applicable.
 - [ ] The approved UX journey, navigation, and permission behavior are unchanged (or the conflict was escalated).
 - [ ] Existing design-system tokens and components were reused where possible; new tokens are justified and recorded.

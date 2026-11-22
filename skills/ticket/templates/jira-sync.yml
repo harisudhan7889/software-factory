@@ -1,0 +1,118 @@
+name: Jira Sync
+
+# Post-merge Jira synchronization, per
+# skills/factory/references/github-pr.md "Post-merge Jira synchronization".
+# Transitions every Jira issue referenced by a merged Pull Request to Done
+# (when that transition exists) and adds a merge comment. Handles a
+# single-Story PR (one issue) and an RFC-build PR (many bundled issues)
+# the same way: every issue key found in the PR title, body, or branch
+# name is processed independently.
+#
+# Requires repository secrets: JIRA_BASE_URL, JIRA_EMAIL, JIRA_API_TOKEN.
+# Provisioned by skills/factory/references/github-provisioning.md.
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  jira-sync:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sync merged PR to Jira
+        env:
+          JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+          JIRA_EMAIL: ${{ secrets.JIRA_EMAIL }}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          MERGED_AT: ${{ github.event.pull_request.merged_at }}
+          MERGED_BY: ${{ github.event.pull_request.merged_by.login }}
+        run: |
+          set -uo pipefail
+
+          if [ -z "${JIRA_BASE_URL:-}" ] || [ -z "${JIRA_EMAIL:-}" ] || [ -z "${JIRA_API_TOKEN:-}" ]; then
+            echo "::warning::Jira secrets are not configured on this repository (JIRA_BASE_URL/JIRA_EMAIL/JIRA_API_TOKEN). Skipping Jira sync — this never blocks or undoes the GitHub merge."
+            exit 0
+          fi
+
+          # Collect every Jira issue key referenced in the PR title, body,
+          # or branch name — a single-Story PR has one, an RFC-build PR
+          # (one branch, one final PR for many bundled tickets) has many.
+          COMBINED="${PR_TITLE}
+${PR_BODY}
+${HEAD_REF}"
+          KEYS=$(printf '%s\n' "$COMBINED" | grep -oE '[A-Z][A-Z0-9]+-[0-9]+' | sort -u)
+
+          if [ -z "$KEYS" ]; then
+            echo "No Jira issue key found in PR #$PR_NUMBER title, body, or branch name. Nothing to sync."
+            exit 0
+          fi
+
+          echo "Found Jira issue(s): $(echo "$KEYS" | tr '\n' ' ')"
+
+          ANY_FAILED=0
+
+          for KEY in $KEYS; do
+            echo "::group::${KEY}"
+
+            CURRENT_STATUS=$(curl -sS -u "${JIRA_EMAIL}:${JIRA_API_TOKEN}" \
+              -H "Accept: application/json" \
+              "${JIRA_BASE_URL}/rest/api/3/issue/${KEY}?fields=status" \
+              | jq -r '.fields.status.name // "unknown"' 2>/dev/null || echo "unknown")
+
+            if [ "$CURRENT_STATUS" = "Done" ]; then
+              echo "${KEY} is already Done — no transition needed."
+            else
+              TRANSITIONS=$(curl -sS -u "${JIRA_EMAIL}:${JIRA_API_TOKEN}" \
+                -H "Accept: application/json" \
+                "${JIRA_BASE_URL}/rest/api/3/issue/${KEY}/transitions")
+
+              DONE_ID=$(echo "$TRANSITIONS" | jq -r '.transitions[]? | select(.to.name=="Done" or .name=="Done") | .id' | head -1)
+
+              if [ -n "$DONE_ID" ]; then
+                HTTP_CODE=$(curl -sS -o /dev/null -w '%{http_code}' \
+                  -u "${JIRA_EMAIL}:${JIRA_API_TOKEN}" \
+                  -X POST -H "Content-Type: application/json" \
+                  "${JIRA_BASE_URL}/rest/api/3/issue/${KEY}/transitions" \
+                  --data "{\"transition\":{\"id\":\"${DONE_ID}\"}}")
+
+                if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+                  echo "${KEY} transitioned to Done."
+                else
+                  echo "::warning::${KEY} transition to Done failed (HTTP ${HTTP_CODE})."
+                  ANY_FAILED=1
+                fi
+              else
+                echo "::warning::${KEY} has no 'Done' transition available from its current status (${CURRENT_STATUS}) — skipping transition. Never invents a status name; only uses transitions Jira actually reports."
+              fi
+            fi
+
+            COMMENT_TEXT="Merged via Pull Request ${PR_URL} (PR #${PR_NUMBER}) by ${MERGED_BY:-unknown} at ${MERGED_AT:-unknown}."
+            PAYLOAD=$(jq -n --arg text "$COMMENT_TEXT" \
+              '{body:{type:"doc",version:1,content:[{type:"paragraph",content:[{type:"text",text:$text}]}]}}')
+            COMMENT_HTTP=$(curl -sS -o /dev/null -w '%{http_code}' \
+              -u "${JIRA_EMAIL}:${JIRA_API_TOKEN}" \
+              -X POST -H "Content-Type: application/json" \
+              "${JIRA_BASE_URL}/rest/api/3/issue/${KEY}/comment" \
+              --data "$PAYLOAD")
+
+            if [ "$COMMENT_HTTP" -ge 200 ] && [ "$COMMENT_HTTP" -lt 300 ]; then
+              echo "${KEY} merge comment added."
+            else
+              echo "::warning::${KEY} merge comment failed (HTTP ${COMMENT_HTTP})."
+              ANY_FAILED=1
+            fi
+
+            echo "::endgroup::"
+          done
+
+          if [ "$ANY_FAILED" -eq 1 ]; then
+            echo "One or more Jira operations failed above (see ::warning:: lines). Per policy this never fails the workflow or affects the already-completed GitHub merge — retry by re-running this job."
+          fi
+
+          exit 0
