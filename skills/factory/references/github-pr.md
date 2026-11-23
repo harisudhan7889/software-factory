@@ -558,11 +558,25 @@ The workflow must continue only when:
 
 When a Pull Request is merged:
 
-1. Identify the originating Jira issue(s) — parse every issue key referenced
-   in the Pull Request title, body, or branch name, not just the first
-   match. A Pull Request delivering an RFC's bundled tickets (`rfc build`
-   default mode) references many keys, typically one per Work breakdown
-   row linked in the PR description; a single-Story Pull Request has one.
+1. Identify the originating Jira issue(s) — parse every issue key found in
+   the Pull Request title, the branch name, and the body's dedicated
+   `## Jira` section (the structured list from the Pull Request proposal
+   template in Phase 7), not just the first match. A Pull Request
+   delivering an RFC's bundled tickets (`rfc build` default mode)
+   references many keys there, typically one per Work breakdown row
+   linked in the PR description; a single-Story Pull Request has one.
+
+   Do not scan the rest of the Pull Request body for issue keys. Running
+   CI automation has no way to tell "this PR delivers this ticket" apart
+   from "this ticket is mentioned in passing" — a `Summary` bullet
+   referencing a dependency, or a `Known limitations` note explaining
+   that a feature is blocked on another ticket, legitimately contains
+   that ticket's key without this Pull Request delivering it. Scanning
+   the whole body transitions that unrelated ticket to `Done` and posts
+   a false merge comment on it — observed in practice when a "Known
+   limitations" section named a blocking ticket to explain why a
+   redirect wasn't live yet, and the post-merge workflow closed that
+   ticket anyway even though its own scope was never implemented.
 2. For each identified issue, independently:
    a. Read its available transitions.
    b. If `Done` is available, transition it to `Done`.
