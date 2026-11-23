@@ -43,9 +43,7 @@ jobs:
           # Collect every Jira issue key referenced in the PR title, body,
           # or branch name — a single-Story PR has one, an RFC-build PR
           # (one branch, one final PR for many bundled tickets) has many.
-          COMBINED="${PR_TITLE}
-${PR_BODY}
-${HEAD_REF}"
+          COMBINED="${PR_TITLE} ${PR_BODY} ${HEAD_REF}"
           KEYS=$(printf '%s\n' "$COMBINED" | grep -oE '[A-Z][A-Z0-9]+-[0-9]+' | sort -u)
 
           if [ -z "$KEYS" ]; then
