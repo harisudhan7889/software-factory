@@ -61,6 +61,48 @@ are invoked by the `factory` skill's `/factory provision-jira` workflow
 (`skills/factory/references/jira-provisioning.md`, RFC-0005, ADR-0003),
 not by any `/ticket` command.
 
+## Blocks/BlockedBy direction — do not trust field-name reasoning, verify the rendered label
+
+Getting a `Blocks` link's direction backwards makes a dependency graph
+read exactly opposite to reality, with no error from Jira to catch it —
+and this field pair is a known trap. Atlassian's own guidance is blunt:
+do not infer meaning from the `inwardIssue`/`outwardIssue` field names
+themselves; they only determine which label (`type.inward` /
+`type.outward`) gets displayed for which party, and which field ends up
+meaning what has been reported to come out reversed from the "obvious"
+reading on real Jira Cloud instances (confirmed independently by
+multiple third-party reports, and by this project's own experience:
+three consecutive attempts to reason about the field names abstractly
+— at creation, then twice more while auditing — each got the direction
+wrong in a different way, resolved only by looking at the actual
+rendered "Linked work items" table in the Jira UI).
+
+**Writing a dependency** (`jira-create.sh`'s `links` input, used by this
+skill and by `/rfc breakdown`): pass `BlockedBy:Y` for a ticket that
+depends on prerequisite `Y` (`Y` must finish first), never `Blocks:Y` —
+this logical flag is correct and does not change. `jira-create.sh`
+itself was fixed (2026-11-23) to swap its internal `inwardIssue`/
+`outwardIssue` JSON construction relative to the "obvious" mapping,
+because the obvious mapping was empirically confirmed to render
+backwards on this factory's Jira instance. If a future instance renders
+the other way, the fix is to swap that same mapping back — always
+based on an actual observed rendering, never on reasoning about what
+the field names "should" mean.
+
+**The only trustworthy verification is the rendered relationship**, not
+the raw field names:
+- Preferred: open the issue in the Jira web UI and read the "Linked
+  work items" table's `Relationship` column directly (`blocks` /
+  `is blocked by`) — this is what a human reading Jira actually sees,
+  and what every other claim must agree with.
+- If UI access isn't available, treat any raw-API read-back of
+  `inwardIssue`/`outwardIssue` as provisional and say so; do not report
+  a dependency direction as confirmed from API field names alone.
+
+Never fix a reported wrong-direction link by reasoning about which
+field "should" mean what. Fix it, then verify the new rendering (UI
+screenshot or equivalent), before telling the user it's corrected.
+
 ## Epic assignment
 
 When creating any Jira issue that can belong to an Epic:

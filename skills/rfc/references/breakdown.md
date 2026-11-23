@@ -159,7 +159,11 @@ Only after explicit approval:
     prerequisite tickets to exist first.
 5.  Add Jira dependency links using the existing ticket workflow when
     supported. If linking is unavailable, record the missing link and
-    report it; do not claim the dependency was created.
+    report it; do not claim the dependency was created. A ticket whose
+    Work breakdown row reads `Depends-on: Y` must be created with
+    `links: "BlockedBy:Y"`, never `Blocks:Y` — see `skills/ticket/
+    SKILL.md` "Blocks/BlockedBy direction" for the exact mapping and why
+    the two are easy to swap.
 6.  Capture the actual Jira key and URL returned for each created
     ticket.
 7.  If creation fails partway through, stop and report which tickets
@@ -203,7 +207,17 @@ Validate that:
 2.  Every created Jira key and URL is grounded in the actual creation
     result.
 3.  Dependency links and `Depends-on` entries are consistent, or any
-    missing links are disclosed.
+    missing links are disclosed. For every row with a `Depends-on`
+    value, verify the created link's actual rendered relationship — per
+    `skills/ticket/SKILL.md` "Blocks/BlockedBy direction", never infer
+    the direction from the raw `inwardIssue`/`outwardIssue` field names
+    or from the creation call's reported success; that reasoning has
+    been independently wrong in both directions on this factory's own
+    tickets. Confirm against the actual rendered relationship (the Jira
+    UI's "Linked work items" table, or an equivalent authoritative
+    read) that the prerequisite is shown as `blocks` the dependent
+    ticket. Report any row whose created link doesn't match its table
+    entry as a discrepancy, not as done.
 4.  The RFC Work breakdown table contains no duplicate ticket rows.
 5.  All required dependencies refer to real Jira keys or clearly
     identified external prerequisites.

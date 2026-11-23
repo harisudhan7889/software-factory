@@ -199,7 +199,7 @@ if [ -n "$LINKS" ]; then
                 --arg type "$TYPE" \
                 --arg inward "$INWARD" \
                 --arg outward "$OUTWARD" \
-                '{type: {name: $type}, inwardIssue: {key: $inward}, outwardIssue: {key: $outward}}')")
+                '{type: {name: $type}, inwardIssue: {key: $outward}, outwardIssue: {key: $inward}}')")
         if echo "$LINK_RESPONSE" | jq -e '.errorMessages // .errors // empty' > /dev/null 2>&1; then
             echo "Warning: link '$SPEC' failed:" >&2
             echo "$LINK_RESPONSE" | jq . >&2
