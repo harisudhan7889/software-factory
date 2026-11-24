@@ -139,6 +139,11 @@ Do NOT use `apply_migration` to change a local database schema — it writes a m
 3. **Generate the migration** → `supabase db pull <descriptive-name> --local --yes`
 4. **Verify** → `supabase migration list --local`
 
+Committing and locally verifying a migration is not the same as it
+existing on the project's real backend — see **Deploying to the
+project's remote environment** under Reference Guides below before
+treating a Story's database changes as complete.
+
 ## Debugging
 
 When you get an error on a Supabase-related request, for example an error code from the Supabase REST API, Postgres database, or PostgREST, an empty result, getting blocked by RLS unexpectedly, or an error from a Supabase service like Auth, Realtime, Edge Functions, or Storage, you **must** fetch Supabase's [Monitoring and Debugging](https://supabase.com/docs/guides/monitoring-and-debugging.md) documentation before diagnosing or proposing a fix, rather than working from memory. The same docs also cover performance optimizations, such as slow queries and missing indexes.
@@ -154,5 +159,7 @@ Use:
 
 ## Reference Guides
 
+- **Deploying to the project's remote environment** → [references/migration-deployment.md](references/migration-deployment.md)
+  **MUST read when** a Jira Story adds or changes a migration file, before treating that Story's database changes as complete — local verification alone is not enough (ADR-0002: remote/managed Supabase is the actual backend).
 - **Skill Feedback** → [references/skill-feedback.md](references/skill-feedback.md)
   **MUST read when** the user reports that this skill gave incorrect guidance or is missing information.

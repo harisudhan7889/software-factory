@@ -372,6 +372,22 @@ Only after explicit approval:
 - Do not implement future Stories.
 - Do not expand scope without approval.
 
+### Database migrations
+
+A new or changed Supabase migration file is not yet implemented once it
+only exists in the repository and has been verified against a local or
+throwaway Supabase stack. Per ADR-0002
+(`factory/docs/adr/0002-default-web-backend-architecture/overview.md`),
+remote/managed Supabase is the project's actual backend; local Supabase
+tooling is for iteration only and never substitutes for it.
+
+When the Story adds or changes a file under `supabase/migrations/`,
+deploy it to the project's remote/managed environment before treating
+the Story's database changes as complete — follow the `supabase`
+skill's deployment step for how. If the remote environment is unknown,
+ambiguous, shared with other in-flight work, or deployment could affect
+a staging/production environment, stop and ask rather than guessing.
+
 ## Phase 8 — Test
 
 Run the tests relevant to the implementation.
@@ -600,6 +616,9 @@ Before completing the workflow, verify:
 - No unrelated functionality was changed.
 - No secrets were committed.
 - The implementation follows relevant ADRs.
+- Any new or changed Supabase migration has been deployed to the
+  project's remote/managed environment (Phase 7 "Database migrations"),
+  and `supabase migration list` shows local and remote in sync.
 - For UI Stories, the implementation matches the approved UX and UI design
   artifacts, and referenced external design artifacts were inspected when
   available.
