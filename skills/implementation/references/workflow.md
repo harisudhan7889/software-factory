@@ -69,6 +69,9 @@ Before creating the implementation plan:
 4. Identify the screens, states, components, responsive behavior,
    interactions, accessibility requirements, and design-system usage relevant
    to the current Story.
+4a. Scan the full referenced section(s) for caveats labeled `Edge case:`,
+    `Exception:`, or `Note:` that qualify the states/interactions
+    identified in step 4, and reconcile them before finalizing the plan.
 5. Use these artifacts when creating the implementation plan.
 
 If no design-tool functions are loaded in the current session, check the

@@ -105,6 +105,10 @@ When the refinement concerns UI work:
 3. Identify the applicable design artifact.
 4. Identify the canonical external design reference when available.
 5. Use only approved design references.
+6. Before finalizing acceptance criteria drawn from a design artifact,
+   scan the full referenced section for explicit caveats (e.g.
+   `Edge case:`, `Exception:`, `Note:`) that qualify the primary rule,
+   and reflect them in the AC rather than only the first-stated rule.
 
 For a UI issue, the refined description may include:
 
