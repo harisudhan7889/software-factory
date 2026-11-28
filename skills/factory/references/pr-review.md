@@ -74,8 +74,9 @@ receives **A pre-seeded** and runs **B**.
 
 5. **Assemble the context bundle** for Part B: the target metadata, the
    diff, the changed-file list, the risk band + signals, the worktree
-   path, and (if `myLastReviewOid` is set) the incremental commit range
-   `myLastReviewOid..HEAD`.
+   path, the `active` standing rules from the project's
+   `.factory/memory.md` (if it exists), and (if `myLastReviewOid` is set)
+   the incremental commit range `myLastReviewOid..HEAD`.
 
 ---
 
@@ -103,6 +104,10 @@ receives **A pre-seeded** and runs **B**.
      given.
    - Cited policy rules are **binding** review criteria; a residual
      violation is at least a 🟠 high finding.
+   - The `active` rows under `## Standing rules` in the project's
+     `.factory/memory.md` (when the file exists) are binding the same way.
+     Cite the row ID (for example `SR-003`) as the rule. The worker agent
+     has no terminal, so Part A includes those rows in the context bundle.
 
 7. **Normalise findings** into the two-axis issue model (see below),
    dropping duplicates, then apply the out-of-scope check

@@ -40,7 +40,9 @@ The first version does not include:
 
 - Automatic merging.
 - Automatic approval.
-- Automatic review-comment resolution.
+- Automatic review-comment resolution. (`/factory pr address-comments`
+  handles review comments, but only with the user's approval of each
+  action. See `references/address-comments.md`.)
 - Automatic branch deletion.
 - Automatic force-push.
 - Automatic merge-conflict resolution.
@@ -711,7 +713,8 @@ Later versions may support:
 - Draft Pull Requests.
 - Automatic merge after explicit approval.
 - Branch cleanup.
-- Review-comment assistance.
+- Review-comment assistance. (Added as `/factory pr address-comments`,
+  RFC-0006.)
 - Required-review detection.
 - CI retry actions.
 - Jira transition based on Pull Request and CI state.

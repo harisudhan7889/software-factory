@@ -44,6 +44,10 @@ Identify and read:
 - Relevant ADRs
 - Existing implementation references
 - Project-level development instructions
+- The `active` rows under `## Standing rules` in the project's
+  `.factory/memory.md`, when the file exists. They are rules reviewers
+  stated in earlier Pull Requests. Follow them. They never override an
+  approved RFC, ADR, or policy (see `../../self-improvement/references/standard.md`).
 
 The RFC describes the intended product and system design.
 

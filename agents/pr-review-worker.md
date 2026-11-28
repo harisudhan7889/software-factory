@@ -25,6 +25,7 @@ You receive a pre-seeded context bundle (Part A's output, from
 - The diff and changed-file list.
 - The risk band and `SIGNAL_*` flags.
 - The worktree path.
+- The project's `active` standing rules, when it has any.
 - The incremental commit range (`myLastReviewOid..HEAD`), if
   applicable.
 

@@ -21,3 +21,9 @@ goes in the git-tracked location this skill standard defines:
 project's own `.factory/memory.md` for project-specific ones. Do not
 skip this because a private memory write already happened to capture
 the same note — the private note does not count as having recorded it.
+
+Standing rules that a person states in a Pull Request review are
+also memory. They are recorded in the current project's
+`.factory/memory.md` under `## Standing rules`, never only in a
+private memory tool, and only with the user's approval. See "Memory —
+standing rules" in `references/standard.md`.

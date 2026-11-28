@@ -245,12 +245,19 @@ Proceed?
 
 If `.factory/memory.md` does not already exist, create it empty (header
 only, no entries) alongside `.factory/project.yml`. It holds this
-project's own self-improvement memory — classification #1
-(informational observation) and #3 (project-specific issue) findings
-from `../self-improvement/references/standard.md` — and is never
-promoted to the shared factory memory without going through that
-standard's promotion step. Never write a secret into it
-(`SEC-SECRET-001`).
+project's own memory, in two parts defined by
+`../self-improvement/references/standard.md`:
+
+- Self-improvement findings — classification #1 (informational
+  observation) and #3 (project-specific issue). They are never promoted
+  to the shared factory memory without going through that standard's
+  promotion step.
+- Standing rules — project rules that reviewers state in Pull
+  Request review, recorded by `/factory pr address-comments` under a
+  `## Standing rules` section. Do not create that section here. It
+  is added when the first rule is recorded.
+
+Never write a secret into it (`SEC-SECRET-001`).
 
 ## Phase 6a — Provision Jira post-merge sync
 

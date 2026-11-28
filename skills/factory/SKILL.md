@@ -16,6 +16,7 @@ delivery, and continuous improvement.
 - `/factory pr resolve-conflicts` — diagnose and resolve Git merge conflicts for the current Pull Request or implementation branch.
 - `/factory pr fix-build` — diagnose and resolve failed GitHub Actions builds for the current Pull Request.
 - `/factory pr review <PR#|branch>` — produce a local, read-only review report for a single Pull Request. For several PRs in one request, dispatch the `pr-review-orchestrator` agent instead.
+- `/factory pr address-comments [<PR#>]` — triage the unresolved review comments on a Pull Request with the user, implement the approved fixes, answer the reviewers, and record reviewer-stated standing rules in project memory.
 
 ## Scope
 
@@ -41,7 +42,7 @@ Jira tickets, and source code.
 
 Use when:
 - Inspecting, provisioning, or changing the factory itself (architecture, capabilities, global skills/workflows)
-- Running `/factory provision`, `/factory provision-jira`, `/factory pr open`, `pr resolve-conflicts`, or `pr fix-build`
+- Running `/factory provision`, `/factory provision-jira`, `/factory pr open`, `pr resolve-conflicts`, `pr fix-build`, or `pr address-comments`
 - Planning capability improvements or self-improvement evaluations
 
 Do not use when:
@@ -178,6 +179,7 @@ Read `references/github-pr.md` when the user invokes `/factory pr open`.
 Read `references/conflict-resolution.md` when the user invokes `/factory pr resolve-conflicts`.
 Read `references/pipeline-debug.md` when the user invokes `/factory pr fix-build`.
 Read `references/pr-review.md` when the user invokes `/factory pr review`.
+Read `references/address-comments.md` when the user invokes `/factory pr address-comments`.
 
 The GitHub PR reference defines the branch, push, Pull Request, CI,
 Jira synchronization, approval, idempotency, and self-improvement rules.
@@ -186,6 +188,12 @@ The PR review reference defines the local, read-only review procedure
 (context acquisition, then review-and-render), the R1 report template,
 and when to dispatch the `pr-review-orchestrator` agent for several PRs
 at once (RFC-0004). It never posts to GitHub, commits, or merges.
+
+The address-comments reference defines how to work through a Pull
+Request's unresolved review comments (RFC-0006): fetch, two-reviewer
+investigation, user triage, approved fixes, approved replies, and
+standing-rules memory. Every reply, resolve, ticket, and memory write
+needs the user's approval first.
 
 ## Policies
 
@@ -209,8 +217,9 @@ documents.
 Factory self-improvement memory — known limitations and rejected
 proposals that didn't result in an immediate change — is stored under
 `/factory/docs/self-improvement/`. A project's own, project-scoped
-memory lives in that project's `.factory/memory.md`. See the `## Memory`
-sections of `../self-improvement/references/standard.md` for when each
-gets read and written.
+memory lives in that project's `.factory/memory.md`, together with its
+standing rules (rules that reviewers state in Pull Request review). See
+the `## Memory` sections of `../self-improvement/references/standard.md`
+for when each gets read and written.
 
 Do not duplicate the RFC or ADR skill inside the factory skill.

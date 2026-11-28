@@ -21,6 +21,10 @@ accepted replacement) rather than deleting the entry.
 
 Statuses: `rejected` · `superseded`.
 
+This file is shared by every project. An entry MUST NOT contain project
+names, repository names, Jira keys, customer data, or project code. See
+"No project specifics in factory memory" in the standard.
+
 ---
 
 No entries yet.

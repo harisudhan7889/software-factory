@@ -185,10 +185,12 @@ Use when you run:
 - `/factory pr open` — Create a PR for finished work.
 - `/factory pr resolve-conflicts` — Resolve merge conflicts.
 - `/factory pr fix-build` — Diagnose a failed CI build.
+- `/factory pr review <PR#|branch>` — Write a local, read-only review report.
+- `/factory pr address-comments [<PR#>]` — Work through unresolved review comments with you. Fix, reply, and record reviewer-stated rules in project memory.
 
 Do not use for product code. Use project skills for product code.
 
-Key files: `skills/factory/references/github-provisioning.md`, `github-pr.md`, `conflict-resolution.md`, `pipeline-debug.md`, `architecture.md`.
+Key files: `skills/factory/references/github-provisioning.md`, `github-pr.md`, `conflict-resolution.md`, `pipeline-debug.md`, `pr-review.md`, `address-comments.md`, `architecture.md`.
 
 ### 2. `rfc` — Design a feature
 
@@ -378,6 +380,8 @@ Purpose: Shared rule for all factory learning.
 Location: `skills/self-improvement/references/standard.md`.
 
 Propose a factory change only with real evidence: repeated failure, workaround, user correction, missing control, or repeated manual work. Most runs need no proposal. Each proposal must include finding, root cause, evidence, file path, current behavior, proposed update, and expected benefit. Human approval is required.
+
+It also defines the factory's git-tracked memory: `factory/docs/self-improvement/` for factory-wide findings, and each project's `.factory/memory.md` for project findings and **standing rules** (rules that reviewers state in Pull Request review, as `SR-NNN` rows with `active` / `superseded` / `promoted` status).
 
 ### 22. `stitch-handoff` — Prepare a Stitch design for implementation
 
@@ -586,7 +590,11 @@ The agent validates the branch, pushes safely (no force-push), checks for existi
 
 Approval: approve title and description before create.
 
-After create, the agent checks CI separately from PR state. If CI fails, run `/factory pr fix-build`. If conflicts appear, run `/factory pr resolve-conflicts`.
+After create, the agent checks CI separately from PR state. If CI fails, run `/factory pr fix-build`. If conflicts appear, run `/factory pr resolve-conflicts`. If reviewers leave comments, run `/factory pr address-comments`.
+
+`/factory pr address-comments` fetches the unresolved threads (and Copilot's hidden low-confidence findings). Two read-only reviewers test each comment, one to verify it and one to challenge it. You choose `Implement`, `Add to backlog`, `Respond only`, or `Skip` for each. The agent then fixes, runs checks, commits, and pushes. You approve the exact reply text before anything is posted. A thread is resolved only after its fix is pushed.
+
+If a reviewer states a rule the team should always follow, the agent proposes it as a standing rule. You approve the exact wording. It is saved in `.factory/memory.md` under `## Standing rules`, and later `/implementation work`, `/factory pr review`, and `address-comments` runs follow it.
 
 On merge, the GitHub Action comments on Jira and moves it to Done. The agent also moves the Story to `In Review` at PR time.
 

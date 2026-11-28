@@ -14,6 +14,10 @@ entry, so the history of what was wrong and when it was fixed survives.
 
 Statuses: `open` · `resolved` · `wontfix`.
 
+This file is shared by every project. An entry MUST NOT contain project
+names, repository names, Jira keys, customer data, or project code. See
+"No project specifics in factory memory" in the standard.
+
 ---
 
 ## 2026-11-14 — rfc skill defaults to three platforms in a web-only factory
@@ -71,3 +75,33 @@ separate, larger change than that update.
 pointer to `../self-improvement/references/standard.md`, so a future
 change to the shared standard (like this memory mechanism) does not
 need to be copied into every reference file by hand.
+
+---
+
+## 2026-11-26 — Copilot "Suppressed comments" format is unverified
+
+**Status:** open
+
+**Finding:** `skills/factory/references/address-comments.md` (Phase 2)
+parses a `<details><summary>Suppressed comments (N)</summary>` block in
+Copilot's review summary, with `**<path>:<line>**` item headings. That
+format was assumed when the procedure was written and has not been
+matched to a real Pull Request.
+
+**Evidence:** A sampled Copilot review summary on a public Pull Request
+used a newer layout (an "open issues" list, no "Suppressed comments"
+text). A scan of 60 recent Pull Requests in one large open-source
+repository found no summary with the phrase. This shows the format can
+differ. It does not show the block never exists.
+
+**Affected artifact:** `skills/factory/references/address-comments.md`,
+`skills/factory/scripts/pr-threads-fetch.sh` (its `test("Suppressed
+comments")` filter).
+
+**Why not fixed now:** no real example was available to build against.
+The procedure tells the agent to show unmatched text to the user instead
+of guessing.
+
+**Expected fix (not yet proposed):** when a PR with a real suppressed
+block is found, record its exact shape here and tighten Phase 2 and the
+script filter to match.
