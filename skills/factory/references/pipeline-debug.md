@@ -414,6 +414,12 @@ debugging runs should behave differently.
 
 Do not propose cosmetic, hypothetical, or one-off changes.
 
+**Approval gate.** If a factory improvement is identified, present it in the
+proposal format from `../../self-improvement/references/standard.md`, then
+ask: "Factory improvements were identified. Apply these changes?" Change no
+factory file before explicit approval (`GR-APPROVAL-001`). After approval,
+follow that standard.
+
 ## Final report
 
 Report:

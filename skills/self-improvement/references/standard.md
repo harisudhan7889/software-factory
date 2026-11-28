@@ -108,6 +108,65 @@ Expected benefit:
 <how future runs improve>
 ```
 
+## Approval and applying an improvement
+
+This section is the single source for approval and apply steps. Workflow
+references point here and do not repeat it.
+
+**No improvement.** Report `Self-improvement: No factory change
+identified.` and finish the workflow normally.
+
+**Confidence.** The user should only need to approve or reject a proposal.
+Do not ask them to rewrite it. If the correct update cannot be determined
+confidently, state the uncertainty and ask for the missing decision. Do
+not guess.
+
+**Approval.** After presenting all proposals, ask: "Factory improvements
+were identified. Apply these changes?" Do not change any factory artifact
+before explicit approval.
+
+**Affected artifact path.** Use the exact repository-relative path of the
+artifact. If it is outside the current repository, use its configured
+path. If the artifact cannot be determined, change nothing and ask.
+
+**Apply.** After approval:
+
+1. Apply only the approved changes, to the exact approved paths.
+2. Do not modify any other file.
+3. Show the resulting diff for every updated artifact.
+4. Validate the updated artifacts where possible.
+5. Record which improvements were applied.
+6. Do not automatically rerun the workflow that found the improvement.
+
+**Accepted ADR.** Do not silently replace an accepted decision. Propose an
+amendment, ask for approval of the architectural change, update the ADR
+only after approval, keep the previous decision and history, and record the
+reason and evidence.
+
+**RFC.** Identify the affected section, propose the change, ask for
+approval, update the RFC only after approval, and show the diff.
+
+**Completion report.** After approved updates are applied:
+
+```text
+Self-improvement
+
+Findings:
+<list>
+
+Approved updates:
+<list>
+
+Updated artifacts:
+<list>
+
+Validation:
+<results>
+```
+
+If the user declines, do not modify the factory. Report the findings as
+observations and finish the workflow normally.
+
 ## Memory — what gets recorded, and where
 
 An applied `Factory improvement` does not get a memory entry: the

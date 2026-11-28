@@ -426,7 +426,7 @@ Do not duplicate Stripe implementation guidance here. `stripe-best-practices` ow
 
 ## Phase 14 — Self-improvement
 
-Follow the common self-improvement standard in `../self-improvement/references/standard.md`.
+Follow the common self-improvement standard in `../../self-improvement/references/standard.md`.
 
 Review the refinement run for:
 

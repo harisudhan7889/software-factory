@@ -246,7 +246,7 @@ Proceed?
 If `.factory/memory.md` does not already exist, create it empty (header
 only, no entries) alongside `.factory/project.yml`. It holds this
 project's own memory, in two parts defined by
-`../self-improvement/references/standard.md`:
+`../../self-improvement/references/standard.md`:
 
 - Self-improvement findings — classification #1 (informational
   observation) and #3 (project-specific issue). They are never promoted
@@ -310,220 +310,31 @@ provisioning.
 
 ## Phase 7 - Self-Improvement Review
 
-Before completing the provisioning workflow, review the execution for
-factory-level improvements.
+Before completing the provisioning workflow, check the run for the items
+below. If none applies, report `Self-improvement: No factory change
+identified.` and stop. Do not open the standard in that case.
+
+If one applies, read `../../self-improvement/references/standard.md`. It owns
+classification, the proposal format, approval, and applying an approved
+change.
 
 Look specifically for:
 
-- API or permission failures
-- Workarounds that were required
-- User corrections or rejected actions
-- Missing permissions or configuration
-- Repeated manual steps
-- Incorrect assumptions in the RFC, ADR, skill, or reference
-- Safety or reporting issues
-- Reusable improvements discovered during the run
-
-### Classify observations
-
-For each significant observation, classify it as:
-
-1. Informational observation
-2. Known limitation
-3. Project-specific issue
-4. Factory improvement
-
-Do not treat every error or observation as a factory improvement.
-
-### No factory improvement
-
-If no factory-level improvement is identified, report:
-
-```text
-Self-improvement: No factory change identified.
-```
-
-Then complete the workflow normally.
-
-### Factory improvement identified
-
-For every factory improvement, create a concrete improvement proposal.
-
-The proposal must contain:
-
-- Finding
-- Root cause
-- Evidence
-- Affected artifact
-- Current behavior
-- Proposed update
-- Expected benefit
-
-Possible affected artifacts include:
-
-- Factory RFC
-- Factory ADR
-- Factory skill
-- Factory reference
-- Factory script
-- Factory documentation
-
-### Improvement proposal
-
-Present each improvement using this format:
-
-```text
-Factory Improvement Proposal
-
-Finding:
-<what happened>
-
-Root cause:
-<why it happened>
-
-Evidence:
-<evidence from the current run>
-
-Affected artifact:
-<file>
-
-Current behavior:
-<what the artifact currently says or does>
-
-Proposed update:
-<exact change to make>
-
-Expected benefit:
-<how future runs improve>
-```
-
-The placeholders above are a template for the factory. They must be
-replaced with the actual finding and proposed change during a real
-provisioning run.
-
-### AI responsibility for improvement proposals
-
-The factory is responsible for formulating a complete and technically
-appropriate proposed update.
-
-The user should only need to approve or reject the proposal. Do not require
-the user to rewrite the proposal or specify how the affected artifact should
-be changed unless the factory cannot safely determine the correct update.
-
-If the correct update cannot be determined confidently, identify the
-uncertainty explicitly and ask the user for the missing decision instead of
-guessing.
-
-### Approval
-
-After presenting all proposed improvements, ask:
-
-```text
-Factory improvements were identified.
-
-Apply these changes?
-```
-
-Do not modify any factory artifact before explicit user approval.
-
-### Apply approved improvements
-
-If the user approves:
-
-1. Apply only the approved changes.
-2. Update the exact approved artifact path(s).
-3. Do not modify any other files.
-3. If an accepted ADR or RFC requires modification, preserve its history
-   and explicitly record the amendment/change rather than silently
-   replacing the original decision.
-4. Show the resulting diff for every updated artifact.
-5. Validate the updated artifact(s).
-6. Record which improvements were applied.
-7. Do not automatically rerun the provisioning workflow.
-
-### Accepted ADR changes
-
-If the improvement changes an Accepted ADR:
-
-1. Do not silently replace the accepted decision.
-2. Propose an amendment or updated decision.
-3. Ask for explicit approval of the architectural change.
-4. Update the ADR only after approval.
-5. Preserve the previous decision/history.
-6. Record the reason for the change and the evidence that caused it.
-7. Show the resulting ADR diff.
-
-### RFC changes
-
-If an approved improvement changes an RFC:
-
-1. Do not silently rewrite the RFC.
-2. Identify the relevant RFC section.
-3. Propose the change.
-4. Ask for explicit approval.
-5. Update the RFC only after approval.
-6. Show the resulting diff.
-
-### Skill, reference, or script changes
-
-If an approved improvement affects a factory skill, reference, or script:
-
-1. Apply only the approved change.
-2. Show the diff.
-3. Validate the updated artifact where possible.
-4. Record the change.
-5. Do not automatically rerun provisioning.
-
-### Affected artifact path
-
-The improvement proposal must identify the exact file path to update.
-
-Use the repository-relative path when the artifact belongs to the current
-project or factory repository.
-
-Examples:
-
-- `docs/adr/0001-github-authentication/overview.md`
-- `references/github-provisioning.md`
-- `SKILL.md`
-- `scripts/github-create.sh`
-
-If the artifact is outside the current repository, identify its exact
-configured path and do not guess.
-
-If the correct artifact cannot be determined, do not modify anything.
-Ask the user to clarify the target.
-
-### Affected artifact path
-
-- RFC: `/factory/docs/rfc/0001-github-repository-provisioning/overview.md`
-- ADR: `/factory/docs/adr/0001-github-authentication/overview.md`
-
-### Self-improvement completion
-
-After approved updates are applied, report:
-
-```text
-Self-improvement
-
-Findings:
-<list>
-
-Approved updates:
-<list>
-
-Updated artifacts:
-<list>
-
-Validation:
-<results>
-```
-
-If the user declines the proposed improvements:
-
-- Do not modify the factory.
-- Report the findings as observations.
-- Continue or finish the current provisioning workflow normally.
+- API or permission failures.
+- Workarounds that were required.
+- User corrections or rejected actions.
+- Missing permissions or configuration.
+- Repeated manual steps.
+- Incorrect assumptions in the RFC, ADR, skill, or reference.
+- Safety or reporting issues.
+
+**Approval gate.** If a factory improvement is identified, present it in the
+proposal format from `../../self-improvement/references/standard.md`, then
+ask: "Factory improvements were identified. Apply these changes?" Change no
+factory file before explicit approval (`GR-APPROVAL-001`). After approval,
+follow that standard.
+
+Do not automatically rerun provisioning after an approved change.
 
 ## Final result
 

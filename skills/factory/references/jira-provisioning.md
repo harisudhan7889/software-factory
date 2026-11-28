@@ -329,7 +329,8 @@ After a provisioning run, review it for factory-level improvements
 following the same procedure as GitHub provisioning
 (`references/github-provisioning.md`, "Phase 7 — Self-Improvement
 Review") and the common standard in
-`../self-improvement/references/standard.md`. In particular, watch for:
+`../../self-improvement/references/standard.md`. The approval gate below
+applies. In particular, watch for:
 
 - The default project template still failing on some sites even with the
   current two-candidate fallback (team-managed `gh-simplified-agility`,
@@ -342,3 +343,9 @@ Review") and the common standard in
 - Any workaround needed to authenticate non-interactively, mirroring the
   GitHub "Execution environments" issue recorded in ADR-0001's Amendment
   1.
+
+**Approval gate.** If a factory improvement is identified, present it in the
+proposal format from `../../self-improvement/references/standard.md`, then
+ask: "Factory improvements were identified. Apply these changes?" Change no
+factory file before explicit approval (`GR-APPROVAL-001`). After approval,
+follow that standard.

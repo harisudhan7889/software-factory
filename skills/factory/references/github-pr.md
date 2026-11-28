@@ -60,23 +60,28 @@ The workflow operates on the current project/repository.
 
 ## Phase 1 — Inspect local project
 
-Before changing local Git or GitHub state:
+Before changing local Git or GitHub state, run:
 
-1. Determine whether the current directory is a Git repository.
-2. Determine the current branch.
-3. Determine the current HEAD commit.
-4. Inspect the working tree.
-5. Inspect configured remotes.
-6. Determine the expected GitHub repository.
-7. Determine the Jira issue(s) associated with the implementation when
+```bash
+bash ../scripts/repo-state.sh --fetch
+```
+
+It reports, in one call: whether this is a Git repository, the current
+branch and HEAD, the default branch, the remotes (credentials masked), the
+GitHub repository, ahead/behind against upstream, the working-tree status,
+whether `.factory/project.yml` exists, and any Pull Request for the branch.
+
+1. Confirm `GITHUB_REPO` is the expected GitHub repository.
+2. Determine the Jira issue(s) associated with the implementation when
    available. A Pull Request delivering a single Jira Story has one; a
    Pull Request delivering an RFC's bundled tickets (`rfc build`
    default mode, one RFC branch and one final PR) has many — read the
    full set from the RFC's Work breakdown table or the ticket
    inventory `rfc build` Phase 2 assembled, not just the first key
    found in a branch name or commit message.
-8. Detect whether a relevant Pull Request already exists.
-9. Read `.factory/project.yml` when present.
+3. Note any Pull Request the script found for the branch (`PR_NUMBER`).
+   Phase 6 completes the search.
+4. Read `.factory/project.yml` when `FACTORY_PROJECT=present`.
 
 Do not modify anything during inspection.
 
@@ -518,7 +523,7 @@ If Jira synchronization fails:
 ## Phase 12b — Transition Jira to review status
 
 After the Pull Request comment is posted, repeat the following for
-**every** Jira issue identified in Phase 1 step 7 — one issue for a
+**every** Jira issue identified in Phase 1 step 2 — one issue for a
 single-Story PR, or the full bundled set for an RFC's one-PR delivery:
 
 1. Read that issue's available transitions.
@@ -725,8 +730,13 @@ These capabilities are outside the first version.
 
 ## Self-Improvement Review
 
-Before completing the workflow, review the execution for factory-level
-improvements.
+Before completing the workflow, check the run for the items below. If none
+applies, report `Self-improvement: No factory change identified.` and stop.
+Do not open the standard in that case.
+
+If one applies, read `../../self-improvement/references/standard.md`. It owns
+classification, the proposal format, approval, and applying an approved
+change.
 
 Look specifically for:
 
@@ -734,163 +744,17 @@ Look specifically for:
 - Workarounds that were required.
 - User corrections or rejected actions.
 - Missing permissions or configuration.
-- Incorrect assumptions in RFC, ADR, skill, or reference.
+- Incorrect assumptions in an RFC, ADR, skill, or reference.
 - Safety or reporting issues.
 - Repeated manual steps.
-- Reusable improvements discovered during the run.
 
-### Classify observations
+**Approval gate.** If a factory improvement is identified, present it in the
+proposal format from `../../self-improvement/references/standard.md`, then
+ask: "Factory improvements were identified. Apply these changes?" Change no
+factory file before explicit approval (`GR-APPROVAL-001`). After approval,
+follow that standard.
 
-For each significant observation, classify it as:
-
-1. Informational observation
-2. Known limitation
-3. Project-specific issue
-4. Factory improvement
-
-Do not treat every error as a factory improvement.
-
-### No factory improvement
-
-If no factory-level improvement is identified, report:
-
-```text
-Self-improvement: No factory change identified.
-```
-
-### Factory improvement identified
-
-For each genuine factory improvement, create a proposal containing:
-
-- Finding
-- Root cause
-- Evidence
-- Exact affected artifact path
-- Current behavior
-- Proposed update
-- Expected benefit
-
-Use:
-
-```text
-Factory Improvement Proposal
-
-Finding:
-<what happened>
-
-Root cause:
-<why it happened>
-
-Evidence:
-<evidence from the current run>
-
-Affected artifact:
-<exact file path>
-
-Current behavior:
-<what the artifact currently says or does>
-
-Proposed update:
-<exact change to make>
-
-Expected benefit:
-<how future runs improve>
-```
-
-The factory is responsible for formulating a complete and technically
-appropriate proposed update.
-
-The user should only need to approve or reject the proposal. Do not require
-the user to rewrite the proposal or specify how the affected artifact should
-be changed unless the factory cannot safely determine the correct update.
-
-If the correct update cannot be determined confidently, identify the
-uncertainty explicitly and ask the user for the missing decision instead of
-guessing.
-
-### Approval
-
-After presenting all proposed factory improvements, ask:
-
-```text
-Factory improvements were identified.
-
-Apply these changes?
-```
-
-Do not modify factory artifacts before explicit user approval.
-
-### Apply approved improvements
-
-If approved:
-
-1. Apply only the approved changes.
-2. Update the exact approved artifact path(s).
-3. Do not modify unrelated files.
-4. If an accepted ADR or RFC changes, preserve its history and explicitly
-   record the amendment.
-5. Show the resulting diff.
-6. Validate the updated artifact(s).
-7. Record which improvements were applied.
-8. Do not automatically rerun `/factory pr`.
-
-### Accepted ADR changes
-
-If an approved improvement changes an Accepted ADR:
-
-1. Do not silently replace the accepted decision.
-2. Propose the amendment explicitly.
-3. Ask for approval of the architectural change.
-4. Update the ADR only after approval.
-5. Preserve the previous decision/history.
-6. Record the reason and evidence.
-7. Show the ADR diff.
-
-### RFC changes
-
-If an approved improvement changes an RFC:
-
-1. Identify the affected section.
-2. Propose the change.
-3. Ask for approval.
-4. Update the RFC only after approval.
-5. Show the resulting diff.
-
-### Skill, reference, or script changes
-
-If an approved improvement changes a factory skill, reference, or script:
-
-1. Apply only the approved change.
-2. Show the diff.
-3. Validate the updated artifact where possible.
-4. Record the change.
-5. Do not automatically rerun `/factory pr`.
-
-### Self-improvement completion
-
-After approved updates are applied, report:
-
-```text
-Self-improvement
-
-Findings:
-<list>
-
-Approved updates:
-<list>
-
-Updated artifacts:
-<list>
-
-Validation:
-<results>
-```
-
-If the user declines the proposed improvements:
-
-- Do not modify the factory.
-- Report the findings as observations.
-- Complete the current PR workflow normally.
+Do not automatically rerun `/factory pr` after an approved change.
 
 ## Final result
 

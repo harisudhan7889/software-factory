@@ -48,17 +48,22 @@ Pull Request when one exists.
 
 ## Phase 1 — Inspect repository and Pull Request state
 
-Before changing anything:
+Before changing anything, run:
 
-1. Determine whether the current directory is a Git repository.
-2. Determine the current branch.
-3. Determine the current HEAD commit.
-4. Inspect the working tree.
-5. Inspect configured remotes.
-6. Identify the relevant Pull Request when available.
-7. Identify the Pull Request source and target branches.
-8. Determine whether the branch is behind, diverged, or has merge conflicts.
-9. Identify the commit or branch relationship causing the conflict.
+```bash
+bash ../scripts/repo-state.sh --fetch
+```
+
+It reports the repository, branch, HEAD, remotes (credentials masked),
+upstream ahead/behind, working-tree status, and the Pull Request for the
+branch (`PR_NUMBER`, `PR_BASE`, `PR_HEAD_REF`, `PR_MERGEABLE`). From that
+output:
+
+1. Identify the relevant Pull Request, its source branch, and its target
+   branch.
+2. Determine whether the branch is behind (`BEHIND`), diverged, or has
+   merge conflicts (`PR_MERGEABLE`).
+3. Identify the commit or branch relationship causing the conflict.
 
 Do not modify files during inspection.
 
@@ -434,9 +439,11 @@ resolution runs should behave differently.
 
 Do not propose cosmetic, hypothetical, or one-off changes.
 
-When a genuine factory improvement is identified, follow the common
-self-improvement standard and obtain explicit approval before modifying
-factory artifacts.
+**Approval gate.** If a factory improvement is identified, present it in the
+proposal format from `../../self-improvement/references/standard.md`, then
+ask: "Factory improvements were identified. Apply these changes?" Change no
+factory file before explicit approval (`GR-APPROVAL-001`). After approval,
+follow that standard.
 
 ## Final report
 

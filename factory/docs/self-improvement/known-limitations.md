@@ -49,7 +49,9 @@ scaffolding on an explicit request rather than assuming all three.
 
 ## 2026-11-14 — Self-improvement logic duplicated instead of shared
 
-**Status:** open
+**Status:** resolved — the approval and apply steps now live once in
+`skills/self-improvement/references/standard.md` ("Approval and applying
+an improvement"). `github-pr.md` and `github-provisioning.md` point to it.
 
 **Finding:** `skills/factory/references/github-pr.md` and
 `skills/factory/references/github-provisioning.md` each carry a full
